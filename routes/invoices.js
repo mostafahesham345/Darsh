@@ -204,7 +204,7 @@ async function sendInvoiceEmail(invoice) {
   }).join('');
 
   const bodyHtml = `
-    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 8px;color:#0a1f44;">New invoice from ${escapeHtml(process.env.BUSINESS_NAME || 'Darsh Tech')}</h1>
+    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:24px;margin:0 0 8px;color:#0a1f44;">New invoice from ${escapeHtml(process.env.BUSINESS_NAME || 'Darsh')}</h1>
     <p style="color:#6b7280;margin:0 0 24px;">Hi ${escapeHtml(invoice.clientName || 'there')}, thank you for working with us. Please find your invoice details below — a PDF copy is attached.</p>
 
     <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background:#f6f7fb;border-radius:12px;padding:18px;margin-bottom:24px;">
@@ -244,8 +244,8 @@ async function sendInvoiceEmail(invoice) {
   const pdf = await generateInvoicePdf(invoice);
   await sendMail({
     to: invoice.clientEmail,
-    subject: `Invoice ${invoice.invoiceNumber} from ${process.env.BUSINESS_NAME || 'Darsh Tech'}`,
-    html: emailShell({ title: `Invoice ${invoice.invoiceNumber}`, preheader: `Invoice for ${money(total, currency)} from ${process.env.BUSINESS_NAME || 'Darsh Tech'}`, bodyHtml }),
+    subject: `Invoice ${invoice.invoiceNumber} from ${process.env.BUSINESS_NAME || 'Darsh'}`,
+    html: emailShell({ title: `Invoice ${invoice.invoiceNumber}`, preheader: `Invoice for ${money(total, currency)} from ${process.env.BUSINESS_NAME || 'Darsh'}`, bodyHtml }),
     attachments: [{ filename: `Invoice_${invoice.invoiceNumber}.pdf`, content: pdf }],
   });
 }

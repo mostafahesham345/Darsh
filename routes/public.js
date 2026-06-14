@@ -72,7 +72,9 @@ router.get('/', async (req, res, next) => {
     // Don't count bots, crawlers, link-preview fetchers, scanners, or uptime checks.
     const ua = (req.get('user-agent') || '').toLowerCase();
     const isBot = !ua || /bot|crawl|spider|slurp|facebookexternalhit|facebot|embedly|quora|pinterest|slackbot|whatsapp|telegram|discord|twitter|linkedin|preview|monitor|uptime|headless|lighthouse|pingdom|gtmetrix|ahrefs|semrush|dataprovider|curl|wget|python-requests|node-fetch|axios|go-http-client|render|scan|http-client|phantomjs|puppeteer/i.test(ua);
-    if (!isLocal && !isBot) trackVisit(isNewVisitor).catch(() => {});
+    // Real browsers send these; most bots/preview-fetchers don't.
+    const looksHuman = (req.get('accept') || '').includes('text/html') && Boolean(req.get('accept-language'));
+    if (!isLocal && !isBot && looksHuman) trackVisit(isNewVisitor).catch(() => {});
   } catch (err) {
     next(err);
   }

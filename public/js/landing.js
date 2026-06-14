@@ -261,6 +261,49 @@
     });
   }
 
+  /* ----- Reviews carousel ----- */
+  document.querySelectorAll('[data-reviews-carousel]').forEach((root) => {
+    const track = root.querySelector('.rc-track');
+    const slides = root.querySelectorAll('.rc-slide');
+    const dots = Array.from(root.querySelectorAll('.rc-dot'));
+    const prevBtn = root.querySelector('.rc-prev');
+    const nextBtn = root.querySelector('.rc-next');
+    const n = slides.length;
+    if (n <= 1) { root.classList.add('single'); return; }
+
+    let idx = 0;
+    let timer = null;
+    const go = (to) => {
+      idx = (to + n) % n;
+      track.style.transform = `translateX(-${idx * 100}%)`;
+      dots.forEach((d, di) => d.classList.toggle('on', di === idx));
+    };
+    const stop = () => { if (timer) { clearInterval(timer); timer = null; } };
+    const start = () => {
+      if (prefersReduced) return;
+      stop();
+      timer = setInterval(() => go(idx + 1), 6000);
+    };
+
+    prevBtn && prevBtn.addEventListener('click', () => { go(idx - 1); start(); });
+    nextBtn && nextBtn.addEventListener('click', () => { go(idx + 1); start(); });
+    dots.forEach((d) => d.addEventListener('click', () => { go(Number(d.dataset.i)); start(); }));
+    root.addEventListener('mouseenter', stop);
+    root.addEventListener('mouseleave', start);
+
+    // Touch swipe
+    let sx = 0;
+    root.addEventListener('touchstart', (e) => { sx = e.touches[0].clientX; stop(); }, { passive: true });
+    root.addEventListener('touchend', (e) => {
+      const dx = e.changedTouches[0].clientX - sx;
+      if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+      start();
+    }, { passive: true });
+
+    go(0);
+    start();
+  });
+
   /* ----- Subtle parallax on hero inner content ----- */
   const heroInner = document.querySelector('.hero-inner');
   if (heroInner && !prefersReduced) {

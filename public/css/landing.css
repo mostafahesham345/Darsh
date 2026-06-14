@@ -1354,9 +1354,30 @@ p  { margin: 0; }
 /* =============================================================================
    REVIEWS
    ============================================================================= */
-.reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-@media (max-width: 920px) { .reviews-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 640px) { .reviews-grid { grid-template-columns: 1fr; max-width: 480px; margin: 0 auto; } }
+/* Reviews carousel (one card at a time) */
+.reviews-carousel { position: relative; max-width: 720px; margin: 0 auto; }
+.rc-viewport { overflow: hidden; }
+.rc-track { display: flex; transition: transform 0.5s var(--easing); }
+.rc-slide { min-width: 100%; box-sizing: border-box; padding: 6px 4px; display: flex; }
+.rc-slide .review-card { width: 100%; text-align: center; align-items: center; }
+.rc-slide .review-text { font-size: 1.15rem; line-height: 1.6; }
+.rc-slide .review-author { align-items: center; }
+
+.rc-arrow {
+  position: absolute; top: 42%; transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff; display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; z-index: 2; transition: background 0.2s, border-color 0.2s;
+}
+.rc-arrow:hover { background: rgba(255, 255, 255, 0.2); border-color: rgba(255, 255, 255, 0.45); }
+.rc-prev { left: -10px; }
+.rc-next { right: -10px; }
+@media (max-width: 800px) { .rc-prev { left: 0; } .rc-next { right: 0; } }
+.rc-dots { display: flex; justify-content: center; gap: 8px; margin-top: 22px; }
+.rc-dot { width: 9px; height: 9px; border-radius: 50%; border: none; padding: 0; background: rgba(255, 255, 255, 0.3); cursor: pointer; transition: background 0.2s, transform 0.2s; }
+.rc-dot.on { background: var(--yellow); transform: scale(1.25); }
+.reviews-carousel.single .rc-arrow, .reviews-carousel.single .rc-dots { display: none; }
 
 .review-card {
   background: #ffffff;

@@ -317,19 +317,34 @@
         <h2 class="text-light">What our clients say</h2>
         <p class="lede lede-light">Real words from the businesses we've built for.</p>
       </div>
-      <div class="reviews-grid">
-        <% reviews.forEach(function(r) { %>
-          <article class="review-card reveal">
-            <div class="review-stars" aria-label="<%= r.rating %> out of 5">
-              <% for (var i = 1; i <= 5; i++) { %><span class="<%= i <= r.rating ? 'on' : '' %>">★</span><% } %>
-            </div>
-            <p class="review-text">“<%= r.text %>”</p>
-            <div class="review-author">
-              <strong><%= r.name %></strong>
-              <% if (r.role) { %><span><%= r.role %></span><% } %>
-            </div>
-          </article>
-        <% }); %>
+      <div class="reviews-carousel reveal" data-reviews-carousel>
+        <button type="button" class="rc-arrow rc-prev" aria-label="Previous review">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </button>
+        <div class="rc-viewport">
+          <div class="rc-track">
+            <% reviews.forEach(function(r) { %>
+              <div class="rc-slide">
+                <article class="review-card">
+                  <div class="review-stars" aria-label="<%= r.rating %> out of 5">
+                    <% for (var i = 1; i <= 5; i++) { %><span class="<%= i <= r.rating ? 'on' : '' %>">★</span><% } %>
+                  </div>
+                  <p class="review-text">“<%= r.text %>”</p>
+                  <div class="review-author">
+                    <strong><%= r.name %></strong>
+                    <% if (r.role) { %><span><%= r.role %></span><% } %>
+                  </div>
+                </article>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+        <button type="button" class="rc-arrow rc-next" aria-label="Next review">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+        </button>
+        <div class="rc-dots">
+          <% reviews.forEach(function(r, i) { %><button type="button" class="rc-dot<%= i === 0 ? ' on' : '' %>" data-i="<%= i %>" aria-label="Go to review <%= i + 1 %>"></button><% }); %>
+        </div>
       </div>
     </div>
   </section>
