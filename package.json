@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "node --env-file=.env server.js",
+    "start": "node --env-file-if-exists=.env server.js",
     "dev": "node --env-file=.env --watch server.js",
     "seed": "node --env-file=.env scripts/seed.js",
     "seed:force": "node --env-file=.env scripts/seed.js --force"
