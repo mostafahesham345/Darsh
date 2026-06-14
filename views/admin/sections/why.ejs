@@ -1,0 +1,68 @@
+<%- include('../_head', { pageTitle: 'Why Darsh' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:why', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>✨ Why Darsh</h1>
+      <p>The section with bullet points explaining why clients choose you.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/why" class="form-root">
+      <div class="form">
+        <h2>Section heading</h2>
+        <div class="field">
+          <label>Eyebrow</label>
+          <input type="text" name="fields[eyebrow]" value="<%= section.fields.eyebrow %>" />
+        </div>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" />
+        </div>
+        <div class="field">
+          <label>Description paragraph</label>
+          <textarea name="fields[lede]"><%= section.fields.lede %></textarea>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Bullet points</h2>
+        <p class="hint">Each bullet has a bold headline and a short description.</p>
+        <div class="repeater" data-repeater data-template="whyPoint">
+          <% (section.points || []).forEach(function(point, i) { %>
+            <div class="repeater-item">
+              <h4>Point #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+              <div class="field">
+                <label>Headline</label>
+                <input type="text" name="points[<%= i %>][title]" value="<%= point.title %>" />
+              </div>
+              <div class="field">
+                <label>Description</label>
+                <textarea name="points[<%= i %>][description]"><%= point.description %></textarea>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add bullet point</button>
+
+        <template data-tpl="whyPoint">
+          <div class="repeater-item">
+            <h4>Point #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="field"><label>Headline</label><input type="text" name="points[__I0__][title]" /></div>
+            <div class="field"><label>Description</label><textarea name="points[__I0__][description]"></textarea></div>
+          </div>
+        </template>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

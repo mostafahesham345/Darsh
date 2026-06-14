@@ -1,0 +1,55 @@
+<%- include('../_head', { pageTitle: 'Page title & SEO' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:meta', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>📝 Page title & SEO</h1>
+      <p>What people see in the browser tab and in Google search results.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/meta" class="form-root">
+      <div class="form">
+        <div class="field">
+          <label>Browser tab title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" required />
+          <div class="help">Shown in the browser tab and Google results.</div>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea name="fields[description]" required><%= section.fields.description %></textarea>
+          <div class="help">A short summary (1–2 sentences) shown in search engines.</div>
+        </div>
+        <div class="field">
+          <label>Year (for copyright)</label>
+          <input type="text" name="fields[year]" value="<%= section.fields.year %>" />
+          <div class="help">Shown in the footer.</div>
+        </div>
+
+        <div class="image-uploader" data-uploader data-key="favicon">
+          <label class="field-label">Favicon (little icon in browser tab)</label>
+          <div class="image-drop">
+            <div class="preview<%= !section.images.favicon.url ? ' empty' : '' %>" style="<%= section.images.favicon.url ? `background-image: url('${section.images.favicon.url}')` : '' %>">
+              <% if (!section.images.favicon.url) { %>No image<% } %>
+            </div>
+            <div class="actions">
+              <label class="pick">Choose image<input type="file" accept="image/*" /></label>
+              <button type="button" class="clear">Remove</button>
+              <small>PNG recommended. Max 8MB.</small>
+            </div>
+          </div>
+          <input type="hidden" name="images[favicon][url]" value="<%= section.images.favicon.url || '' %>" />
+          <input type="hidden" name="images[favicon][path]" value="<%= section.images.favicon.path || '' %>" />
+        </div>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

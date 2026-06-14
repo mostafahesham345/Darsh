@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Client Portal — Darsh</title>
+  <link rel="icon" type="image/png" href="/images/Logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/portal.css" />
+</head>
+<body>
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <img src="/images/Logo.png" alt="Darsh" class="auth-logo" />
+
+      <% if (sent) { %>
+        <div class="auth-sent">
+          <div class="icon">📬</div>
+          <h1>Check your email</h1>
+          <p class="sub">If that address belongs to a client, we've sent a secure sign-in link. It expires in 30 minutes.</p>
+          <p class="auth-note"><a href="/portal/login">← Use a different email</a></p>
+        </div>
+      <% } else { %>
+        <h1>Client Portal</h1>
+        <p class="sub">Enter your email and we'll send you a secure sign-in link — no password needed.</p>
+
+        <% if (error) { %><div class="auth-alert err"><%= error %></div><% } %>
+        <% if (!firebaseReady) { %><div class="auth-alert err">The portal is offline right now. Please contact us directly.</div><% } %>
+
+        <form method="post" action="/portal/login">
+          <div class="auth-field">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@company.com" autocomplete="email" required autofocus />
+          </div>
+          <button type="submit" class="auth-btn">Send sign-in link</button>
+        </form>
+
+        <p class="auth-note">Not a client yet? <a href="/#contact">Start a project →</a></p>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>

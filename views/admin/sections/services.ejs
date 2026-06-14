@@ -1,0 +1,93 @@
+<%- include('../_head', { pageTitle: 'Services' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:services', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>🛠️ Services</h1>
+      <p>The three cards under "What we do".</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/services" class="form-root">
+      <div class="form">
+        <h2>Section heading</h2>
+        <div class="field">
+          <label>Eyebrow (small label above the title)</label>
+          <input type="text" name="fields[eyebrow]" value="<%= section.fields.eyebrow %>" />
+        </div>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" />
+        </div>
+        <div class="field">
+          <label>Description paragraph</label>
+          <textarea name="fields[lede]"><%= section.fields.lede %></textarea>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Service cards</h2>
+        <p class="hint">Each card can be marked "featured" (darker background) with an optional tag like "Most booked".</p>
+        <div class="repeater" data-repeater data-template="serviceCard">
+          <% (section.cards || []).forEach(function(card, i) { %>
+            <div class="repeater-item">
+              <h4>Card #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+              <div class="field">
+                <label>Card title</label>
+                <input type="text" name="cards[<%= i %>][title]" value="<%= card.title %>" />
+              </div>
+              <div class="field">
+                <label>Card description</label>
+                <textarea name="cards[<%= i %>][description]"><%= card.description %></textarea>
+              </div>
+              <div class="field">
+                <label>Bullets (one per line)</label>
+                <textarea name="cards[<%= i %>][bulletsText]" rows="3"><%= (card.bullets || []).join('\n') %></textarea>
+              </div>
+              <div class="row-2">
+                <div class="field">
+                  <label>Tag (optional)</label>
+                  <input type="text" name="cards[<%= i %>][tag]" value="<%= card.tag || '' %>" />
+                  <div class="help">Shown on the card, e.g. "Most booked".</div>
+                </div>
+                <div class="field">
+                  <label>Featured?</label>
+                  <select name="cards[<%= i %>][featured]">
+                    <option value="false"<%= !card.featured ? ' selected' : '' %>>No</option>
+                    <option value="true"<%= card.featured ? ' selected' : '' %>>Yes (highlighted)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add card</button>
+
+        <template data-tpl="serviceCard">
+          <div class="repeater-item">
+            <h4>Card #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="field"><label>Card title</label><input type="text" name="cards[__I0__][title]" /></div>
+            <div class="field"><label>Card description</label><textarea name="cards[__I0__][description]"></textarea></div>
+            <div class="field"><label>Bullets (one per line)</label><textarea name="cards[__I0__][bulletsText]" rows="3"></textarea></div>
+            <div class="row-2">
+              <div class="field"><label>Tag (optional)</label><input type="text" name="cards[__I0__][tag]" /></div>
+              <div class="field"><label>Featured?</label>
+                <select name="cards[__I0__][featured]"><option value="false">No</option><option value="true">Yes (highlighted)</option></select>
+              </div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

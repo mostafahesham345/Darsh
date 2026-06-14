@@ -1,0 +1,54 @@
+<%- include('../_head', { pageTitle: mode === 'new' ? 'New client' : 'Edit client' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'clients', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1><%= mode === 'new' ? 'New client' : 'Edit client' %></h1>
+      <p><a href="/admin/clients" style="color:var(--muted);">← Back to clients</a></p>
+    </div>
+
+    <form method="post" action="<%= mode === 'new' ? '/admin/clients/new' : '/admin/clients/' + client.id + '/edit' %>" class="form">
+      <div class="row-2">
+        <div class="field">
+          <label for="name">Full name *</label>
+          <input id="name" name="name" type="text" value="<%= client.name || '' %>" required />
+        </div>
+        <div class="field">
+          <label for="company">Company</label>
+          <input id="company" name="company" type="text" value="<%= client.company || '' %>" />
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="email">Email *</label>
+          <input id="email" name="email" type="email" value="<%= client.email || '' %>" required />
+          <div class="help">This email receives invoices, receipts, and project updates.</div>
+        </div>
+        <div class="field">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="text" value="<%= client.phone || '' %>" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="address">Billing address</label>
+        <textarea id="address" name="address"><%= client.address || '' %></textarea>
+      </div>
+
+      <div class="field">
+        <label for="notes">Internal notes</label>
+        <textarea id="notes" name="notes" placeholder="Anything you want to remember about this client."><%= client.notes || '' %></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a href="/admin/clients" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-yellow"><%= mode === 'new' ? 'Create client' : 'Save changes' %></button>
+      </div>
+    </form>
+  </main>
+</div>
+</body>
+</html>

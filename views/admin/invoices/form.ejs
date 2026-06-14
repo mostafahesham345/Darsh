@@ -1,0 +1,150 @@
+<% const isEdit = typeof mode !== 'undefined' && mode === 'edit'; const inv = typeof invoice !== 'undefined' ? invoice : {}; %>
+<%- include('../_head', { pageTitle: isEdit ? 'Edit invoice' : 'New invoice' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'invoices', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1><%= isEdit ? 'Edit invoice' : 'New invoice' %></h1>
+      <p><a href="/admin/invoices" style="color:var(--muted);">← Back to invoices</a><% if (!isEdit) { %> · When you save, the invoice email is sent to the client automatically.<% } else { %> · Editing won't re-send the email — use "Resend" from the list for that.<% } %></p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn">Firebase not connected — saving is disabled.</div>
+    <% } %>
+
+    <form method="post" action="<%= isEdit ? '/admin/invoices/' + inv.id + '/edit' : '/admin/invoices/new' %>" class="form" id="invoiceForm">
+      <div class="row-2">
+        <div class="field">
+          <label for="invoiceNumber">Invoice number</label>
+          <input id="invoiceNumber" name="invoiceNumber" type="text" value="<%= isEdit ? (inv.invoiceNumber || '') : nextNum %>" />
+        </div>
+        <div class="field">
+          <label for="issueDate">Issue date</label>
+          <input id="issueDate" name="issueDate" type="text" value="<%= isEdit ? (inv.issueDate || '') : '' %>" placeholder="e.g. April 22, 2026" />
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="dueDate">Due date</label>
+          <input id="dueDate" name="dueDate" type="text" value="<%= isEdit ? (inv.dueDate || '') : '' %>" placeholder="e.g. May 6, 2026 — or 'Upon receipt'" />
+        </div>
+        <div class="field">
+          <label for="currency">Currency</label>
+          <input id="currency" name="currency" type="text" value="<%= isEdit ? (inv.currency || 'USD') : 'USD' %>" />
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px;">Client</h2>
+      <% if (clients.length) { %>
+        <div class="field">
+          <label for="clientId">Pick a client</label>
+          <select id="clientId" name="clientId">
+            <option value="">— Enter manually —</option>
+            <% clients.forEach(function(c) { %>
+              <option value="<%= c.id %>"
+                <%= isEdit && inv.clientId === c.id ? 'selected' : '' %>
+                data-name="<%= c.name || '' %>"
+                data-company="<%= c.company || '' %>"
+                data-email="<%= c.email || '' %>"
+                data-address="<%= (c.address || '').replace(/"/g, '&quot;') %>"><%= c.name %><%= c.company ? ' — ' + c.company : '' %></option>
+            <% }); %>
+          </select>
+          <div class="help">Selecting a client autofills the fields below. If you pick a client, those fields will take priority.</div>
+        </div>
+      <% } else { %>
+        <div class="alert alert-info" style="margin-bottom:16px;">No clients saved yet — <a href="/admin/clients/new">add one</a> first for easier autofill, or enter details manually below.</div>
+      <% } %>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="clientName">Client name *</label>
+          <input id="clientName" name="clientName" type="text" value="<%= isEdit ? (inv.clientName || '') : '' %>" required />
+        </div>
+        <div class="field">
+          <label for="clientCompany">Company</label>
+          <input id="clientCompany" name="clientCompany" type="text" value="<%= isEdit ? (inv.clientCompany || '') : '' %>" />
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="clientEmail">Client email *</label>
+          <input id="clientEmail" name="clientEmail" type="email" value="<%= isEdit ? (inv.clientEmail || '') : '' %>" required />
+          <div class="help">The invoice and receipt will be sent here.</div>
+        </div>
+        <div class="field">
+          <label for="clientAddress">Address</label>
+          <input id="clientAddress" name="clientAddress" type="text" value="<%= isEdit ? (inv.clientAddress || '') : '' %>" />
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px;">Line items</h2>
+      <div id="items"></div>
+      <button type="button" class="repeater-add" id="addItem">+ Add another item</button>
+
+      <div class="row-2" style="margin-top:18px;">
+        <div class="field">
+          <label for="taxRate">Tax rate (%)</label>
+          <input id="taxRate" name="taxRate" type="number" step="0.01" min="0" value="<%= isEdit ? (inv.taxRate || 0) : 0 %>" />
+        </div>
+        <div class="field">
+          <label for="discount">Discount amount</label>
+          <input id="discount" name="discount" type="number" step="0.01" min="0" value="<%= isEdit ? (inv.discount || 0) : 0 %>" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" placeholder="Thank-you message, payment instructions, reference info — anything that should appear on the invoice."><%= isEdit ? (inv.notes || '') : '' %></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a href="/admin/invoices" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-yellow"><%= isEdit ? 'Save changes' : 'Create & email invoice' %></button>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script>
+  const items = document.getElementById('items');
+  function addItem(desc = '', qty = 1, rate = '') {
+    const row = document.createElement('div');
+    row.className = 'repeater-item';
+    const safeDesc = String(desc).replace(/"/g, '&quot;');
+    row.innerHTML = `
+      <button type="button" class="remove-btn">Remove</button>
+      <div class="field"><label>Description</label><input type="text" name="itemDesc" value="${safeDesc}" required /></div>
+      <div class="row-2">
+        <div class="field"><label>Quantity</label><input type="number" name="itemQty" step="0.01" min="0" value="${qty}" /></div>
+        <div class="field"><label>Rate</label><input type="number" name="itemRate" step="0.01" min="0" value="${rate}" /></div>
+      </div>`;
+    row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+    items.appendChild(row);
+  }
+  document.getElementById('addItem').addEventListener('click', () => addItem());
+
+  <% if (isEdit && Array.isArray(inv.items) && inv.items.length) { %>
+    <% inv.items.forEach(function(it) { %>
+      addItem(<%- JSON.stringify(it.description || '') %>, <%= Number(it.qty) || 1 %>, <%= Number(it.rate) || 0 %>);
+    <% }); %>
+  <% } else { %>
+    addItem();
+  <% } %>
+
+  const picker = document.getElementById('clientId');
+  if (picker) {
+    picker.addEventListener('change', (e) => {
+      const opt = e.target.options[e.target.selectedIndex];
+      if (!opt || !opt.value) return;
+      document.getElementById('clientName').value = opt.dataset.name || '';
+      document.getElementById('clientCompany').value = opt.dataset.company || '';
+      document.getElementById('clientEmail').value = opt.dataset.email || '';
+      document.getElementById('clientAddress').value = opt.dataset.address || '';
+    });
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<%- include('./_head', { pageTitle: 'Website Content' }) %>
+
+<div class="app-shell">
+  <%- include('./_sidebar', { active: 'content', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>Website Content</h1>
+      <p>Pick a section to edit. Your changes appear on the live website as soon as you save.</p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn">
+        Firebase isn't connected — saves are disabled until Firestore is enabled in your Firebase console.
+      </div>
+    <% } %>
+
+    <div class="content-grid">
+      <% const items = [
+        ['meta', '📝', 'Page title & SEO', 'Page title, description, and favicon'],
+        ['nav', '🧭', 'Top navigation', 'Logo, menu items, portal button'],
+        ['hero', '🌟', 'Hero / landing', 'Big headline, subtitle, buttons, and stats at the top of the page'],
+        ['ticker', '⚡', 'Tech ticker', 'The scrolling list of technologies under the hero'],
+        ['services', '🛠️', 'Services', 'The three service cards'],
+        ['process', '📐', 'Process', 'The four-step process section'],
+        ['why', '✨', 'Why Darsh', 'The "why us" section with bullet points'],
+        ['work', '💼', 'Selected work', 'Portfolio cards with images and tags'],
+        ['contact', '📮', 'Contact', 'Contact form copy'],
+        ['footer', '🔻', 'Footer', 'Footer logo, links, and copyright'],
+      ]; %>
+      <% items.forEach(function(item) { %>
+        <a href="/admin/content/<%= item[0] %>" class="content-card">
+          <div class="emoji"><%= item[1] %></div>
+          <h3><%= item[2] %></h3>
+          <p><%= item[3] %></p>
+          <span class="arrow">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </span>
+        </a>
+      <% }); %>
+    </div>
+  </main>
+</div>
+</body>
+</html>

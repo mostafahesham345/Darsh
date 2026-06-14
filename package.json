@@ -1,0 +1,22 @@
+{
+  "name": "darsh-landing",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env --watch server.js",
+    "seed": "node --env-file=.env scripts/seed.js",
+    "seed:force": "node --env-file=.env scripts/seed.js --force"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "ejs": "^5.0.2",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "firebase": "^12.12.0",
+    "multer": "^2.1.1",
+    "nodemailer": "^8.0.5",
+    "pdfkit": "^0.18.0"
+  }
+}

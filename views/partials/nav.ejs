@@ -1,0 +1,20 @@
+<%
+  // On sub-pages, rewrite same-page anchors (#foo) to point back to the home page.
+  function navHref(h) { return (!home && h && h.charAt(0) === '#') ? '/' + h : h; }
+%>
+<header class="nav" id="nav">
+  <a href="<%= home ? '#top' : '/' %>" class="nav-brand" aria-label="Darsh home" data-cms="nav.images.logo">
+    <img src="<%= content.nav.images.logo.url %>" alt="Darsh" />
+  </a>
+
+  <nav class="nav-links" id="navLinks">
+    <% (content.nav.links || []).forEach(function(link) { %>
+      <a href="<%= navHref(link.href) %>"><%= link.label %></a>
+    <% }); %>
+    <a href="/portal/login" class="btn btn-portal"><%= content.nav.fields.portalLabel %></a>
+  </nav>
+
+  <button class="nav-burger" id="navBurger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</header>

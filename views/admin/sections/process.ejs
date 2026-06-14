@@ -1,0 +1,91 @@
+<%- include('../_head', { pageTitle: 'Process' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:process', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>📐 Process</h1>
+      <p>The four-step "How we work" section on the dark navy background.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/process" class="form-root">
+      <div class="form">
+        <h2>Section heading</h2>
+        <div class="field">
+          <label>Eyebrow</label>
+          <input type="text" name="fields[eyebrow]" value="<%= section.fields.eyebrow %>" />
+        </div>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" />
+        </div>
+        <div class="field">
+          <label>Description paragraph</label>
+          <textarea name="fields[lede]"><%= section.fields.lede %></textarea>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Steps</h2>
+        <p class="hint">The numbered steps shown in a row.</p>
+        <div class="repeater" data-repeater data-template="step">
+          <% (section.steps || []).forEach(function(step, i) { %>
+            <div class="repeater-item">
+              <h4>Step #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+              <div class="row-2">
+                <div class="field">
+                  <label>Step number (2 digits)</label>
+                  <input type="text" name="steps[<%= i %>][num]" value="<%= step.num %>" />
+                </div>
+                <div class="field">
+                  <label>Step title</label>
+                  <input type="text" name="steps[<%= i %>][title]" value="<%= step.title %>" />
+                </div>
+              </div>
+              <div class="field">
+                <label>Step description</label>
+                <textarea name="steps[<%= i %>][description]"><%= step.description %></textarea>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add step</button>
+
+        <template data-tpl="step">
+          <div class="repeater-item">
+            <h4>Step #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="row-2">
+              <div class="field"><label>Step number (2 digits)</label><input type="text" name="steps[__I0__][num]" value="05" /></div>
+              <div class="field"><label>Step title</label><input type="text" name="steps[__I0__][title]" /></div>
+            </div>
+            <div class="field"><label>Step description</label><textarea name="steps[__I0__][description]"></textarea></div>
+          </div>
+        </template>
+      </div>
+
+      <div class="form">
+        <h2>Bottom button</h2>
+        <div class="row-2">
+          <div class="field">
+            <label>Button text</label>
+            <input type="text" name="fields[ctaLabel]" value="<%= section.fields.ctaLabel %>" />
+          </div>
+          <div class="field">
+            <label>Button link</label>
+            <input type="text" name="fields[ctaHref]" value="<%= section.fields.ctaHref %>" />
+          </div>
+        </div>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

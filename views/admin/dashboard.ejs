@@ -1,0 +1,80 @@
+<%- include('./_head', { pageTitle: 'Dashboard' }) %>
+
+<div class="app-shell">
+  <%- include('./_sidebar', { active: 'dashboard', adminEmail, newLeads }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>Dashboard</h1>
+      <p>Welcome back. Here's how your website is doing.</p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn">
+        <strong>Firebase not connected yet.</strong> Check your <code>.env</code> — once Firestore is enabled in the Firebase console, stats will start appearing here.
+      </div>
+    <% } %>
+
+    <% if (stats.error) { %>
+      <div class="alert alert-err">Could not load stats: <%= stats.error %></div>
+    <% } %>
+
+    <div class="stats-grid">
+      <div class="stat-card"<%= newLeads > 0 ? ' style="border-left:3px solid #f7b500;"' : '' %>>
+        <div class="label">New leads</div>
+        <div class="value"><%= newLeads.toLocaleString() %></div>
+        <div class="sub"><a href="/admin/leads" style="color:inherit;">Unread contact‑form messages →</a></div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total visits</div>
+        <div class="value"><%= stats.total.toLocaleString() %></div>
+        <div class="sub">All-time visits to your website</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Today</div>
+        <div class="value"><%= stats.today.toLocaleString() %></div>
+        <div class="sub">Visits in the last 24 hours (UTC)</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Last 30 days</div>
+        <div class="value"><%= stats.last30Total.toLocaleString() %></div>
+        <div class="sub">Total visits in the last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Tracking since</div>
+        <div class="value" style="font-size: 1.15rem;"><%= stats.firstSeen ? new Date(stats.firstSeen).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—' %></div>
+        <div class="sub"><%= stats.lastSeen ? 'Last visit: ' + new Date(stats.lastSeen).toLocaleString() : 'No visits yet' %></div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>Visits — past 7 days</h3>
+      <% const maxCount = Math.max(1, ...stats.last7.map(d => d.count)); %>
+      <div class="bar-chart">
+        <% stats.last7.forEach(function(d) { %>
+          <div class="bar" style="height: <%= Math.max(3, (d.count / maxCount) * 100) %>%;">
+            <span class="tip"><%= d.count %> visit<%= d.count === 1 ? '' : 's' %></span>
+          </div>
+        <% }); %>
+      </div>
+      <div class="bar-labels">
+        <% stats.last7.forEach(function(d) { %><span><%= d.label %><strong><%= d.count %></strong></span><% }); %>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <h3>Quick actions</h3>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <a class="btn" href="/admin/leads">📥 Leads</a>
+        <a class="btn" href="/admin/clients">👥 Clients</a>
+        <a class="btn" href="/admin/contracts">📄 Contracts</a>
+        <a class="btn" href="/admin/invoices">🧾 Invoices</a>
+        <a class="btn" href="/admin/projects">🚀 Projects</a>
+        <a class="btn" href="/admin/content">✏️ Edit website content</a>
+        <a class="btn" href="/" target="_blank">🌐 View live website</a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

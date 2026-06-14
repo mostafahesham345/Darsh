@@ -1,0 +1,175 @@
+<% const isEdit = typeof mode !== 'undefined' && mode === 'edit'; const c = typeof contract !== 'undefined' && contract ? contract : {}; %>
+<%- include('../_head', { pageTitle: isEdit ? 'Edit contract' : 'New contract' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'contracts', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1><%= isEdit ? 'Edit contract' : 'New contract' %></h1>
+      <p><a href="/admin/contracts" style="color:var(--muted);">← Back to contracts</a> · <%= isEdit ? 'Update the details and save. Re-download the PDF from the list afterwards.' : "Fill in the details, hit generate, and you'll get a polished PDF. A copy is also saved here for later re-download." %></p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn">Firebase not connected — <%= isEdit ? 'changes cannot be saved.' : "you can still generate the PDF, but it won't be saved and clients won't autofill." %></div>
+    <% } %>
+
+    <form method="post" action="<%= isEdit ? '/admin/contracts/' + c.id + '/edit' : '/admin/contracts/generate' %>" class="form" id="contractForm">
+      <h2>Contract details</h2>
+      <p class="hint">All fields support sensible defaults. Provide as much as you want for a more detailed document.</p>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="title">Contract title</label>
+          <input id="title" name="title" type="text" value="<%= c.title || 'Service Agreement' %>" />
+        </div>
+        <div class="field">
+          <label for="contractNumber">Contract number</label>
+          <input id="contractNumber" name="contractNumber" type="text" placeholder="Auto-generated if blank" value="<%= c.contractNumber || '' %>" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="effectiveDate">Effective date</label>
+        <input id="effectiveDate" name="effectiveDate" type="text" placeholder="e.g. April 22, 2026" value="<%= c.effectiveDate || '' %>" />
+      </div>
+
+      <h2 style="margin-top:18px;">Client</h2>
+      <input type="hidden" id="clientId" name="clientId" value="<%= c.clientId || '' %>" />
+      <% if (clients.length) { %>
+        <div class="field">
+          <label for="clientPicker">Pick from existing client</label>
+          <select id="clientPicker">
+            <option value="">— Enter manually —</option>
+            <% clients.forEach(function(cl) { %>
+              <option value="<%= cl.id %>"
+                data-name="<%= cl.name || '' %>"
+                data-company="<%= cl.company || '' %>"
+                data-email="<%= cl.email || '' %>"
+                data-address="<%= (cl.address || '').replace(/"/g, '&quot;') %>"><%= cl.name %><%= cl.company ? ' — ' + cl.company : '' %></option>
+            <% }); %>
+          </select>
+        </div>
+      <% } %>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="clientName">Client full name *</label>
+          <input id="clientName" name="clientName" type="text" required value="<%= c.clientName || '' %>" />
+        </div>
+        <div class="field">
+          <label for="clientCompany">Company</label>
+          <input id="clientCompany" name="clientCompany" type="text" value="<%= c.clientCompany || '' %>" />
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="clientEmail">Client email</label>
+          <input id="clientEmail" name="clientEmail" type="email" value="<%= c.clientEmail || '' %>" />
+        </div>
+        <div class="field">
+          <label for="clientAddress">Client address</label>
+          <input id="clientAddress" name="clientAddress" type="text" value="<%= c.clientAddress || '' %>" />
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px;">Project</h2>
+      <div class="field">
+        <label for="projectDescription">Project overview</label>
+        <textarea id="projectDescription" name="projectDescription" rows="3" placeholder="A short paragraph describing what this engagement covers."><%= c.projectDescription || '' %></textarea>
+      </div>
+      <div class="field">
+        <label for="scope">Scope of work</label>
+        <textarea id="scope" name="scope" rows="5" placeholder="One item per line — e.g.&#10;Design and develop a responsive marketing website&#10;Integrate CMS for client-managed content&#10;Deploy to production with custom domain"><%= c.scope || '' %></textarea>
+        <div class="help">One bullet per line.</div>
+      </div>
+      <div class="field">
+        <label for="deliverables">Deliverables</label>
+        <textarea id="deliverables" name="deliverables" rows="4" placeholder="One deliverable per line."><%= c.deliverables || '' %></textarea>
+      </div>
+
+      <h2 style="margin-top:18px;">Timeline</h2>
+      <div class="row-2">
+        <div class="field">
+          <label for="startDate">Start date</label>
+          <input id="startDate" name="startDate" type="text" placeholder="e.g. May 1, 2026" value="<%= c.startDate || '' %>" />
+        </div>
+        <div class="field">
+          <label for="endDate">End / delivery date</label>
+          <input id="endDate" name="endDate" type="text" placeholder="e.g. July 15, 2026" value="<%= c.endDate || '' %>" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="milestones">Milestones (optional)</label>
+        <textarea id="milestones" name="milestones" rows="3" placeholder="One milestone per line."><%= c.milestones || '' %></textarea>
+      </div>
+
+      <h2 style="margin-top:18px;">Compensation</h2>
+      <div class="row-2">
+        <div class="field">
+          <label for="totalFee">Total fee</label>
+          <input id="totalFee" name="totalFee" type="number" step="0.01" min="0" value="<%= c.totalFee || '' %>" />
+        </div>
+        <div class="field">
+          <label for="currency">Currency</label>
+          <input id="currency" name="currency" type="text" value="<%= c.currency || 'USD' %>" />
+        </div>
+      </div>
+      <div class="field">
+        <label for="paymentTerms">Payment terms</label>
+        <input id="paymentTerms" name="paymentTerms" type="text" placeholder="e.g. 50% upfront, 50% on delivery. Net 14." value="<%= c.paymentTerms || '' %>" />
+      </div>
+      <div class="field">
+        <label for="paymentSchedule">Payment schedule (optional)</label>
+        <textarea id="paymentSchedule" name="paymentSchedule" rows="3" placeholder="One entry per line."><%= c.paymentSchedule || '' %></textarea>
+      </div>
+
+      <h2 style="margin-top:18px;">Clauses (leave blank to use sensible defaults)</h2>
+      <div class="field">
+        <label for="ipClause">Intellectual property</label>
+        <textarea id="ipClause" name="ipClause" rows="3" placeholder="Defaults to a standard IP transfer clause."><%= c.ipClause || '' %></textarea>
+      </div>
+      <div class="field">
+        <label for="confidentialityClause">Confidentiality</label>
+        <textarea id="confidentialityClause" name="confidentialityClause" rows="3"><%= c.confidentialityClause || '' %></textarea>
+      </div>
+      <div class="field">
+        <label for="terminationClause">Termination</label>
+        <textarea id="terminationClause" name="terminationClause" rows="3"><%= c.terminationClause || '' %></textarea>
+      </div>
+      <div class="field">
+        <label for="additionalTerms">Additional terms</label>
+        <textarea id="additionalTerms" name="additionalTerms" rows="3"><%= c.additionalTerms || '' %></textarea>
+      </div>
+
+      <h2 style="margin-top:18px;">Your signature</h2>
+      <p class="hint"><%= isEdit ? 'This contract was signed by the provider on creation.' : 'Submitting this contract signs it on behalf of the provider. It then goes to the client to countersign in their portal.' %></p>
+      <div class="field">
+        <label for="providerName">Authorized signatory (provider)</label>
+        <input id="providerName" name="providerName" type="text" value="<%= (c.providerSignature) || (typeof adminName !== 'undefined' ? adminName : '') %>" placeholder="e.g. Mostafa Hesham" />
+        <div class="help">Your full name. This appears as the provider's signature on the contract.</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-yellow"><%= isEdit ? 'Save changes' : 'Sign & generate contract' %></button>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script>
+  const picker = document.getElementById('clientPicker');
+  if (picker) {
+    picker.addEventListener('change', (e) => {
+      const opt = e.target.options[e.target.selectedIndex];
+      document.getElementById('clientId').value = opt && opt.value ? opt.value : '';
+      if (!opt || !opt.value) return;
+      document.getElementById('clientName').value = opt.dataset.name || '';
+      document.getElementById('clientCompany').value = opt.dataset.company || '';
+      document.getElementById('clientEmail').value = opt.dataset.email || '';
+      document.getElementById('clientAddress').value = opt.dataset.address || '';
+    });
+  }
+</script>
+</body>
+</html>

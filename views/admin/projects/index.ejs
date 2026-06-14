@@ -1,0 +1,80 @@
+<%- include('../_head', { pageTitle: 'Projects' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'projects', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>Projects</h1>
+        <p>Track every project through its stages — clients get an email each time you move one forward.</p>
+      </div>
+      <a href="/admin/projects/new" class="btn btn-yellow">+ New project</a>
+    </div>
+
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase not connected — projects can't be saved yet.</div><% } %>
+    <% if (!mailReady) { %><div class="alert alert-warn">Email not configured — project updates will be saved but not sent until SMTP is configured.</div><% } %>
+    <% if (flash) { %><div class="alert <%= (typeof flashWarn !== 'undefined' && flashWarn) ? 'alert-warn' : 'alert-ok' %>"><%= flash %></div><% } %>
+
+    <% if (!projects.length) { %>
+      <div class="form" style="text-align:center;padding:56px 28px;">
+        <div style="font-size:2.6rem;margin-bottom:12px;">🚀</div>
+        <h2 style="margin:0 0 6px;">No active projects</h2>
+        <p class="hint" style="margin-bottom:18px;">Add a project to a client and start tracking progress.</p>
+        <a href="/admin/projects/new" class="btn btn-yellow">+ New project</a>
+      </div>
+    <% } else { %>
+      <div class="project-grid">
+        <% projects.forEach(function(p) {
+             const idx = stages.findIndex(s => s.key === p.stage);
+             const pct = Math.round(((idx + 1) / stages.length) * 100);
+             const meta = stageMeta(p.stage);
+        %>
+          <div class="project-card">
+            <div class="project-card-head">
+              <div>
+                <h3><%= p.name %></h3>
+                <div class="sub"><%= p.clientName || 'No client' %><%= p.clientEmail ? ' · ' + p.clientEmail : '' %></div>
+              </div>
+              <span class="badge <%= p.stage === 'done' ? 'badge-ok' : 'badge-info' %>"><%= meta.label %></span>
+            </div>
+
+            <% if (p.description) { %><p class="project-desc"><%= p.description %></p><% } %>
+
+            <div class="progress-track">
+              <% stages.forEach(function(s, i) { %>
+                <div class="progress-step <%= i <= idx ? 'done' : '' %>" title="<%= s.label %>"></div>
+              <% }); %>
+            </div>
+            <div class="project-meta">
+              <span><%= pct %>% complete</span>
+              <% if (p.targetDate) { %><span>Target: <%= p.targetDate %></span><% } %>
+            </div>
+
+            <form method="post" action="/admin/projects/<%= p.id %>/stage" class="stage-form">
+              <label>Advance stage</label>
+              <div class="stage-controls">
+                <select name="stage">
+                  <% stages.forEach(function(s) { %>
+                    <option value="<%= s.key %>" <%= s.key === p.stage ? 'selected' : '' %>><%= s.label %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <input type="text" name="note" placeholder="Optional note for the client (e.g. 'Mockups uploaded for review')" />
+              <div class="project-actions">
+                <a href="/admin/projects/<%= p.id %>" class="btn btn-ghost btn-sm">Details</a>
+                <a href="/admin/projects/<%= p.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                <button type="submit" class="btn btn-yellow btn-sm">Update & notify</button>
+              </div>
+            </form>
+            <form method="post" action="/admin/projects/<%= p.id %>/delete" class="project-delete" onsubmit="return confirm('Delete this project?');">
+              <button type="submit" class="btn btn-danger btn-sm">Delete project</button>
+            </form>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>

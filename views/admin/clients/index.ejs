@@ -1,0 +1,63 @@
+<%- include('../_head', { pageTitle: 'Clients' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'clients', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>Clients</h1>
+        <p>Manage client records. All details flow into contracts, invoices, and project updates.</p>
+      </div>
+      <a href="/admin/clients/new" class="btn btn-yellow">+ New client</a>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> Clients can't be saved until Firestore is configured.</div>
+    <% } %>
+    <% if (flash) { %><div class="alert alert-ok"><%= flash %></div><% } %>
+
+    <% if (!clients.length) { %>
+      <div class="form" style="text-align:center;padding:56px 28px;">
+        <div style="font-size:2.6rem;margin-bottom:12px;">👥</div>
+        <h2 style="margin:0 0 6px;">No clients yet</h2>
+        <p class="hint" style="margin-bottom:18px;">Add your first client to start generating contracts and invoices.</p>
+        <a href="/admin/clients/new" class="btn btn-yellow">+ Add your first client</a>
+      </div>
+    <% } else { %>
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Company</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th style="width:120px;text-align:right;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% clients.forEach(function(c) { %>
+              <tr>
+                <td><strong><%= c.name || '—' %></strong></td>
+                <td><%= c.company || '—' %></td>
+                <td><%= c.email ? c.email : '—' %></td>
+                <td><%= c.phone || '—' %></td>
+                <td>
+                  <div style="display:flex;gap:8px;align-items:center;justify-content:flex-end;">
+                    <a href="/admin/clients/<%= c.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                    <form method="post" action="/admin/clients/<%= c.id %>/delete" style="margin:0;" onsubmit="return confirm('Delete this client? Existing contracts/invoices/projects will keep their copy of the details, but the client record will be removed.');">
+                      <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>

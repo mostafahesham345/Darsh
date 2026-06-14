@@ -1,0 +1,84 @@
+<% const isEdit = typeof mode !== 'undefined' && mode === 'edit'; const p = typeof project !== 'undefined' ? project : {}; %>
+<%- include('../_head', { pageTitle: isEdit ? 'Edit project' : 'New project' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'projects', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1><%= isEdit ? 'Edit project' : 'New project' %></h1>
+      <p><a href="/admin/projects" style="color:var(--muted);">← Back to projects</a><% if (!isEdit) { %> · The client gets a welcome email when the project is created.<% } else { %> · Editing here doesn't email the client. Use the stage tracker to send updates.<% } %></p>
+    </div>
+
+    <form method="post" action="<%= isEdit ? '/admin/projects/' + p.id + '/edit' : '/admin/projects/new' %>" class="form">
+      <div class="field">
+        <label for="name">Project name *</label>
+        <input id="name" name="name" type="text" value="<%= isEdit ? (p.name || '') : '' %>" required />
+      </div>
+
+      <div class="field">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3" placeholder="A short summary the client will see in emails."><%= isEdit ? (p.description || '') : '' %></textarea>
+      </div>
+
+      <h2 style="margin-top:18px;">Client</h2>
+      <% if (clients.length) { %>
+        <div class="field">
+          <label for="clientId">Link to a client</label>
+          <select id="clientId" name="clientId" <%= isEdit ? '' : 'required' %>>
+            <option value="">— Select a client —</option>
+            <% clients.forEach(function(c) { %>
+              <option value="<%= c.id %>"
+                <%= isEdit && p.clientId === c.id ? 'selected' : '' %>
+                data-name="<%= c.name || '' %>" data-email="<%= c.email || '' %>"><%= c.name %><%= c.company ? ' — ' + c.company : '' %></option>
+            <% }); %>
+          </select>
+        </div>
+      <% } else if (!isEdit) { %>
+        <div class="alert alert-warn">You need at least one client before creating a project. <a href="/admin/clients/new">Add a client</a> first.</div>
+      <% } %>
+
+      <h2 style="margin-top:18px;">Schedule</h2>
+      <div class="row-2">
+        <div class="field">
+          <label for="startDate">Start date</label>
+          <input id="startDate" name="startDate" type="date" value="<%= isEdit ? (p.startDate || '') : '' %>" />
+        </div>
+        <div class="field">
+          <label for="targetDate">Target delivery date</label>
+          <input id="targetDate" name="targetDate" type="date" value="<%= isEdit ? (p.targetDate || '') : '' %>" />
+        </div>
+      </div>
+
+      <div class="row-2">
+        <% if (!isEdit) { %>
+          <div class="field">
+            <label for="stage">Starting stage</label>
+            <select id="stage" name="stage">
+              <% stages.forEach(function(s) { %>
+                <option value="<%= s.key %>" <%= s.key === 'discovery' ? 'selected' : '' %>><%= s.label %></option>
+              <% }); %>
+            </select>
+          </div>
+        <% } else { %>
+          <div class="field">
+            <label>Current stage</label>
+            <input type="text" value="<%= (stages.find(function(s){return s.key===p.stage;}) || {label: p.stage || '—'}).label %>" disabled />
+            <div class="help">To change the stage (and notify the client), use the project view page.</div>
+          </div>
+        <% } %>
+        <div class="field">
+          <label for="budget">Budget (optional)</label>
+          <input id="budget" name="budget" type="text" value="<%= isEdit ? (p.budget || '') : '' %>" placeholder="e.g. USD 12,000" />
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <a href="/admin/projects" class="btn btn-ghost">Cancel</a>
+        <button type="submit" class="btn btn-yellow" <%= (clients.length || isEdit) ? '' : 'disabled' %>><%= isEdit ? 'Save changes' : 'Create & notify client' %></button>
+      </div>
+    </form>
+  </main>
+</div>
+</body>
+</html>

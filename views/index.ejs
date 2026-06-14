@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= content.meta.fields.title %></title>
+  <meta name="description" content="<%= content.meta.fields.description %>" />
+  <link rel="icon" type="image/png" href="<%= content.meta.images.favicon.url %>" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="/css/landing.css" />
+</head>
+<body>
+
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <!-- NAV -->
+  <%- include('partials/nav', { content, home: true }) %>
+
+  <!-- HERO -->
+  <section class="hero" id="top">
+    <div class="hero-bg" style="background-image: url('/images/BackgroundPic.png');"></div>
+    <div class="hero-bg-veil"></div>
+    <div class="hero-bg-grid"></div>
+
+    <span class="blob blob-1" aria-hidden="true"></span>
+    <span class="blob blob-2" aria-hidden="true"></span>
+    <span class="blob blob-3" aria-hidden="true"></span>
+
+    <div class="hero-inner">
+      <span class="hero-badge reveal" data-cms="hero.fields.badge">
+        <span class="hero-badge-dot"></span>
+        <%= content.hero.fields.badge %>
+      </span>
+
+      <h1 class="hero-title reveal">
+        <span data-cms="hero.fields.titleLine1"><%= content.hero.fields.titleLine1 %></span>
+        <br />
+        <span data-cms="hero.fields.titleLine2"><%= content.hero.fields.titleLine2 %></span>
+        <span class="hero-title-grad" data-cms="hero.fields.titleAccent"><%= content.hero.fields.titleAccent %></span><span data-cms="hero.fields.titleSuffix"><%= content.hero.fields.titleSuffix %></span>
+      </h1>
+
+      <p class="hero-sub reveal" data-cms="hero.fields.sub">
+        <%= content.hero.fields.sub %>
+      </p>
+
+      <div class="hero-cta reveal">
+        <a href="<%= content.hero.links.primaryCta.href %>" class="btn btn-primary btn-glow">
+          <span data-cms="hero.links.primaryCta.label"><%= content.hero.links.primaryCta.label %></span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+        <a href="<%= content.hero.links.secondaryCta.href %>" class="btn btn-ghost" data-cms="hero.links.secondaryCta.label">
+          <%= content.hero.links.secondaryCta.label %>
+        </a>
+      </div>
+
+      <div class="hero-kpis reveal">
+        <% (content.hero.kpis || []).forEach(function(kpi, idx) { %>
+          <% if (idx > 0) { %><div class="kpi-sep"></div><% } %>
+          <div class="kpi">
+            <div class="kpi-value" data-count="<%= kpi.value %>"<% if (kpi.suffix) { %> data-suffix="<%= kpi.suffix %>"<% } %>>0</div>
+            <div class="kpi-label"><%= kpi.label %></div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- TICKER -->
+  <div class="ticker" aria-hidden="true">
+    <div class="ticker-track">
+      <% for (var loop = 0; loop < 2; loop++) { %>
+        <% (content.ticker.items || []).forEach(function(item) { %>
+          <span class="ticker-item"><%= item %></span><span class="ticker-dot">◆</span>
+        <% }); %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- SERVICES -->
+  <section class="section section-yellow" id="services">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow" data-cms="services.fields.eyebrow"><%= content.services.fields.eyebrow %></span>
+        <h2 data-cms="services.fields.title"><%= content.services.fields.title %></h2>
+        <p class="lede" data-cms="services.fields.lede">
+          <%= content.services.fields.lede %>
+        </p>
+      </div>
+
+      <div class="services-grid">
+        <% (content.services.cards || []).forEach(function(card, idx) { %>
+          <article class="service-card<%= card.featured ? ' service-card-featured' : '' %> reveal">
+            <% if (card.tag) { %><span class="service-tag"><%= card.tag %></span><% } %>
+            <span class="card-shine"></span>
+            <div class="service-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <% if (idx === 0) { %>
+                  <path d="M3 3h7v7H3z"/><path d="M14 3h7v7h-7z"/><path d="M14 14h7v7h-7z"/><path d="M3 14h7v7H3z"/>
+                <% } else if (idx === 1) { %>
+                  <path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="m2 17 10 5 10-5"/><path d="m2 12 10 5 10-5"/>
+                <% } else { %>
+                  <path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/><circle cx="6" cy="6" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="18" cy="18" r="1.5" fill="currentColor"/>
+                <% } %>
+              </svg>
+            </div>
+            <h3><%= card.title %></h3>
+            <p><%= card.description %></p>
+            <ul class="service-list">
+              <% (card.bullets || []).forEach(function(b) { %><li><%= b %></li><% }); %>
+            </ul>
+          </article>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTIONS / SERVICES SHOWCASE TEASER -->
+  <section class="section" id="solutions">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow"><%= servicesMeta.eyebrow %></span>
+        <h2><%= servicesMeta.title %></h2>
+        <p class="lede"><%= servicesMeta.lede %></p>
+      </div>
+
+      <%- include('partials/services-grid', { services }) %>
+
+      <div class="svc-cta reveal">
+        <a href="#contact" class="btn btn-dark btn-glow">
+          <span>Start a project</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROCESS -->
+  <section class="section section-navy" id="process">
+    <span class="orb orb-a" aria-hidden="true"></span>
+    <span class="orb orb-b" aria-hidden="true"></span>
+
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow eyebrow-light" data-cms="process.fields.eyebrow"><%= content.process.fields.eyebrow %></span>
+        <h2 class="text-light" data-cms="process.fields.title"><%= content.process.fields.title %></h2>
+        <p class="lede lede-light" data-cms="process.fields.lede">
+          <%= content.process.fields.lede %>
+        </p>
+      </div>
+
+      <div class="process">
+        <% (content.process.steps || []).forEach(function(step, idx) { %>
+          <div class="process-step reveal">
+            <div class="process-num"><%= step.num %></div>
+            <h3><%= step.title %></h3>
+            <p><%= step.description %></p>
+          </div>
+          <% if (idx < (content.process.steps.length - 1)) { %>
+            <div class="process-line"><span class="process-line-fill"></span></div>
+          <% } %>
+        <% }); %>
+      </div>
+
+      <div class="process-cta reveal">
+        <a href="<%= content.process.fields.ctaHref %>" class="btn btn-yellow btn-glow">
+          <span><%= content.process.fields.ctaLabel %></span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY -->
+  <section class="section section-yellow" id="why">
+    <div class="container">
+      <div class="why-grid">
+        <div class="reveal">
+          <span class="eyebrow" data-cms="why.fields.eyebrow"><%= content.why.fields.eyebrow %></span>
+          <h2 data-cms="why.fields.title"><%= content.why.fields.title %></h2>
+          <p class="lede" style="margin-top:16px;" data-cms="why.fields.lede">
+            <%= content.why.fields.lede %>
+          </p>
+
+          <div class="why-points">
+            <% (content.why.points || []).forEach(function(point) { %>
+              <div class="why-point">
+                <span class="why-point-icon">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                </span>
+                <div>
+                  <strong><%= point.title %></strong>
+                  <p><%= point.description %></p>
+                </div>
+              </div>
+            <% }); %>
+          </div>
+        </div>
+
+        <div class="why-mock reveal">
+          <div class="mock-window">
+            <span class="mock-glow" aria-hidden="true"></span>
+            <div class="mock-bar">
+              <span></span><span></span><span></span>
+              <span class="mock-url">darsh / dashboard</span>
+            </div>
+            <div class="mock-body">
+              <div class="mock-row mock-row-head">
+                <span class="mock-dot"></span>
+                <span class="mock-line w40"></span>
+                <span style="flex:1"></span>
+                <span class="mock-pill"></span>
+              </div>
+              <div class="mock-bars">
+                <div class="mock-bar-row"><span class="mock-line w30"></span><span class="mock-progress"><div data-width="84%"></div></span></div>
+                <div class="mock-bar-row"><span class="mock-line w40"></span><span class="mock-progress"><div data-width="62%"></div></span></div>
+                <div class="mock-bar-row"><span class="mock-line w30"></span><span class="mock-progress"><div data-width="95%"></div></span></div>
+                <div class="mock-bar-row"><span class="mock-line w40"></span><span class="mock-progress"><div data-width="48%"></div></span></div>
+              </div>
+              <div class="mock-grid">
+                <div class="mock-card">
+                  <span class="mock-line-big"></span>
+                  <span class="mock-line w70"></span>
+                  <span class="mock-line w50"></span>
+                </div>
+                <div class="mock-card">
+                  <span class="mock-line-big mock-line-big-yellow"></span>
+                  <span class="mock-line w60"></span>
+                  <span class="mock-line w40"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WORK -->
+  <section class="section section-yellow" id="work">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow" data-cms="work.fields.eyebrow"><%= content.work.fields.eyebrow %></span>
+        <h2 data-cms="work.fields.title"><%= content.work.fields.title %></h2>
+        <p class="lede" data-cms="work.fields.lede"><%= content.work.fields.lede %></p>
+      </div>
+
+      <div class="work-grid">
+        <%
+          function normalizeUrl(u) {
+            const s = (u || '').trim();
+            if (!s) return '';
+            return /^https?:\/\//i.test(s) ? s : 'https://' + s.replace(/^\/+/, '');
+          }
+          function displayUrl(u) {
+            try { return new URL(normalizeUrl(u)).host; } catch (_) { return (u || '').replace(/^https?:\/\//, ''); }
+          }
+          function shotUrl(u) {
+            const full = normalizeUrl(u);
+            if (!full) return '/images/placeholder.svg';
+            return 'https://api.microlink.io/?url=' + encodeURIComponent(full) + '&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800';
+          }
+          function previewUrl(card) {
+            if (card && card.image && card.image.url) return card.image.url;
+            return shotUrl(card && card.url);
+          }
+        %>
+        <% (content.work.cards || []).forEach(function(card, idx) { %>
+          <a href="<%= card.url %>" target="_blank" rel="noopener" class="work-card reveal">
+            <div class="work-frame">
+              <div class="work-frame-bar">
+                <span></span><span></span><span></span>
+                <span class="work-frame-url"><%= displayUrl(card.url) %></span>
+              </div>
+              <div class="work-frame-shot">
+                <img src="<%= previewUrl(card) %>" alt="<%= card.title %>" loading="lazy" onerror="this.parentElement.classList.add('shot-error')" />
+                <div class="work-shot-fallback">preview unavailable</div>
+              </div>
+              <div class="work-overlay">
+                <span class="work-visit">
+                  Visit site
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+                </span>
+              </div>
+            </div>
+            <div class="work-meta">
+              <div class="work-meta-row">
+                <h3><%= card.title %></h3>
+                <span class="work-arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></svg>
+                </span>
+              </div>
+              <p><%= card.description %></p>
+              <div class="work-tags">
+                <% (card.tags || []).forEach(function(t) { %><span class="work-tag"><%= t %></span><% }); %>
+              </div>
+            </div>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section-contact" id="contact">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="container">
+      <div class="contact-card reveal">
+        <span class="eyebrow eyebrow-light" data-cms="contact.fields.eyebrow"><%= content.contact.fields.eyebrow %></span>
+        <h2 class="text-light" data-cms="contact.fields.title"><%= content.contact.fields.title %></h2>
+        <p class="lede lede-light" data-cms="contact.fields.lede"><%= content.contact.fields.lede %></p>
+
+        <form class="contact-form" id="contactForm" method="post" action="/contact" novalidate>
+          <div class="contact-row">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" placeholder="Jane Doe" autocomplete="name" required />
+              <span class="field-err" data-err="name"></span>
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" placeholder="jane@company.com" autocomplete="email" required />
+              <span class="field-err" data-err="email"></span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cf-company">Company</label>
+            <input id="cf-company" name="company" type="text" placeholder="Acme, Inc." autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="cf-msg">What are you building?</label>
+            <textarea id="cf-msg" name="message" placeholder="A quick sketch of the problem, the timeline, and what success looks like." required></textarea>
+            <span class="field-err" data-err="message"></span>
+          </div>
+
+          <!-- Honeypot: hidden from humans, catches bots -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="cf-website">Website</label>
+            <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <button type="submit" class="btn btn-yellow btn-glow btn-block" id="contactSubmit">
+            <span class="btn-label"><%= content.contact.fields.submitLabel %></span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+
+          <p class="contact-status" id="contactStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <%- include('partials/footer', { content, home: true }) %>
+
+  <% if (typeof previewBanner !== 'undefined' && previewBanner) { %>
+    <div class="preview-banner"><%= previewBanner %></div>
+    <style>body { padding-top: 36px; }</style>
+  <% } %>
+
+  <% if (firebaseWebConfig && firebaseReady) { %>
+    <script>window.__FIREBASE_WEB__ = <%- JSON.stringify(firebaseWebConfig) %>;</script>
+    <script type="module" src="/js/cms-live.js"></script>
+  <% } %>
+
+  <script src="/js/landing.js" defer></script>
+</body>
+</html>

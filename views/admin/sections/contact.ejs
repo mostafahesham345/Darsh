@@ -1,0 +1,40 @@
+<%- include('../_head', { pageTitle: 'Contact' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:contact', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>📮 Contact</h1>
+      <p>The copy shown above the contact form at the bottom of the page.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/contact" class="form-root">
+      <div class="form">
+        <div class="field">
+          <label>Eyebrow</label>
+          <input type="text" name="fields[eyebrow]" value="<%= section.fields.eyebrow %>" />
+        </div>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" />
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <textarea name="fields[lede]"><%= section.fields.lede %></textarea>
+        </div>
+        <div class="field">
+          <label>Submit button text</label>
+          <input type="text" name="fields[submitLabel]" value="<%= section.fields.submitLabel %>" />
+        </div>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

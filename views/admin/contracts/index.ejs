@@ -1,0 +1,74 @@
+<%- include('../_head', { pageTitle: 'Contracts' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'contracts', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>Contracts</h1>
+        <p>Generate, save, and re-download PDF contracts. Saved copies live in Firestore so you can always pull them back.</p>
+      </div>
+      <a href="/admin/contracts/new" class="btn btn-yellow">+ New contract</a>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> Generated contracts won't be saved until Firestore is reachable.</div>
+    <% } %>
+    <% if (flash) { %><div class="alert alert-ok"><%= flash %></div><% } %>
+
+    <% if (!contracts.length) { %>
+      <div class="form" style="text-align:center;padding:56px 28px;">
+        <div style="font-size:2.6rem;margin-bottom:12px;">📄</div>
+        <h2 style="margin:0 0 6px;">No contracts yet</h2>
+        <p class="hint" style="margin-bottom:18px;">Generate your first contract — a PDF is downloaded and a copy is saved here.</p>
+        <a href="/admin/contracts/new" class="btn btn-yellow">+ New contract</a>
+      </div>
+    <% } else { %>
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Contract</th>
+              <th>Title</th>
+              <th>Client</th>
+              <th>Effective</th>
+              <th style="text-align:right;">Fee</th>
+              <th>Status</th>
+              <th style="text-align:right;width:240px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% contracts.forEach(function(c) { %>
+              <tr>
+                <td><strong><%= c.contractNumber %></strong></td>
+                <td><%= c.title || '—' %></td>
+                <td><%= c.clientName || '—' %><%= c.clientCompany ? ' — ' + c.clientCompany : '' %></td>
+                <td><%= c.effectiveDate || '—' %></td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums;">
+                  <% if (c.totalFee) { %><%= c.currency || 'USD' %> <%= Number(c.totalFee).toFixed(2) %><% } else { %>—<% } %>
+                </td>
+                <td>
+                  <% if (c.status === 'signed') { %>
+                    <span class="badge badge-ok">Signed</span>
+                  <% } else { %>
+                    <span class="badge badge-warn">Pending client</span>
+                  <% } %>
+                </td>
+                <td style="text-align:right;">
+                  <a href="/admin/contracts/<%= c.id %>/download" class="btn btn-ghost btn-sm">PDF</a>
+                  <a href="/admin/contracts/<%= c.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                  <form method="post" action="/admin/contracts/<%= c.id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this contract permanently?');">
+                    <button type="submit" class="btn btn-danger btn-sm">×</button>
+                  </form>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,239 @@
+/* =============================================================================
+   Darsh — Client Portal
+   ============================================================================= */
+:root {
+  --yellow: #f7e27e;
+  --navy: #0a1f44;
+  --navy-2: #0f2a5c;
+  --soft: #f8fafc;
+  --ink: #0a1f44;
+  --ink-soft: rgba(10, 31, 68, 0.72);
+  --ink-mute: rgba(10, 31, 68, 0.55);
+  --line: rgba(10, 31, 68, 0.12);
+  --card: #ffffff;
+  --bg: #eef1f7;
+  --ok: #059669;
+  --ok-bg: #ecfdf5;
+  --warn: #b45309;
+  --warn-bg: #fffbeb;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; }
+h1, h2, h3 { font-family: "Space Grotesk", "Inter", sans-serif; letter-spacing: -0.02em; margin: 0; }
+
+/* ---- Auth screen ---- */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background:
+    radial-gradient(ellipse at 30% 0%, rgba(247, 226, 126, 0.18), transparent 55%),
+    linear-gradient(180deg, var(--navy) 0%, #060f24 100%);
+}
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card);
+  border-radius: 20px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
+}
+.auth-logo { display: block; height: 56px; margin: 0 auto 20px; }
+.auth-card h1 { font-size: 1.5rem; text-align: center; margin-bottom: 6px; }
+.auth-card .sub { text-align: center; color: var(--ink-mute); font-size: 0.95rem; margin-bottom: 26px; }
+.auth-field { margin-bottom: 16px; }
+.auth-field label { display: block; font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-mute); margin-bottom: 6px; }
+.auth-field input {
+  width: 100%;
+  padding: 13px 15px;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  font-size: 0.98rem;
+  font-family: inherit;
+}
+.auth-field input:focus { outline: none; border-color: var(--navy); box-shadow: 0 0 0 4px rgba(10, 31, 68, 0.1); }
+.auth-btn {
+  width: 100%;
+  padding: 14px;
+  background: var(--navy);
+  color: var(--yellow);
+  border: none;
+  border-radius: 11px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.auth-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(10, 31, 68, 0.25); }
+.auth-note { text-align: center; font-size: 0.85rem; color: var(--ink-mute); margin-top: 18px; }
+.auth-note a { color: var(--navy); font-weight: 600; text-decoration: none; }
+.auth-alert { padding: 12px 14px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 18px; }
+.auth-alert.err { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.auth-sent { text-align: center; }
+.auth-sent .icon { font-size: 2.6rem; margin-bottom: 10px; }
+
+/* ---- Portal shell ---- */
+.portal-top {
+  background: var(--navy);
+  color: var(--soft);
+  padding: 0 24px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.portal-top .brand { display: flex; align-items: center; gap: 10px; font-family: "Space Grotesk", sans-serif; font-weight: 700; }
+/* The wordmark is a square image with lots of transparent padding — scale it up
+   and crop the padding with symmetric negative margins so it reads at full size. */
+.portal-top .brand img { height: 170px; width: auto; margin: -60px 0; display: block; }
+.portal-top .right { display: flex; align-items: center; gap: 16px; font-size: 0.9rem; }
+.portal-top .right .who { color: rgba(248, 250, 252, 0.7); }
+.portal-top form { margin: 0; }
+.portal-top button {
+  background: transparent;
+  color: rgba(248, 250, 252, 0.7);
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.15s, background 0.15s;
+}
+.portal-top button:hover { color: var(--yellow); background: rgba(255, 255, 255, 0.06); }
+
+.portal-main { max-width: 920px; margin: 0 auto; padding: 32px 24px 64px; }
+.portal-hello { margin-bottom: 28px; }
+.portal-hello h1 { font-size: 1.8rem; margin-bottom: 4px; }
+.portal-hello p { color: var(--ink-mute); margin: 0; }
+
+.portal-section { margin-bottom: 36px; }
+.portal-section > h2 { font-size: 1.15rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+.portal-section > h2 .count { font-size: 0.75rem; font-weight: 600; color: var(--ink-mute); background: rgba(10, 31, 68, 0.06); padding: 2px 9px; border-radius: 99px; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 24px;
+  margin-bottom: 14px;
+}
+.empty-card { text-align: center; color: var(--ink-mute); padding: 40px 28px; background: var(--card); border: 1px dashed var(--line-strong, rgba(10,31,68,0.2)); border-radius: 16px; }
+.empty-card .icon { font-size: 2.4rem; line-height: 1; display: block; margin-bottom: 12px; }
+.empty-card .title { font-family: "Space Grotesk", "Inter", sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--ink); margin-bottom: 6px; }
+.empty-card .msg { font-size: 0.92rem; color: var(--ink-mute); max-width: 380px; margin: 0 auto; line-height: 1.55; }
+
+/* Project card */
+.proj-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+.proj-head h3 { font-size: 1.1rem; }
+.proj-desc { color: var(--ink-soft); font-size: 0.95rem; margin: 8px 0 16px; }
+.stage-badge { background: var(--navy); color: var(--yellow); font-size: 0.78rem; font-weight: 700; padding: 5px 12px; border-radius: 99px; white-space: nowrap; }
+.stage-badge.done { background: var(--ok); color: #fff; }
+.progress-track { display: flex; gap: 4px; margin: 14px 0 6px; }
+.progress-track .seg { flex: 1; height: 7px; border-radius: 4px; background: rgba(10, 31, 68, 0.1); }
+.progress-track .seg.on { background: var(--yellow); }
+.progress-meta { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--ink-mute); }
+.proj-history { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; }
+.proj-history .h-item { font-size: 0.85rem; padding: 4px 0; color: var(--ink-soft); }
+.proj-history .h-item b { color: var(--ink); }
+.proj-history .h-when { color: var(--ink-mute); }
+
+/* Tables */
+.doc-table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.doc-table th { text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); padding: 12px 16px; background: rgba(10, 31, 68, 0.03); }
+.doc-table td { padding: 14px 16px; border-top: 1px solid var(--line); font-size: 0.92rem; }
+.doc-table tr:first-child td { border-top: none; }
+.doc-table .num { font-variant-numeric: tabular-nums; text-align: right; }
+.pill { display: inline-flex; align-items: center; padding: 3px 10px; border-radius: 99px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; }
+.pill.paid { background: var(--ok-bg); color: var(--ok); }
+.pill.sent, .pill.draft { background: var(--warn-bg); color: var(--warn); }
+.dl-btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 13px; background: var(--navy); color: var(--yellow); border-radius: 8px; font-size: 0.82rem; font-weight: 600; text-decoration: none; }
+.dl-btn:hover { background: var(--navy-2); }
+
+.pay-note {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  margin-top: 14px;
+  padding: 16px 18px;
+  background: linear-gradient(135deg, #fff7d6 0%, #ffffff 100%);
+  border: 1px solid #f3e2a0;
+  border-left: 4px solid var(--yellow);
+  border-radius: 14px;
+}
+.pay-note .pay-icon { font-size: 1.4rem; line-height: 1; flex-shrink: 0; }
+.pay-note .pay-title { font-family: "Space Grotesk", "Inter", sans-serif; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+.pay-note p { margin: 0; font-size: 0.92rem; color: var(--ink-soft); line-height: 1.55; }
+
+.dl-btn.ghost { background: transparent; color: var(--navy); border: 1px solid var(--line); }
+.dl-btn.ghost:hover { background: rgba(10,31,68,0.04); }
+
+/* =============================================================================
+   Contract view + e-signature
+   ============================================================================= */
+.contract-page { max-width: 800px; }
+.contract-back { display: inline-block; margin-bottom: 16px; color: var(--ink-mute); font-size: 0.9rem; font-weight: 500; }
+.contract-back:hover { color: var(--navy); }
+.contract-flash { padding: 14px 18px; border-radius: 12px; margin-bottom: 18px; font-size: 0.95rem; font-weight: 500; }
+.contract-flash.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid #a7f3d0; }
+.contract-flash.err { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+.contract-doc { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 40px 44px; box-shadow: 0 6px 24px rgba(10,31,68,0.06); }
+@media (max-width: 560px) { .contract-doc { padding: 28px 22px; } }
+.contract-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; padding-bottom: 22px; margin-bottom: 8px; border-bottom: 2px solid var(--navy); }
+.contract-head h1 { font-size: 1.6rem; color: var(--navy); margin-bottom: 6px; }
+.contract-meta { color: var(--ink-mute); font-size: 0.88rem; }
+.status-pill { flex-shrink: 0; padding: 6px 14px; border-radius: 99px; font-size: 0.76rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
+.status-pill.signed { background: var(--ok-bg); color: var(--ok); }
+.status-pill.pending { background: var(--warn-bg); color: var(--warn); }
+
+.c-section { padding: 20px 0; border-bottom: 1px solid var(--line); }
+.c-section:last-child { border-bottom: none; }
+.c-section h2 { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--navy); margin-bottom: 12px; }
+.c-section p { color: var(--ink-soft); line-height: 1.7; font-size: 0.95rem; }
+.c-section ul { margin: 0; padding-left: 20px; color: var(--ink-soft); line-height: 1.7; font-size: 0.95rem; }
+.c-section ul li { margin-bottom: 4px; }
+.c-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; }
+@media (max-width: 480px) { .c-grid { grid-template-columns: 1fr; } }
+.c-label { display: block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ink-mute); font-weight: 600; margin-bottom: 3px; }
+.c-val { font-weight: 600; color: var(--ink); font-size: 0.96rem; }
+
+.signatures .sig-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 6px; }
+@media (max-width: 480px) { .signatures .sig-grid { grid-template-columns: 1fr; } }
+.sig-block { padding-top: 8px; }
+.sig-name { font-size: 1.7rem; line-height: 1.1; min-height: 38px; color: var(--navy); }
+.sig-name.signature { font-family: "Dancing Script", cursive; font-weight: 700; }
+.sig-name.pending { font-family: "Inter", sans-serif; font-size: 0.95rem; color: var(--ink-mute); font-style: italic; padding-top: 12px; }
+.sig-rule { border-bottom: 1px solid var(--ink); margin: 6px 0 8px; }
+.sig-role { font-size: 0.85rem; font-weight: 600; color: var(--ink); }
+.sig-date { font-size: 0.8rem; color: var(--ink-mute); margin-top: 2px; }
+
+.sign-box { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 28px 30px; margin-top: 20px; box-shadow: 0 6px 24px rgba(10,31,68,0.06); }
+.sign-box h3 { font-size: 1.2rem; color: var(--navy); margin-bottom: 6px; }
+.sign-box > p { color: var(--ink-mute); font-size: 0.92rem; margin-bottom: 20px; }
+.sign-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+@media (max-width: 480px) { .sign-row { grid-template-columns: 1fr; } }
+.sign-box .agree { display: flex; gap: 10px; align-items: flex-start; font-size: 0.9rem; color: var(--ink-soft); line-height: 1.5; margin-bottom: 20px; cursor: pointer; }
+.sign-box .agree input { margin-top: 3px; flex-shrink: 0; width: 16px; height: 16px; }
+.sign-done { margin-top: 20px; text-align: center; }
+
+@media (max-width: 560px) {
+  .doc-table thead { display: none; }
+  .doc-table, .doc-table tbody, .doc-table tr, .doc-table td { display: block; width: 100%; }
+  .doc-table tr { border-top: 1px solid var(--line); padding: 8px 0; }
+  .doc-table td { border: none; padding: 4px 16px; }
+  .doc-table .num { text-align: left; }
+}

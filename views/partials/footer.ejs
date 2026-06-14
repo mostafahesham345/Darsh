@@ -1,0 +1,24 @@
+<%
+  function fHref(h) { return (!home && h && h.charAt(0) === '#') ? '/' + h : h; }
+%>
+<footer class="footer">
+  <div class="container footer-inner">
+    <div class="footer-brand">
+      <img src="<%= content.footer.images.logo.url %>" alt="" aria-hidden="true" />
+      <div>
+        <div class="footer-brand-name" data-cms="footer.fields.brandName"><%= content.footer.fields.brandName %></div>
+        <div class="footer-brand-sub" data-cms="footer.fields.brandTagline"><%= content.footer.fields.brandTagline %></div>
+      </div>
+    </div>
+
+    <nav class="footer-links">
+      <% (content.footer.links || []).forEach(function(link) { %>
+        <a href="<%= fHref(link.href) %>"><%= link.label %></a>
+      <% }); %>
+    </nav>
+
+    <div class="footer-meta">
+      © <span id="year"><%= content.meta.fields.year %></span> <%= content.footer.fields.copyright %>
+    </div>
+  </div>
+</footer>

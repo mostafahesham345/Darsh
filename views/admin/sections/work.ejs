@@ -1,0 +1,115 @@
+<%- include('../_head', { pageTitle: 'Selected work' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:work', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>💼 Selected work</h1>
+      <p>Your portfolio cards. Each card auto-shows a live screenshot of the website URL — or upload your own preview image for a guaranteed, fast-loading result.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/work" class="form-root">
+      <div class="form">
+        <h2>Section heading</h2>
+        <div class="field">
+          <label>Eyebrow</label>
+          <input type="text" name="fields[eyebrow]" value="<%= section.fields.eyebrow %>" />
+        </div>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" />
+        </div>
+        <div class="field">
+          <label>Description paragraph</label>
+          <textarea name="fields[lede]"><%= section.fields.lede %></textarea>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Portfolio cards</h2>
+        <p class="hint">Paste each project's website URL — a live screenshot is shown automatically.</p>
+        <div class="repeater" data-repeater data-template="workCard">
+          <% (section.cards || []).forEach(function(card, i) { %>
+            <div class="repeater-item">
+              <h4>Card #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+
+              <div class="field">
+                <label>Website URL</label>
+                <input type="url" name="cards[<%= i %>][url]" value="<%= card.url %>" placeholder="https://example.com" />
+                <div class="help">Must include <code>https://</code>. A screenshot is auto-generated from this URL.</div>
+              </div>
+
+              <div class="field">
+                <label>Preview image (optional — overrides the screenshot)</label>
+                <div class="image-uploader" data-uploader data-key="image">
+                  <div class="image-drop">
+                    <div class="preview<%= !(card.image && card.image.url) ? ' empty' : '' %>" style="<%= (card.image && card.image.url) ? `background-image: url('${card.image.url}')` : '' %>">
+                      <% if (!(card.image && card.image.url)) { %>No image<% } %>
+                    </div>
+                    <div class="actions">
+                      <label class="pick">Choose image<input type="file" accept="image/*" /></label>
+                      <button type="button" class="clear">Remove</button>
+                      <small>Wide image (≈16:10). Max 8MB.</small>
+                    </div>
+                  </div>
+                  <input type="hidden" name="cards[<%= i %>][image][url]" value="<%= (card.image && card.image.url) || '' %>" />
+                  <input type="hidden" name="cards[<%= i %>][image][path]" value="<%= (card.image && card.image.path) || '' %>" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Project title</label>
+                <input type="text" name="cards[<%= i %>][title]" value="<%= card.title %>" />
+              </div>
+              <div class="field">
+                <label>Project description</label>
+                <textarea name="cards[<%= i %>][description]"><%= card.description %></textarea>
+              </div>
+              <div class="field">
+                <label>Tags (comma-separated)</label>
+                <input type="text" name="cards[<%= i %>][tagsText]" value="<%= (card.tags || []).join(', ') %>" />
+                <div class="help">e.g. "React, TypeScript, Postgres"</div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add portfolio card</button>
+
+        <template data-tpl="workCard">
+          <div class="repeater-item">
+            <h4>Card #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="field"><label>Website URL</label><input type="url" name="cards[__I0__][url]" placeholder="https://example.com" /></div>
+            <div class="field">
+              <label>Preview image (optional — overrides the screenshot)</label>
+              <div class="image-uploader" data-uploader data-key="image">
+                <div class="image-drop">
+                  <div class="preview empty">No image</div>
+                  <div class="actions">
+                    <label class="pick">Choose image<input type="file" accept="image/*" /></label>
+                    <button type="button" class="clear">Remove</button>
+                    <small>Wide image (≈16:10). Max 8MB.</small>
+                  </div>
+                </div>
+                <input type="hidden" name="cards[__I0__][image][url]" value="" />
+                <input type="hidden" name="cards[__I0__][image][path]" value="" />
+              </div>
+            </div>
+            <div class="field"><label>Project title</label><input type="text" name="cards[__I0__][title]" /></div>
+            <div class="field"><label>Project description</label><textarea name="cards[__I0__][description]"></textarea></div>
+            <div class="field"><label>Tags (comma-separated)</label><input type="text" name="cards[__I0__][tagsText]" /></div>
+          </div>
+        </template>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<%- include('../_head', { pageTitle: 'Hero' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:hero', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>🌟 Hero / landing</h1>
+      <p>The big area at the top of the page — headline, subtitle, buttons, and stats.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/hero" class="form-root">
+      <div class="form">
+        <h2>Top badge</h2>
+        <div class="field">
+          <label>Badge text</label>
+          <input type="text" name="fields[badge]" value="<%= section.fields.badge %>" />
+          <div class="help">Small pill at the top of the hero — e.g. "Now taking projects for Q3 · 2026".</div>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Headline</h2>
+        <p class="hint">The big bold title. It's split into parts to highlight the yellow word.</p>
+        <div class="field">
+          <label>Line 1</label>
+          <input type="text" name="fields[titleLine1]" value="<%= section.fields.titleLine1 %>" />
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Line 2 — normal text</label>
+            <input type="text" name="fields[titleLine2]" value="<%= section.fields.titleLine2 %>" />
+          </div>
+          <div class="field">
+            <label>Line 2 — yellow word</label>
+            <input type="text" name="fields[titleAccent]" value="<%= section.fields.titleAccent %>" />
+            <div class="help">This word shows in yellow.</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>End punctuation</label>
+          <input type="text" name="fields[titleSuffix]" value="<%= section.fields.titleSuffix %>" />
+          <div class="help">Usually just a period "."</div>
+        </div>
+        <div class="field">
+          <label>Subtitle paragraph</label>
+          <textarea name="fields[sub]" rows="4"><%= section.fields.sub %></textarea>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Buttons</h2>
+        <div class="row-2">
+          <div class="field">
+            <label>Main button — text</label>
+            <input type="text" name="links[primaryCta][label]" value="<%= section.links.primaryCta.label %>" />
+          </div>
+          <div class="field">
+            <label>Main button — link</label>
+            <input type="text" name="links[primaryCta][href]" value="<%= section.links.primaryCta.href %>" />
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Secondary button — text</label>
+            <input type="text" name="links[secondaryCta][label]" value="<%= section.links.secondaryCta.label %>" />
+          </div>
+          <div class="field">
+            <label>Secondary button — link</label>
+            <input type="text" name="links[secondaryCta][href]" value="<%= section.links.secondaryCta.href %>" />
+          </div>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Stats box</h2>
+        <p class="hint">The three numbers below the buttons.</p>
+        <div class="repeater" data-repeater data-template="kpi">
+          <% (section.kpis || []).forEach(function(kpi, i) { %>
+            <div class="repeater-item">
+              <h4>Stat #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+              <div class="row-2">
+                <div class="field">
+                  <label>Number</label>
+                  <input type="number" name="kpis[<%= i %>][value]" value="<%= kpi.value %>" />
+                </div>
+                <div class="field">
+                  <label>Suffix</label>
+                  <input type="text" name="kpis[<%= i %>][suffix]" value="<%= kpi.suffix || '' %>" />
+                  <div class="help">e.g. "%" or "+" — leave blank for nothing.</div>
+                </div>
+              </div>
+              <div class="field">
+                <label>Label below the number</label>
+                <input type="text" name="kpis[<%= i %>][label]" value="<%= kpi.label %>" />
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add stat</button>
+
+        <template data-tpl="kpi">
+          <div class="repeater-item">
+            <h4>Stat #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="row-2">
+              <div class="field"><label>Number</label><input type="number" name="kpis[__I0__][value]" value="0" /></div>
+              <div class="field"><label>Suffix</label><input type="text" name="kpis[__I0__][suffix]" /></div>
+            </div>
+            <div class="field"><label>Label below the number</label><input type="text" name="kpis[__I0__][label]" /></div>
+          </div>
+        </template>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

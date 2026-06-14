@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title><%= contract.title || 'Contract' %> — Darsh</title>
+  <link rel="icon" type="image/png" href="/images/Logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/portal.css" />
+</head>
+<body>
+  <header class="portal-top">
+    <a href="/portal" class="brand"><img src="/images/LogoNav.png" alt="Darsh" onerror="this.src='/images/Logo.png'" /></a>
+    <div class="right">
+      <span class="who"><%= client.name || client.email %></span>
+      <form method="post" action="/portal/logout"><button type="submit">Sign out</button></form>
+    </div>
+  </header>
+
+  <main class="portal-main contract-page">
+    <a href="/portal" class="contract-back">← Back to portal</a>
+
+    <% if (signed) { %>
+      <div class="contract-flash ok">✓ Thank you — your signature has been recorded. This contract is now fully signed.</div>
+    <% } %>
+    <% if (error) { %>
+      <div class="contract-flash err">Please enter your first and last name and tick the agreement box to sign.</div>
+    <% } %>
+
+    <%
+      function lines(s) { return (s || '').split(/\r?\n/).map(function(l){return l.trim();}).filter(Boolean); }
+      function fmt(iso) { try { return new Date(iso).toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' }); } catch(_) { return iso || ''; } }
+      var DEF_IP = 'Upon full payment of all fees due under this Agreement, the Service Provider transfers ownership of all deliverables to the Client, except for pre-existing tools, libraries, and frameworks which remain the property of the Service Provider and are licensed to the Client for use within the deliverables.';
+      var DEF_CONF = 'Both parties agree to keep confidential any proprietary or sensitive information shared during the course of this engagement and will not disclose such information to any third party without prior written consent.';
+      var DEF_TERM = 'Either party may terminate this Agreement with fourteen (14) days written notice. The Client shall pay for all work performed up to the termination date.';
+    %>
+
+    <article class="contract-doc">
+      <div class="contract-head">
+        <div>
+          <h1><%= contract.title || 'Service Agreement' %></h1>
+          <div class="contract-meta">Contract #<%= contract.contractNumber %> · Dated <%= contract.effectiveDate || fmt(contract.createdAt) %></div>
+        </div>
+        <span class="status-pill <%= contract.status === 'signed' ? 'signed' : 'pending' %>">
+          <%= contract.status === 'signed' ? 'Signed' : 'Awaiting your signature' %>
+        </span>
+      </div>
+
+      <section class="c-section">
+        <h2>Parties</h2>
+        <div class="c-grid">
+          <div><span class="c-label">Service Provider</span><span class="c-val">Darsh</span></div>
+          <div><span class="c-label">Client</span><span class="c-val"><%= contract.clientName || '—' %></span></div>
+          <% if (contract.clientCompany) { %><div><span class="c-label">Company</span><span class="c-val"><%= contract.clientCompany %></span></div><% } %>
+          <% if (contract.clientEmail) { %><div><span class="c-label">Email</span><span class="c-val"><%= contract.clientEmail %></span></div><% } %>
+        </div>
+      </section>
+
+      <% if (contract.projectDescription) { %>
+      <section class="c-section"><h2>Project Overview</h2><p><%= contract.projectDescription %></p></section>
+      <% } %>
+
+      <% if (lines(contract.scope).length) { %>
+      <section class="c-section"><h2>Scope of Work</h2><ul><% lines(contract.scope).forEach(function(l){ %><li><%= l %></li><% }); %></ul></section>
+      <% } %>
+
+      <% if (lines(contract.deliverables).length) { %>
+      <section class="c-section"><h2>Deliverables</h2><ul><% lines(contract.deliverables).forEach(function(l){ %><li><%= l %></li><% }); %></ul></section>
+      <% } %>
+
+      <section class="c-section">
+        <h2>Timeline & Compensation</h2>
+        <div class="c-grid">
+          <div><span class="c-label">Start</span><span class="c-val"><%= contract.startDate || 'Upon execution' %></span></div>
+          <div><span class="c-label">End / Delivery</span><span class="c-val"><%= contract.endDate || 'Per schedule' %></span></div>
+          <div><span class="c-label">Total Fee</span><span class="c-val"><%= contract.totalFee ? (contract.currency || 'USD') + ' ' + Number(contract.totalFee).toLocaleString(undefined,{minimumFractionDigits:2}) : '—' %></span></div>
+          <% if (contract.paymentTerms) { %><div><span class="c-label">Payment Terms</span><span class="c-val"><%= contract.paymentTerms %></span></div><% } %>
+        </div>
+      </section>
+
+      <section class="c-section"><h2>Intellectual Property</h2><p><%= contract.ipClause || DEF_IP %></p></section>
+      <section class="c-section"><h2>Confidentiality</h2><p><%= contract.confidentialityClause || DEF_CONF %></p></section>
+      <section class="c-section"><h2>Termination</h2><p><%= contract.terminationClause || DEF_TERM %></p></section>
+      <% if (contract.additionalTerms) { %>
+      <section class="c-section"><h2>Additional Terms</h2><p><%= contract.additionalTerms %></p></section>
+      <% } %>
+
+      <!-- Signatures -->
+      <section class="c-section signatures">
+        <h2>Signatures</h2>
+        <div class="sig-grid">
+          <div class="sig-block">
+            <div class="sig-name signature"><%= contract.providerSignature || 'Darsh' %></div>
+            <div class="sig-rule"></div>
+            <div class="sig-role">Service Provider — Darsh</div>
+            <div class="sig-date">Signed <%= fmt(contract.providerSignedAt) %></div>
+          </div>
+
+          <div class="sig-block">
+            <% if (contract.status === 'signed') { %>
+              <div class="sig-name signature"><%= contract.clientSignature %></div>
+              <div class="sig-rule"></div>
+              <div class="sig-role">Client — <%= contract.clientName || '' %></div>
+              <div class="sig-date">Signed <%= fmt(contract.clientSignedAt) %></div>
+            <% } else { %>
+              <div class="sig-name pending">Awaiting signature</div>
+              <div class="sig-rule"></div>
+              <div class="sig-role">Client — <%= contract.clientName || '' %></div>
+            <% } %>
+          </div>
+        </div>
+      </section>
+    </article>
+
+    <% if (contract.status !== 'signed') { %>
+      <div class="sign-box">
+        <h3>Sign this contract</h3>
+        <p>Type your legal first and last name below to sign. Your typed name is your electronic signature and is legally binding.</p>
+        <form method="post" action="/portal/contracts/<%= contract.id %>/sign">
+          <div class="sign-row">
+            <div class="auth-field">
+              <label for="firstName">First name</label>
+              <input id="firstName" name="firstName" type="text" required />
+            </div>
+            <div class="auth-field">
+              <label for="lastName">Last name</label>
+              <input id="lastName" name="lastName" type="text" required />
+            </div>
+          </div>
+          <label class="agree">
+            <input type="checkbox" name="agree" value="1" required />
+            <span>I have read and agree to the terms of this contract, and I consent to signing it electronically.</span>
+          </label>
+          <button type="submit" class="auth-btn">Sign &amp; submit</button>
+        </form>
+      </div>
+    <% } else { %>
+      <div class="sign-done">
+        <a class="dl-btn" href="/portal/contracts/<%= contract.id %>/download">Download signed PDF</a>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

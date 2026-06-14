@@ -1,0 +1,122 @@
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <img src="/images/Logo.png" alt="" class="sidebar-logo" />
+    <div>
+      <div class="name">Darsh</div>
+      <div class="sub">Admin</div>
+    </div>
+  </div>
+
+  <a href="/admin" class="nav-item<%= active === 'dashboard' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+      </svg>
+    </span>
+    Dashboard
+  </a>
+
+  <div class="nav-group-label">Business</div>
+
+  <a href="/admin/leads" class="nav-item<%= active === 'leads' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+        <polyline points="22,6 12,13 2,6"/>
+      </svg>
+    </span>
+    Leads
+    <% if (typeof newLeads !== 'undefined' && newLeads > 0) { %><span class="nav-badge"><%= newLeads %></span><% } %>
+  </a>
+
+  <a href="/admin/clients" class="nav-item<%= active === 'clients' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+    </span>
+    Clients
+  </a>
+
+  <a href="/admin/contracts" class="nav-item<%= active === 'contracts' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/>
+      </svg>
+    </span>
+    Contracts
+  </a>
+
+  <a href="/admin/invoices" class="nav-item<%= active === 'invoices' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="4" y="2" width="16" height="20" rx="2"/>
+        <line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/>
+      </svg>
+    </span>
+    Invoices
+  </a>
+
+  <a href="/admin/projects" class="nav-item<%= active === 'projects' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </span>
+    Projects
+  </a>
+
+  <div class="nav-group-label">Website</div>
+
+  <a href="/admin/content" class="nav-item<%= active === 'content' || (active && active.startsWith('content:')) ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+      </svg>
+    </span>
+    Website Content
+  </a>
+
+  <% if (active && active.startsWith('content')) { %>
+    <div class="nav-sub">
+      <% const sectionList = [
+        ['meta', 'Page title & SEO'],
+        ['nav', 'Top navigation'],
+        ['hero', 'Hero / landing'],
+        ['ticker', 'Tech ticker'],
+        ['services', 'Services'],
+        ['process', 'Process'],
+        ['why', 'Why Darsh'],
+        ['work', 'Selected work'],
+        ['contact', 'Contact'],
+        ['footer', 'Footer'],
+      ]; %>
+      <% sectionList.forEach(function(pair) { %>
+        <a href="/admin/content/<%= pair[0] %>" class="nav-item<%= active === ('content:' + pair[0]) ? ' active' : '' %>"><%= pair[1] %></a>
+      <% }); %>
+    </div>
+  <% } %>
+
+  <a href="/" target="_blank" class="nav-item">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+        <polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+      </svg>
+    </span>
+    View website
+  </a>
+
+  <div class="sidebar-foot">
+    <div class="email"><%= typeof adminEmail !== 'undefined' ? adminEmail : '' %></div>
+    <form method="post" action="/admin/logout">
+      <button type="submit">Sign out</button>
+    </form>
+  </div>
+</aside>

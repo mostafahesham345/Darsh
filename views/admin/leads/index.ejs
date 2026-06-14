@@ -1,0 +1,60 @@
+<%- include('../_head', { pageTitle: 'Leads' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'leads', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>Leads</h1>
+      <p>Messages submitted through the website contact form.</p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> Leads are emailed but not stored until Firestore is configured.</div>
+    <% } %>
+    <% if (flash) { %><div class="alert alert-ok"><%= flash %></div><% } %>
+
+    <% if (!leads.length) { %>
+      <div class="form" style="text-align:center;padding:56px 28px;">
+        <div style="font-size:2.6rem;margin-bottom:12px;">📥</div>
+        <h2 style="margin:0 0 6px;">No leads yet</h2>
+        <p class="hint">When someone fills out the contact form on your website, they'll show up here.</p>
+      </div>
+    <% } else { %>
+      <% function when(iso) { try { return new Date(iso).toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }); } catch (_) { return iso || ''; } } %>
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <% leads.forEach(function(l) { %>
+          <div class="form" style="padding:20px 22px;<%= l.status === 'new' ? 'border-left:3px solid #f7b500;' : '' %>">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+              <div>
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px;">
+                  <strong style="font-size:1.08rem;"><%= l.name || '—' %></strong>
+                  <% if (l.status === 'new') { %><span class="pill pill-warn">New</span><% } %>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:0.9rem;">
+                  <a href="mailto:<%= l.email %>" style="color:inherit;font-weight:500;"><%= l.email %></a>
+                  <% if (l.company) { %><span style="color:var(--line-strong);">·</span><span style="color:var(--muted);"><%= l.company %></span><% } %>
+                </div>
+                <div style="margin-top:6px;font-size:0.8rem;color:var(--muted);"><%= when(l.createdAt) %></div>
+              </div>
+              <div style="display:flex;gap:8px;flex-shrink:0;">
+                <a href="mailto:<%= l.email %>?subject=Re: your message to Darsh" class="btn btn-yellow btn-sm">Reply</a>
+                <% if (l.status === 'new') { %>
+                  <form method="post" action="/admin/leads/<%= l.id %>/read" style="display:inline;">
+                    <button type="submit" class="btn btn-ghost btn-sm">Mark read</button>
+                  </form>
+                <% } %>
+                <form method="post" action="/admin/leads/<%= l.id %>/delete" style="display:inline;" onsubmit="return confirm('Delete this lead?');">
+                  <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                </form>
+              </div>
+            </div>
+            <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line, #e5e7eb);white-space:pre-wrap;line-height:1.6;"><%= l.message %></div>
+          </div>
+        <% }); %>
+      </div>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>

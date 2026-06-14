@@ -1,0 +1,86 @@
+<%- include('../_head', { pageTitle: 'Footer' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:footer', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>🔻 Footer</h1>
+      <p>The bottom of the website — logo, tagline, links, and copyright.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/footer" class="form-root">
+      <div class="form">
+        <h2>Footer logo</h2>
+        <div class="image-uploader" data-uploader data-key="logo">
+          <div class="image-drop">
+            <div class="preview<%= !section.images.logo.url ? ' empty' : '' %>" style="<%= section.images.logo.url ? `background-image: url('${section.images.logo.url}')` : '' %>">
+              <% if (!section.images.logo.url) { %>No image<% } %>
+            </div>
+            <div class="actions">
+              <label class="pick">Choose image<input type="file" accept="image/*" /></label>
+              <button type="button" class="clear">Remove</button>
+              <small>PNG with transparency. Max 8MB.</small>
+            </div>
+          </div>
+          <input type="hidden" name="images[logo][url]" value="<%= section.images.logo.url || '' %>" />
+          <input type="hidden" name="images[logo][path]" value="<%= section.images.logo.path || '' %>" />
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Brand text</h2>
+        <div class="row-2">
+          <div class="field">
+            <label>Brand name</label>
+            <input type="text" name="fields[brandName]" value="<%= section.fields.brandName %>" />
+          </div>
+          <div class="field">
+            <label>Tagline</label>
+            <input type="text" name="fields[brandTagline]" value="<%= section.fields.brandTagline %>" />
+          </div>
+        </div>
+        <div class="field">
+          <label>Copyright text</label>
+          <input type="text" name="fields[copyright]" value="<%= section.fields.copyright %>" />
+          <div class="help">The year is prepended automatically.</div>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Footer links</h2>
+        <div class="repeater" data-repeater data-template="footerLink">
+          <% (section.links || []).forEach(function(link, i) { %>
+            <div class="repeater-item">
+              <h4>Link #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+              <div class="row-2">
+                <div class="field"><label>Text</label><input type="text" name="links[<%= i %>][label]" value="<%= link.label %>" /></div>
+                <div class="field"><label>Link / anchor</label><input type="text" name="links[<%= i %>][href]" value="<%= link.href %>" /></div>
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add link</button>
+
+        <template data-tpl="footerLink">
+          <div class="repeater-item">
+            <h4>Link #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="row-2">
+              <div class="field"><label>Text</label><input type="text" name="links[__I0__][label]" /></div>
+              <div class="field"><label>Link / anchor</label><input type="text" name="links[__I0__][href]" /></div>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>

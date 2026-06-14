@@ -1,0 +1,90 @@
+<%- include('../_head', { pageTitle: 'Invoices' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'invoices', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>Invoices</h1>
+        <p>Create invoices, email the client, track payment, and send receipts — all in one place.</p>
+      </div>
+      <a href="/admin/invoices/new" class="btn btn-yellow">+ New invoice</a>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> Invoices can't be saved yet.</div>
+    <% } %>
+    <% if (!mailReady) { %>
+      <div class="alert alert-warn"><strong>Email not configured.</strong> Invoices will be created but emails won't send until SMTP is set up in <code>.env</code>.</div>
+    <% } %>
+    <% if (flash) { %><div class="alert <%= (typeof flashWarn !== 'undefined' && flashWarn) ? 'alert-warn' : 'alert-ok' %>"><%= flash %></div><% } %>
+
+    <% if (!invoices.length) { %>
+      <div class="form" style="text-align:center;padding:56px 28px;">
+        <div style="font-size:2.6rem;margin-bottom:12px;">🧾</div>
+        <h2 style="margin:0 0 6px;">No invoices yet</h2>
+        <p class="hint" style="margin-bottom:18px;">Create an invoice to send your first bill and receipt via email.</p>
+        <a href="/admin/invoices/new" class="btn btn-yellow">+ Create invoice</a>
+      </div>
+    <% } else { %>
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Invoice</th>
+              <th>Client</th>
+              <th>Issued</th>
+              <th>Due</th>
+              <th style="text-align:right;">Total</th>
+              <th>Status</th>
+              <th style="text-align:right;width:320px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% invoices.forEach(function(inv) {
+                 const total = invoiceTotal(inv);
+                 const currency = inv.currency || 'USD';
+            %>
+              <tr>
+                <td><strong><%= inv.invoiceNumber %></strong></td>
+                <td><%= inv.clientName %><%= inv.clientCompany ? ' — ' + inv.clientCompany : '' %></td>
+                <td><%= inv.issueDate || '—' %></td>
+                <td><%= inv.dueDate || '—' %></td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums;"><%= currency %> <%= total.toFixed(2) %></td>
+                <td>
+                  <% if (inv.status === 'paid') { %>
+                    <span class="badge badge-ok">Paid</span>
+                  <% } else if (inv.status === 'sent') { %>
+                    <span class="badge badge-info">Sent</span>
+                  <% } else { %>
+                    <span class="badge badge-muted">Draft</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:flex-end;">
+                    <a href="/admin/invoices/<%= inv.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                    <a href="/admin/invoices/<%= inv.id %>/download" class="btn btn-ghost btn-sm">PDF</a>
+                    <form method="post" action="/admin/invoices/<%= inv.id %>/resend" style="margin:0;">
+                      <button type="submit" class="btn btn-ghost btn-sm">Resend</button>
+                    </form>
+                    <% if (inv.status !== 'paid') { %>
+                      <form method="post" action="/admin/invoices/<%= inv.id %>/paid" style="margin:0;" onsubmit="return confirm('Mark this invoice as paid? A receipt will be emailed to the client.');">
+                        <button type="submit" class="btn btn-yellow btn-sm">Mark paid</button>
+                      </form>
+                    <% } %>
+                    <form method="post" action="/admin/invoices/<%= inv.id %>/delete" style="margin:0;" onsubmit="return confirm('Delete this invoice permanently?');">
+                      <button type="submit" class="btn btn-danger btn-sm">×</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>

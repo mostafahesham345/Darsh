@@ -1,0 +1,76 @@
+<%- include('../_head', { pageTitle: project.name }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'projects', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1><%= project.name %></h1>
+        <p><a href="/admin/projects" style="color:var(--muted);">← All projects</a></p>
+      </div>
+      <a href="/admin/projects/<%= project.id %>/edit" class="btn btn-ghost btn-sm">Edit details</a>
+    </div>
+
+    <div class="form">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:16px;margin-bottom:18px;">
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px;">Client</div>
+          <div style="font-weight:600;font-size:1.05rem;"><%= project.clientName || '—' %></div>
+          <% if (project.clientEmail) { %><div style="color:var(--muted);font-size:0.88rem;"><%= project.clientEmail %></div><% } %>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px;">Current stage</div>
+          <span class="badge <%= project.stage === 'done' ? 'badge-ok' : 'badge-info' %>" style="font-size:0.9rem;"><%= stageMeta(project.stage).label %></span>
+        </div>
+        <% if (project.targetDate) { %>
+          <div>
+            <div style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px;">Target date</div>
+            <div style="font-weight:600;"><%= project.targetDate %></div>
+          </div>
+        <% } %>
+      </div>
+
+      <% if (project.description) { %>
+        <p style="color:var(--ink);margin:0 0 20px;"><%= project.description %></p>
+      <% } %>
+
+      <h2 style="margin-top:8px;">Stage history</h2>
+      <% const history = Array.isArray(project.stageHistory) ? project.stageHistory : []; %>
+      <div class="timeline">
+        <% history.slice().reverse().forEach(function(h) { %>
+          <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="timeline-body">
+              <div class="timeline-title"><%= stageMeta(h.stage).label %></div>
+              <div class="timeline-date"><%= new Date(h.at).toLocaleString() %></div>
+              <% if (h.note) { %><div class="timeline-note"><%= h.note %></div><% } %>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <form method="post" action="/admin/projects/<%= project.id %>/stage" class="form">
+      <h2>Advance to next stage</h2>
+      <p class="hint">The client will receive an email with the new stage, a progress bar, and your optional note.</p>
+      <div class="field">
+        <label>Stage</label>
+        <select name="stage">
+          <% stages.forEach(function(s) { %>
+            <option value="<%= s.key %>" <%= s.key === project.stage ? 'selected' : '' %>><%= s.label %> — <%= s.description %></option>
+          <% }); %>
+        </select>
+      </div>
+      <div class="field">
+        <label>Note for client</label>
+        <textarea name="note" rows="3" placeholder="A short update that accompanies the status email."></textarea>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-yellow">Update & notify</button>
+      </div>
+    </form>
+  </main>
+</div>
+</body>
+</html>

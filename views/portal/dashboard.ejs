@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Your Portal — Darsh</title>
+  <link rel="icon" type="image/png" href="/images/Logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/portal.css" />
+</head>
+<body>
+  <header class="portal-top">
+    <a href="/portal" class="brand"><img src="/images/LogoNav.png" alt="Darsh" onerror="this.src='/images/Logo.png'" /></a>
+    <div class="right">
+      <span class="who"><%= client.name || client.email %></span>
+      <form method="post" action="/portal/logout"><button type="submit">Sign out</button></form>
+    </div>
+  </header>
+
+  <main class="portal-main">
+    <div class="portal-hello">
+      <h1>Hi <%= (client.name || '').split(' ')[0] || 'there' %> 👋</h1>
+      <p>Here's everything we're working on together.</p>
+    </div>
+
+    <%
+      function fmtDate(iso) { try { return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }); } catch (_) { return iso || ''; } }
+    %>
+
+    <!-- PROJECTS -->
+    <section class="portal-section">
+      <h2>Projects <span class="count"><%= projects.length %></span></h2>
+      <% if (!projects.length) { %>
+        <div class="empty-card">
+          <span class="icon">🚀</span>
+          <div class="title">No active projects yet</div>
+          <p class="msg">As soon as we kick off, you'll see live progress, stage updates, and a timeline right here.</p>
+        </div>
+      <% } else { %>
+        <% projects.forEach(function(p) {
+             const idx = stages.findIndex(s => s.key === p.stage);
+             const total = stages.length;
+             const pct = Math.round(((idx + 1) / total) * 100);
+             const history = Array.isArray(p.stageHistory) ? p.stageHistory.slice().reverse().slice(0, 4) : [];
+        %>
+          <div class="card">
+            <div class="proj-head">
+              <div>
+                <h3><%= p.name %></h3>
+                <% if (p.targetDate) { %><div class="progress-meta" style="margin-top:4px;">Target: <%= p.targetDate %></div><% } %>
+              </div>
+              <span class="stage-badge <%= p.stage === 'done' ? 'done' : '' %>"><%= stageMeta(p.stage).label %></span>
+            </div>
+            <% if (p.description) { %><p class="proj-desc"><%= p.description %></p><% } %>
+
+            <div class="progress-track">
+              <% stages.forEach(function(s, i) { %><span class="seg <%= i <= idx ? 'on' : '' %>"></span><% }); %>
+            </div>
+            <div class="progress-meta">
+              <span><%= stageMeta(p.stage).description %></span>
+              <span><%= pct %>% complete</span>
+            </div>
+
+            <% if (history.length) { %>
+              <div class="proj-history">
+                <% history.forEach(function(h) { %>
+                  <div class="h-item"><b><%= stageMeta(h.stage).label %></b> <span class="h-when">· <%= fmtDate(h.at) %></span><% if (h.note) { %> — <%= h.note %><% } %></div>
+                <% }); %>
+              </div>
+            <% } %>
+          </div>
+        <% }); %>
+      <% } %>
+    </section>
+
+    <!-- INVOICES -->
+    <section class="portal-section">
+      <h2>Invoices <span class="count"><%= invoices.length %></span></h2>
+      <% if (!invoices.length) { %>
+        <div class="empty-card">
+          <span class="icon">🧾</span>
+          <div class="title">No invoices yet</div>
+          <p class="msg">Invoices and receipts will appear here for you to view and download the moment we send them.</p>
+        </div>
+      <% } else { %>
+        <table class="doc-table">
+          <thead>
+            <tr><th>Invoice</th><th>Issued</th><th>Due</th><th class="num">Total</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% invoices.forEach(function(inv) {
+                 const total = invoiceTotal(inv);
+                 const cur = inv.currency || 'USD';
+                 const st = inv.status || 'draft';
+            %>
+              <tr>
+                <td><strong><%= inv.invoiceNumber %></strong></td>
+                <td><%= inv.issueDate || '—' %></td>
+                <td><%= inv.dueDate || 'On receipt' %></td>
+                <td class="num"><%= money(total, cur) %></td>
+                <td><span class="pill <%= st %>"><%= st === 'paid' ? 'Paid' : st === 'sent' ? 'Due' : 'Draft' %></span></td>
+                <td><a class="dl-btn" href="/portal/invoices/<%= inv.id %>/download"><%= st === 'paid' ? 'Receipt' : 'PDF' %></a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+
+      <% if (zelle && invoices.some(function(i){ return i.status !== 'paid'; })) { %>
+        <div class="pay-note">
+          <span class="pay-icon">💸</span>
+          <div>
+            <div class="pay-title">How to pay</div>
+            <p>Send payment via <strong>Zelle</strong> to <strong><%= zelle.recipient %></strong><%= zelle.name ? ' (' + zelle.name + ')' : '' %>. Please include your <strong>invoice number</strong> in the memo so we can match it to your account.</p>
+          </div>
+        </div>
+      <% } %>
+    </section>
+
+    <!-- CONTRACTS -->
+    <section class="portal-section">
+      <h2>Contracts <span class="count"><%= contracts.length %></span></h2>
+      <% if (!contracts.length) { %>
+        <div class="empty-card">
+          <span class="icon">📄</span>
+          <div class="title">No contracts on file</div>
+          <p class="msg">Signed agreements and statements of work will show up here, ready to download anytime.</p>
+        </div>
+      <% } else { %>
+        <table class="doc-table">
+          <thead>
+            <tr><th>Contract</th><th>Title</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <% contracts.forEach(function(c) { %>
+              <tr>
+                <td><strong><%= c.contractNumber %></strong></td>
+                <td><%= c.title || '—' %></td>
+                <td>
+                  <% if (c.status === 'signed') { %>
+                    <span class="pill paid">Signed</span>
+                  <% } else { %>
+                    <span class="pill sent">Awaiting you</span>
+                  <% } %>
+                </td>
+                <td style="white-space:nowrap;">
+                  <% if (c.status === 'signed') { %>
+                    <a class="dl-btn ghost" href="/portal/contracts/<%= c.id %>">View</a>
+                    <a class="dl-btn" href="/portal/contracts/<%= c.id %>/download">PDF</a>
+                  <% } else { %>
+                    <a class="dl-btn" href="/portal/contracts/<%= c.id %>">Review &amp; sign →</a>
+                  <% } %>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+    </section>
+  </main>
+</body>
+</html>
