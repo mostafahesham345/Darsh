@@ -1,0 +1,151 @@
+<%- include('./_head', { pageTitle: 'Analytics' }) %>
+
+<div class="app-shell">
+  <%- include('./_sidebar', { active: 'analytics', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>Analytics</h1>
+      <p>A snapshot of the numbers that matter — revenue, taxes, projects, and pipeline.</p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> These numbers will populate once Firestore is configured.</div>
+    <% } %>
+
+    <!-- REVENUE -->
+    <h2 class="section-label">💰 Revenue</h2>
+    <div class="stats-grid">
+      <div class="stat-card" style="border-left:3px solid var(--ok);">
+        <div class="label">Collected (paid)</div>
+        <div class="value"><%= money(revenue.collected, 'USD') %></div>
+        <div class="sub">Money actually received</div>
+      </div>
+      <div class="stat-card" style="border-left:3px solid var(--warn);">
+        <div class="label">Outstanding</div>
+        <div class="value"><%= money(revenue.outstanding, 'USD') %></div>
+        <div class="sub">Unpaid invoices still owed</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total invoiced</div>
+        <div class="value"><%= money(revenue.totalInvoiced, 'USD') %></div>
+        <div class="sub">Paid + outstanding</div>
+      </div>
+    </div>
+
+    <!-- TAXES -->
+    <h2 class="section-label">🧾 Tax estimate</h2>
+    <div class="chart-card">
+      <div class="stats-grid" style="margin-bottom:18px;">
+        <div class="stat-card" style="border-left:3px solid var(--danger);">
+          <div class="label">Est. tax to set aside</div>
+          <div class="value"><%= money(revenue.estTax, 'USD') %></div>
+          <div class="sub">~<%= taxRate %>% of collected revenue</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Est. take-home</div>
+          <div class="value"><%= money(revenue.afterTax, 'USD') %></div>
+          <div class="sub">Collected minus estimated tax</div>
+        </div>
+      </div>
+      <form method="get" action="/admin/analytics" style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
+        <div class="field" style="margin:0;">
+          <label for="taxRate" style="margin-bottom:4px;">Estimated tax rate (%)</label>
+          <input id="taxRate" name="taxRate" type="number" min="0" max="60" step="0.5" value="<%= taxRate %>" style="width:140px;" />
+        </div>
+        <button type="submit" class="btn btn-sm">Recalculate</button>
+        <span class="hint" style="align-self:center;">Rough estimate only — confirm with your accountant. Set a default with <code>TAX_RATE_ESTIMATE</code> in <code>.env</code>.</span>
+      </form>
+    </div>
+
+    <!-- INVOICES -->
+    <h2 class="section-label">📄 Invoices</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Paid</div>
+        <div class="value" style="color:var(--ok);"><%= invoices.paidCount %></div>
+        <div class="sub">Invoices marked paid</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Unpaid</div>
+        <div class="value" style="color:var(--warn);"><%= invoices.unpaidCount %></div>
+        <div class="sub">Awaiting payment</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total invoices</div>
+        <div class="value"><%= invoices.total %></div>
+        <div class="sub">All time</div>
+      </div>
+    </div>
+
+    <!-- PROJECTS -->
+    <h2 class="section-label">🚀 Projects</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Active</div>
+        <div class="value"><%= projects.active %></div>
+        <div class="sub">In design → delivery</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Pending</div>
+        <div class="value"><%= projects.pending %></div>
+        <div class="sub">In discovery / planning</div>
+      </div>
+      <div class="stat-card" style="border-left:3px solid var(--ok);">
+        <div class="label">Completed</div>
+        <div class="value"><%= projects.completed %></div>
+        <div class="sub">Delivered & closed</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Total projects</div>
+        <div class="value"><%= projects.total %></div>
+        <div class="sub">All time</div>
+      </div>
+    </div>
+
+    <% if (projects.total) { %>
+      <div class="chart-card">
+        <h3>Projects by stage</h3>
+        <% const maxStage = Math.max(1, ...projects.byStage.map(s => s.count)); %>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px;">
+          <% projects.byStage.forEach(function(s) { %>
+            <div style="display:flex;align-items:center;gap:12px;">
+              <span style="width:150px;flex-shrink:0;font-size:0.86rem;color:var(--muted);"><%= s.label %></span>
+              <div style="flex:1;background:#eef1f7;border-radius:6px;height:18px;overflow:hidden;">
+                <div style="height:100%;width:<%= s.count ? Math.max(4,(s.count/maxStage)*100) : 0 %>%;background:linear-gradient(90deg,var(--navy),var(--yellow));border-radius:6px;"></div>
+              </div>
+              <span style="width:28px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums;"><%= s.count %></span>
+            </div>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+
+    <!-- PIPELINE -->
+    <h2 class="section-label">👥 Clients & pipeline</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Clients</div>
+        <div class="value"><%= counts.clients %></div>
+        <div class="sub">Total client records</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Contracts</div>
+        <div class="value"><%= counts.contracts %></div>
+        <div class="sub"><%= counts.contractsSigned %> signed · <%= counts.contractsPending %> pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Leads</div>
+        <div class="value"><%= counts.leads %></div>
+        <div class="sub"><%= counts.newLeads %> new / unread</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Reviews</div>
+        <div class="value"><%= counts.reviews %></div>
+        <div class="sub"><%= counts.reviewsApproved %> live · <%= counts.reviewsPending %> pending<% if (counts.reviews) { %> · ★ <%= counts.avgRating.toFixed(1) %><% } %></div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

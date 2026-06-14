@@ -208,6 +208,59 @@
     });
   }
 
+  /* ----- Review form (real submit) ----- */
+  const rForm = document.getElementById('reviewForm');
+  if (rForm) {
+    const rBtn = document.getElementById('reviewSubmit');
+    const rStatus = document.getElementById('reviewStatus');
+    const rLabel = rBtn ? rBtn.querySelector('.btn-label') : null;
+    const rDefault = rLabel ? rLabel.textContent : 'Submit review';
+
+    const rClear = () => {
+      rForm.querySelectorAll('.field-err').forEach((el) => (el.textContent = ''));
+      rForm.querySelectorAll('.field.invalid').forEach((el) => el.classList.remove('invalid'));
+    };
+    const rErr = (key, msg) => {
+      const el = rForm.querySelector(`.field-err[data-err="${key}"]`);
+      if (el) { el.textContent = msg; const f = el.closest('.field'); if (f) f.classList.add('invalid'); }
+    };
+    const rSet = (msg, kind) => { if (rStatus) { rStatus.textContent = msg; rStatus.className = 'contact-status' + (kind ? ' ' + kind : ''); } };
+
+    rForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      rClear();
+      rSet('', '');
+      const data = Object.fromEntries(new FormData(rForm).entries());
+      if (rBtn) rBtn.disabled = true;
+      if (rLabel) rLabel.textContent = 'Sending…';
+      try {
+        const res = await fetch('/reviews', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const json = await res.json().catch(() => ({}));
+        if (res.ok && json.ok) {
+          rForm.reset();
+          if (rLabel) rLabel.textContent = '✓ Submitted';
+          rSet("Thank you! Your review was submitted and will appear once it's approved.", 'success');
+          setTimeout(() => { if (rLabel) rLabel.textContent = rDefault; if (rBtn) rBtn.disabled = false; }, 4500);
+          return;
+        }
+        if (json.errors) {
+          Object.entries(json.errors).forEach(([k, v]) => rErr(k, v));
+          rSet('Please fix the highlighted fields.', 'error');
+        } else {
+          rSet(json.error || 'Something went wrong. Please try again.', 'error');
+        }
+      } catch (_) {
+        rSet('Network error — please try again.', 'error');
+      }
+      if (rLabel) rLabel.textContent = rDefault;
+      if (rBtn) rBtn.disabled = false;
+    });
+  }
+
   /* ----- Subtle parallax on hero inner content ----- */
   const heroInner = document.querySelector('.hero-inner');
   if (heroInner && !prefersReduced) {

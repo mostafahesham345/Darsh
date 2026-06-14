@@ -17,6 +17,15 @@
     Dashboard
   </a>
 
+  <a href="/admin/analytics" class="nav-item<%= active === 'analytics' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>
+      </svg>
+    </span>
+    Analytics
+  </a>
+
   <div class="nav-group-label">Business</div>
 
   <a href="/admin/leads" class="nav-item<%= active === 'leads' ? ' active' : '' %>">
@@ -28,6 +37,16 @@
     </span>
     Leads
     <% if (typeof newLeads !== 'undefined' && newLeads > 0) { %><span class="nav-badge"><%= newLeads %></span><% } %>
+  </a>
+
+  <a href="/admin/reviews" class="nav-item<%= active === 'reviews' ? ' active' : '' %>">
+    <span class="icon">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+      </svg>
+    </span>
+    Reviews
+    <% if (typeof pendingReviews !== 'undefined' && pendingReviews > 0) { %><span class="nav-badge"><%= pendingReviews %></span><% } %>
   </a>
 
   <a href="/admin/clients" class="nav-item<%= active === 'clients' ? ' active' : '' %>">

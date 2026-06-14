@@ -11,7 +11,12 @@ import {
 import { uploadBuffer } from '../lib/upload.js';
 import { isReady, getInitError } from '../lib/firebase.js';
 import { getStats } from '../lib/analytics.js';
-import { countNewLeads } from '../lib/business.js';
+import {
+  countNewLeads, countPendingReviews,
+  listInvoices, listProjects, listClients, listContracts, listLeads, listReviews,
+  invoiceTotal, PROJECT_STAGES,
+} from '../lib/business.js';
+import { money } from '../lib/mail.js';
 
 const router = Router();
 const ALLOWED_IMAGE_TYPES = new Set([
@@ -60,9 +65,11 @@ router.get('/', requireAdmin, async (req, res, next) => {
   try {
     const stats = await getStats();
     const newLeads = await countNewLeads();
+    const pendingReviews = await countPendingReviews();
     res.render('admin/dashboard', {
       stats,
       newLeads,
+      pendingReviews,
       firebaseReady: isReady(),
       firebaseError: getInitError()?.message || null,
       adminEmail: req.session.admin.email,
@@ -70,6 +77,61 @@ router.get('/', requireAdmin, async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+});
+
+/* ---------- Business analytics ---------- */
+router.get('/analytics', requireAdmin, async (req, res, next) => {
+  try {
+    const [invoices, projects, clients, contracts, leads, reviews] = await Promise.all([
+      listInvoices(), listProjects(), listClients(), listContracts(), listLeads(), listReviews(),
+    ]);
+
+    // --- Revenue ---
+    let collected = 0, outstanding = 0, paidCount = 0, unpaidCount = 0;
+    invoices.forEach((inv) => {
+      const t = invoiceTotal(inv);
+      if (inv.status === 'paid') { collected += t; paidCount += 1; }
+      else { outstanding += t; unpaidCount += 1; }
+    });
+    const totalInvoiced = collected + outstanding;
+    const taxRate = Math.max(0, Math.min(60, Number(req.query.taxRate) || Number(process.env.TAX_RATE_ESTIMATE) || 25));
+    const estTax = collected * (taxRate / 100);
+    const afterTax = collected - estTax;
+
+    // --- Projects ---
+    const completedProjects = projects.filter((p) => p.stage === 'done').length;
+    const pendingProjects = projects.filter((p) => p.stage === 'discovery').length;
+    const activeProjects = projects.filter((p) => p.stage !== 'done' && p.stage !== 'discovery').length;
+    const projectsByStage = PROJECT_STAGES.map((s) => ({
+      label: s.label, key: s.key, count: projects.filter((p) => p.stage === s.key).length,
+    }));
+
+    // --- Pipeline ---
+    const contractsSigned = contracts.filter((c) => c.status === 'signed').length;
+    const contractsPending = contracts.length - contractsSigned;
+    const newLeads = leads.filter((l) => l.status === 'new').length;
+    const reviewsApproved = reviews.filter((r) => r.status === 'approved').length;
+    const reviewsPending = reviews.filter((r) => r.status === 'pending').length;
+    const avgRating = reviews.length
+      ? (reviews.reduce((a, r) => a + (Number(r.rating) || 0), 0) / reviews.length)
+      : 0;
+
+    res.render('admin/analytics', {
+      adminEmail: req.session.admin.email,
+      firebaseReady: isReady(),
+      money,
+      taxRate,
+      revenue: { collected, outstanding, totalInvoiced, estTax, afterTax },
+      invoices: { paidCount, unpaidCount, total: invoices.length },
+      projects: { active: activeProjects, pending: pendingProjects, completed: completedProjects, total: projects.length, byStage: projectsByStage },
+      counts: {
+        clients: clients.length,
+        contracts: contracts.length, contractsSigned, contractsPending,
+        leads: leads.length, newLeads,
+        reviews: reviews.length, reviewsApproved, reviewsPending, avgRating,
+      },
+    });
+  } catch (err) { next(err); }
 });
 
 /* ---------- Website Content index ---------- */

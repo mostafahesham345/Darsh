@@ -1,8 +1,9 @@
 import { Router } from 'express';
+import { randomUUID } from 'node:crypto';
 import { getAllSections } from '../lib/content.js';
 import { isReady } from '../lib/firebase.js';
 import { trackVisit } from '../lib/analytics.js';
-import { createLead } from '../lib/business.js';
+import { createLead, createReview, listApprovedReviews } from '../lib/business.js';
 import { sendMail, emailShell, escapeHtml, mailReady } from '../lib/mail.js';
 import { services, servicesMeta } from '../lib/services-data.js';
 
@@ -41,17 +42,34 @@ function firebaseWebConfig() {
 router.get('/', async (req, res, next) => {
   try {
     const content = await getAllSections();
+    const reviews = await listApprovedReviews();
+
+    // New-visitor detection: a long-lived cookie means refreshes (and return
+    // visits) are NOT counted as new visitors.
+    const cookieHeader = req.headers.cookie || '';
+    const isNewVisitor = !/(?:^|;\s*)darsh_v=/.test(cookieHeader);
+    if (isNewVisitor) {
+      res.cookie('darsh_v', randomUUID(), {
+        maxAge: 365 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+      });
+    }
+
     res.render('index', {
       content,
       services,
       servicesMeta,
+      reviews,
       firebaseWebConfig: firebaseWebConfig(),
       firebaseReady: isReady(),
     });
+
     // Don't count local/dev hits — only real visitors on a live domain.
     const host = (req.get('host') || '').toLowerCase();
     const isLocal = host.startsWith('localhost') || host.startsWith('127.0.0.1') || host.startsWith('[::1]') || host.startsWith('0.0.0.0');
-    if (!isLocal) trackVisit().catch(() => {});
+    if (!isLocal) trackVisit(isNewVisitor).catch(() => {});
   } catch (err) {
     next(err);
   }
@@ -158,6 +176,38 @@ async function sendLeadAutoReply(lead) {
     html: emailShell({ title: `Thanks for reaching out`, preheader: `We’ll reply within one business day.`, bodyHtml }),
   });
 }
+
+router.post('/reviews', async (req, res) => {
+  try {
+    const body = req.body || {};
+    if (body.website) return res.json({ ok: true }); // honeypot
+
+    const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+    if (rateLimited(ip)) {
+      return res.status(429).json({ ok: false, error: 'Too many submissions — please try again in a minute.' });
+    }
+
+    const name = (body.name || '').trim();
+    const role = (body.role || '').trim();
+    const text = (body.text || '').trim();
+    const rating = Math.round(Number(body.rating) || 0);
+
+    const errors = {};
+    if (!name) errors.name = 'Please enter your name.';
+    if (!rating || rating < 1 || rating > 5) errors.rating = 'Please pick a star rating.';
+    if (!text) errors.text = 'Please write a short review.';
+    if (Object.keys(errors).length) return res.status(400).json({ ok: false, errors });
+
+    if (!isReady()) {
+      return res.status(503).json({ ok: false, error: 'Reviews are temporarily unavailable.' });
+    }
+    await createReview({ name, role, text, rating });
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error('[reviews] submit error:', err);
+    return res.status(500).json({ ok: false, error: 'Something went wrong. Please try again.' });
+  }
+});
 
 router.get('/healthz', (req, res) => {
   res.json({ ok: true, firebaseReady: isReady() });

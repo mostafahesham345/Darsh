@@ -9,6 +9,7 @@ import contractsRoutes from './routes/contracts.js';
 import invoicesRoutes from './routes/invoices.js';
 import projectsRoutes from './routes/projects.js';
 import leadsRoutes from './routes/leads.js';
+import reviewsRoutes from './routes/reviews.js';
 import portalRoutes from './routes/portal.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -44,6 +45,7 @@ app.use('/admin/contracts', contractsRoutes);
 app.use('/admin/invoices', invoicesRoutes);
 app.use('/admin/projects', projectsRoutes);
 app.use('/admin/leads', leadsRoutes);
+app.use('/admin/reviews', reviewsRoutes);
 app.use('/admin', adminRoutes);
 app.use('/portal', portalRoutes);
 app.use('/', publicRoutes);

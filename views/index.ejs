@@ -308,6 +308,82 @@
     </div>
   </section>
 
+  <!-- REVIEWS (only shown once at least one review is approved) -->
+  <% if (reviews && reviews.length) { %>
+  <section class="section section-navy" id="reviews">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow eyebrow-light">Reviews</span>
+        <h2 class="text-light">What our clients say</h2>
+        <p class="lede lede-light">Real words from the businesses we've built for.</p>
+      </div>
+      <div class="reviews-grid">
+        <% reviews.forEach(function(r) { %>
+          <article class="review-card reveal">
+            <div class="review-stars" aria-label="<%= r.rating %> out of 5">
+              <% for (var i = 1; i <= 5; i++) { %><span class="<%= i <= r.rating ? 'on' : '' %>">★</span><% } %>
+            </div>
+            <p class="review-text">“<%= r.text %>”</p>
+            <div class="review-author">
+              <strong><%= r.name %></strong>
+              <% if (r.role) { %><span><%= r.role %></span><% } %>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- LEAVE A REVIEW (always available) -->
+  <section class="section" id="leave-review">
+    <div class="container">
+      <div class="review-form-card reveal">
+        <span class="eyebrow">Leave a review</span>
+        <h2>Worked with us? Tell the world.</h2>
+        <p class="lede" style="margin-top:8px;">Reviews are checked before they go live. Thanks for taking a minute.</p>
+
+        <form class="review-form" id="reviewForm" method="post" action="/reviews" novalidate>
+          <div class="field">
+            <label>Your rating</label>
+            <div class="star-input">
+              <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
+              <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+              <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+              <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+              <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+            </div>
+            <span class="field-err" data-err="rating"></span>
+          </div>
+          <div class="contact-row">
+            <div class="field">
+              <label for="rv-name">Name</label>
+              <input id="rv-name" name="name" type="text" placeholder="Jane Doe" required />
+              <span class="field-err" data-err="name"></span>
+            </div>
+            <div class="field">
+              <label for="rv-role">Company / role <span style="opacity:.6;">(optional)</span></label>
+              <input id="rv-role" name="role" type="text" placeholder="Owner, Acme Inc." />
+            </div>
+          </div>
+          <div class="field">
+            <label for="rv-text">Your review</label>
+            <textarea id="rv-text" name="text" placeholder="What was it like working with us?" required></textarea>
+            <span class="field-err" data-err="text"></span>
+          </div>
+          <div class="hp-field" aria-hidden="true">
+            <label for="rv-website">Website</label>
+            <input id="rv-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+          <button type="submit" class="btn btn-dark btn-glow btn-block" id="reviewSubmit">
+            <span class="btn-label">Submit review</span>
+          </button>
+          <p class="contact-status" id="reviewStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
   <!-- CONTACT -->
   <section class="section-contact" id="contact">
     <div class="stars" aria-hidden="true"></div>

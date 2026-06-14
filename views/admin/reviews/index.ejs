@@ -1,0 +1,82 @@
+<%- include('../_head', { pageTitle: 'Reviews' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'reviews', adminEmail, pendingReviews: pending.length }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>Reviews</h1>
+      <p>Approve reviews to publish them on your website. Only approved reviews are shown publicly.</p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> Reviews can't be loaded until Firestore is configured.</div>
+    <% } %>
+    <% if (flash) { %><div class="alert alert-ok"><%= flash %></div><% } %>
+
+    <% function stars(n) { n = Math.max(0, Math.min(5, Number(n) || 0)); return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); } %>
+    <% function when(iso) { try { return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' }); } catch(_) { return iso || ''; } } %>
+
+    <!-- PENDING -->
+    <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;margin:6px 0 12px;">Pending approval <% if (pending.length) { %><span class="pill pill-warn"><%= pending.length %></span><% } %></h2>
+    <% if (!pending.length) { %>
+      <div class="form" style="text-align:center;padding:32px;color:var(--muted);">Nothing waiting for review. 🎉</div>
+    <% } else { %>
+      <% pending.forEach(function(r) { %>
+        <div class="form" style="padding:20px 22px;border-left:3px solid var(--warn);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <strong style="font-size:1.05rem;"><%= r.name %></strong>
+                <span style="color:#f5a623;letter-spacing:2px;"><%= stars(r.rating) %></span>
+              </div>
+              <% if (r.role) { %><div class="hint" style="font-size:0.85rem;"><%= r.role %></div><% } %>
+              <div class="hint" style="font-size:0.78rem;margin-top:2px;"><%= when(r.createdAt) %></div>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+              <form method="post" action="/admin/reviews/<%= r.id %>/approve" style="margin:0;">
+                <button type="submit" class="btn btn-yellow btn-sm">Approve</button>
+              </form>
+              <form method="post" action="/admin/reviews/<%= r.id %>/delete" style="margin:0;" onsubmit="return confirm('Delete this review permanently?');">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);white-space:pre-wrap;line-height:1.6;"><%= r.text %></div>
+        </div>
+      <% }); %>
+    <% } %>
+
+    <!-- APPROVED -->
+    <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.15rem;margin:28px 0 12px;">Published <span class="pill" style="background:#ecfdf5;color:#065f46;"><%= approved.length %></span></h2>
+    <% if (!approved.length) { %>
+      <div class="form" style="text-align:center;padding:32px;color:var(--muted);">No published reviews yet. The reviews section stays hidden on your website until you approve one.</div>
+    <% } else { %>
+      <% approved.forEach(function(r) { %>
+        <div class="form" style="padding:20px 22px;border-left:3px solid var(--ok);">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+            <div>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <strong style="font-size:1.05rem;"><%= r.name %></strong>
+                <span style="color:#f5a623;letter-spacing:2px;"><%= stars(r.rating) %></span>
+                <span class="badge badge-ok">Live</span>
+              </div>
+              <% if (r.role) { %><div class="hint" style="font-size:0.85rem;"><%= r.role %></div><% } %>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+              <form method="post" action="/admin/reviews/<%= r.id %>/unapprove" style="margin:0;">
+                <button type="submit" class="btn btn-ghost btn-sm">Hide</button>
+              </form>
+              <form method="post" action="/admin/reviews/<%= r.id %>/delete" style="margin:0;" onsubmit="return confirm('Delete this review permanently?');">
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+              </form>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--line);white-space:pre-wrap;line-height:1.6;"><%= r.text %></div>
+        </div>
+      <% }); %>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>
