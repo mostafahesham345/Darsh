@@ -73,17 +73,6 @@
 
   </section>
 
-  <!-- TICKER -->
-  <div class="ticker" aria-hidden="true">
-    <div class="ticker-track">
-      <% for (var loop = 0; loop < 2; loop++) { %>
-        <% (content.ticker.items || []).forEach(function(item) { %>
-          <span class="ticker-item"><%= item %></span><span class="ticker-dot">◆</span>
-        <% }); %>
-      <% } %>
-    </div>
-  </div>
-
   <!-- SERVICES -->
   <section class="section section-yellow" id="services">
     <div class="container">
@@ -121,6 +110,31 @@
       </div>
     </div>
   </section>
+
+  <!-- BRANDS WE WORKED WITH (sliding logos; hidden when no logos uploaded) -->
+  <%
+    var brandLogos = (content.brands && Array.isArray(content.brands.items))
+      ? content.brands.items.filter(function (b) { return b && b.image && b.image.url; })
+      : [];
+  %>
+  <% if (brandLogos.length) { %>
+  <section class="brands" id="brands">
+    <div class="container">
+      <div class="section-head reveal" style="margin-bottom:44px;">
+        <span class="eyebrow eyebrow-light">Our clients</span>
+        <h2 class="text-light"><%= (content.brands.fields && content.brands.fields.title) || 'Brands we worked with' %></h2>
+      </div>
+    </div>
+    <div class="brands-marquee">
+      <div class="brands-group">
+        <% brandLogos.forEach(function(b) { %><span class="brand-logo"><img src="<%= b.image.url %>" alt="<%= b.name || '' %>" loading="lazy" /></span><% }); %>
+      </div>
+      <div class="brands-group" aria-hidden="true">
+        <% brandLogos.forEach(function(b) { %><span class="brand-logo"><img src="<%= b.image.url %>" alt="" loading="lazy" /></span><% }); %>
+      </div>
+    </div>
+  </section>
+  <% } %>
 
   <!-- SOLUTIONS / SERVICES SHOWCASE TEASER -->
   <section class="section" id="solutions">

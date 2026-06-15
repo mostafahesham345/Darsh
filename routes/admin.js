@@ -8,7 +8,7 @@ import {
   sectionKeys,
   defaults,
 } from '../lib/content.js';
-import { uploadBuffer } from '../lib/upload.js';
+import { uploadBuffer, uploadConfigured } from '../lib/upload.js';
 import { isReady, getInitError } from '../lib/firebase.js';
 import { getStats } from '../lib/analytics.js';
 import {
@@ -32,7 +32,7 @@ const upload = multer({
 });
 
 const VALID_SECTIONS = new Set([
-  'meta', 'nav', 'hero', 'ticker', 'services', 'process', 'why', 'work', 'contact', 'footer',
+  'meta', 'nav', 'hero', 'brands', 'services', 'process', 'why', 'work', 'contact', 'footer',
 ]);
 
 /* ---------- Auth ---------- */
@@ -174,7 +174,7 @@ router.post('/content/:key', requireAdmin, async (req, res, next) => {
 /* ---------- Image upload (shared) ---------- */
 router.post('/upload', requireAdminJson, upload.single('file'), async (req, res, next) => {
   try {
-    if (!isReady()) return res.status(503).json({ error: 'Firebase not initialized' });
+    if (!uploadConfigured()) return res.status(503).json({ error: 'Image storage not configured' });
     if (!req.file) return res.status(400).json({ error: 'no file' });
     const { url, path } = await uploadBuffer(req.file.buffer, req.file.originalname, req.file.mimetype);
     res.json({ ok: true, url, path });
@@ -301,8 +301,17 @@ function normalizeSubmission(key, body) {
       };
     }
 
-    case 'ticker': {
-      return { items: toArray(body.items) };
+    case 'brands': {
+      return {
+        fields: { title: body.fields?.title || '' },
+        items: toArray(body.items).map((it) => ({
+          name: it?.name || '',
+          image: {
+            url: it?.image?.url || '',
+            path: it?.image?.path || null,
+          },
+        })),
+      };
     }
 
     case 'services': {

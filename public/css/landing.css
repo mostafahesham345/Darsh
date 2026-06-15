@@ -487,42 +487,66 @@ p  { margin: 0; }
 }
 
 /* =============================================================================
-   TICKER
+   BRANDS WE WORKED WITH (sliding logos)
    ============================================================================= */
-.ticker {
-  background: var(--navy);
-  color: rgba(248, 250, 252, 0.7);
+.brands {
+  --brand-gap: 56px;
+  background: linear-gradient(180deg, var(--navy) 0%, #0c244f 100%);
+  padding: 100px 0;
   overflow: hidden;
-  border-top: 1px solid rgba(248, 250, 252, 0.05);
-  border-bottom: 1px solid rgba(248, 250, 252, 0.05);
-  padding: 18px 0;
-  position: relative;
 }
-.ticker::before, .ticker::after {
-  content: "";
-  position: absolute;
-  top: 0; bottom: 0;
-  width: 80px;
-  z-index: 2;
-  pointer-events: none;
-}
-.ticker::before { left: 0; background: linear-gradient(90deg, var(--navy), transparent); }
-.ticker::after { right: 0; background: linear-gradient(-90deg, var(--navy), transparent); }
-.ticker-track {
+/* Marquee: two identical groups side by side; each scrolls one full width + gap,
+   so the loop is perfectly seamless with no empty space at the end. */
+.brands-marquee {
   display: flex;
-  gap: 36px;
-  white-space: nowrap;
-  animation: tickerSlide 40s linear infinite;
+  gap: var(--brand-gap);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 7%, #000 93%, transparent 100%);
 }
-.ticker-item {
-  font-family: "JetBrains Mono", monospace;
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
+.brands-group {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  gap: var(--brand-gap);
+  min-width: 100%;
+  animation: brandsScroll 32s linear infinite;
 }
-.ticker-dot { color: var(--yellow); opacity: 0.55; }
-@keyframes tickerSlide {
+.brands-marquee:hover .brands-group { animation-play-state: paused; }
+
+/* Every logo sits in an identical white tile — uniform size + always readable
+   on the navy background regardless of the logo's own colors. */
+.brand-logo {
+  flex-shrink: 0;
+  width: 180px;
+  height: 110px;
+  padding: 20px 24px;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s var(--easing);
+}
+.brand-logo:hover { transform: translateY(-4px); }
+.brand-logo img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+}
+
+@media (max-width: 600px) {
+  .brands { --brand-gap: 32px; padding: 64px 0; }
+  .brand-logo { width: 140px; height: 88px; padding: 16px 18px; }
+}
+
+@keyframes brandsScroll {
   from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  to   { transform: translateX(calc(-100% - var(--brand-gap))); }
 }
 
 /* =============================================================================

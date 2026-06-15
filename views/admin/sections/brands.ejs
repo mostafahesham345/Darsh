@@ -1,0 +1,93 @@
+<%- include('../_head', { pageTitle: 'Brands we worked with' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'content:brands', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>🏢 Brands we worked with</h1>
+      <p>Upload brand logos. They slide across a strip under the hero. If there are no logos, the whole section is hidden.</p>
+    </div>
+
+    <% if (saved) { %><div class="alert alert-ok">Saved! Your changes are live.</div><% } %>
+    <% if (!firebaseReady) { %><div class="alert alert-warn">Firebase isn't connected — saves won't work.</div><% } %>
+
+    <form method="post" action="/admin/content/brands" class="form-root">
+      <div class="form">
+        <h2>Section heading</h2>
+        <div class="field">
+          <label>Title</label>
+          <input type="text" name="fields[title]" value="<%= section.fields.title %>" />
+          <div class="help">Shown above the logos. Leave blank to hide the title.</div>
+        </div>
+      </div>
+
+      <div class="form">
+        <h2>Brand logos</h2>
+        <p class="hint">Add one card per brand. PNG/SVG with a transparent background works best.</p>
+        <div class="repeater" data-repeater data-template="brandLogo">
+          <% (section.items || []).forEach(function(item, i) { %>
+            <div class="repeater-item">
+              <h4>Logo #<span class="idx"><%= i + 1 %></span></h4>
+              <button type="button" class="remove-btn">Remove</button>
+
+              <div class="field">
+                <label>Logo image</label>
+                <div class="image-uploader" data-uploader data-key="image">
+                  <div class="image-drop">
+                    <div class="preview<%= !(item.image && item.image.url) ? ' empty' : '' %>" style="<%= (item.image && item.image.url) ? `background-image: url('${item.image.url}')` : '' %>">
+                      <% if (!(item.image && item.image.url)) { %>No image<% } %>
+                    </div>
+                    <div class="actions">
+                      <label class="pick">Choose logo<input type="file" accept="image/*" /></label>
+                      <button type="button" class="clear">Remove</button>
+                      <small>Transparent PNG / SVG. Max 8MB.</small>
+                    </div>
+                  </div>
+                  <input type="hidden" name="items[<%= i %>][image][url]" value="<%= (item.image && item.image.url) || '' %>" />
+                  <input type="hidden" name="items[<%= i %>][image][path]" value="<%= (item.image && item.image.path) || '' %>" />
+                </div>
+              </div>
+
+              <div class="field">
+                <label>Brand name (for accessibility)</label>
+                <input type="text" name="items[<%= i %>][name]" value="<%= item.name || '' %>" placeholder="e.g. Big Birdz" />
+              </div>
+            </div>
+          <% }); %>
+        </div>
+        <button type="button" class="repeater-add">+ Add brand logo</button>
+
+        <template data-tpl="brandLogo">
+          <div class="repeater-item">
+            <h4>Logo #<span class="idx">__I__</span></h4>
+            <button type="button" class="remove-btn">Remove</button>
+            <div class="field">
+              <label>Logo image</label>
+              <div class="image-uploader" data-uploader data-key="image">
+                <div class="image-drop">
+                  <div class="preview empty">No image</div>
+                  <div class="actions">
+                    <label class="pick">Choose logo<input type="file" accept="image/*" /></label>
+                    <button type="button" class="clear">Remove</button>
+                    <small>Transparent PNG / SVG. Max 8MB.</small>
+                  </div>
+                </div>
+                <input type="hidden" name="items[__I0__][image][url]" value="" />
+                <input type="hidden" name="items[__I0__][image][path]" value="" />
+              </div>
+            </div>
+            <div class="field">
+              <label>Brand name (for accessibility)</label>
+              <input type="text" name="items[__I0__][name]" placeholder="e.g. Big Birdz" />
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <%- include('../_form_footer') %>
+    </form>
+  </main>
+</div>
+</body>
+</html>
