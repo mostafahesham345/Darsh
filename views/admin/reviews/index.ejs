@@ -13,6 +13,18 @@
       <div class="alert alert-warn"><strong>Firebase not connected.</strong> Reviews can't be loaded until Firestore is configured.</div>
     <% } %>
     <% if (flash) { %><div class="alert alert-ok"><%= flash %></div><% } %>
+    <% if (typeof error !== 'undefined' && error) { %><div class="alert alert-warn"><%= error %></div><% } %>
+
+    <!-- SEND REVIEW REQUEST -->
+    <div class="form" style="padding:20px 22px;margin-bottom:24px;">
+      <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.05rem;margin:0 0 4px;">Request a review</h2>
+      <p class="hint" style="margin:0 0 14px;">Enter a client's email and we'll send them a link to leave a review.</p>
+      <form method="post" action="/admin/reviews/request" style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:0;">
+        <input type="email" name="email" placeholder="client@example.com" required
+               style="flex:1;min-width:240px;padding:11px 14px;border:1px solid var(--line);border-radius:9px;font-size:0.95rem;" />
+        <button type="submit" class="btn btn-yellow">Send review request</button>
+      </form>
+    </div>
 
     <% function stars(n) { n = Math.max(0, Math.min(5, Number(n) || 0)); return '★★★★★'.slice(0, n) + '☆☆☆☆☆'.slice(0, 5 - n); } %>
     <% function when(iso) { try { return new Date(iso).toLocaleString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'numeric', minute:'2-digit' }); } catch(_) { return iso || ''; } } %>

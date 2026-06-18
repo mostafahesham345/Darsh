@@ -214,6 +214,14 @@ router.post('/reviews', async (req, res) => {
   }
 });
 
+/* Standalone "leave a review" page — the link emailed to clients. */
+router.get('/review', (req, res) => {
+  res.render('review', {
+    businessName: process.env.BUSINESS_NAME || 'Darsh',
+    faviconUrl: '/images/Logo.png',
+  });
+});
+
 router.get('/healthz', (req, res) => {
   res.json({ ok: true, firebaseReady: isReady() });
 });

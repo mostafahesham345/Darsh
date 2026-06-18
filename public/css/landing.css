@@ -244,6 +244,9 @@ p  { margin: 0; }
 .nav-burger { display: none; }
 
 @media (max-width: 860px) {
+  /* Clear the status bar / notch so the nav isn't flush against the top edge. */
+  .nav { padding-top: calc(env(safe-area-inset-top, 0px) + 14px); }
+  .nav.scrolled { padding-top: calc(env(safe-area-inset-top, 0px) + 10px); }
   .nav-links { display: none; }
   .nav-burger {
     display: inline-flex;

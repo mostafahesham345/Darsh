@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Leave a review — <%= businessName %></title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" type="image/png" href="<%= faviconUrl %>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="/css/landing.css" />
+  <style>
+    body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
+    .review-page-wrap { width: 100%; max-width: 560px; }
+    .review-brand { text-align: center; margin-bottom: 22px; }
+    .review-brand img { height: 56px; width: auto; }
+    .thank-you { text-align: center; padding: 24px 8px; }
+    .thank-you .check { font-size: 3rem; line-height: 1; margin-bottom: 12px; }
+    .thank-you h2 { font-family: 'Space Grotesk', sans-serif; margin: 0 0 10px; }
+    .thank-you p { color: var(--muted, #6b7280); line-height: 1.6; margin: 0; }
+  </style>
+</head>
+<body>
+  <div class="review-page-wrap">
+    <div class="review-brand">
+      <img src="/images/LogoDark.png" alt="<%= businessName %>" />
+    </div>
+
+    <div class="review-form-card" id="reviewCard">
+      <span class="eyebrow">Leave a review</span>
+      <h2>How was your experience?</h2>
+      <p class="lede" style="margin-top:8px;">Your honest feedback means a lot. It only takes a minute.</p>
+
+      <form class="review-form" id="reviewForm" method="post" action="/reviews" novalidate>
+        <div class="field">
+          <label>Your rating</label>
+          <div class="star-input">
+            <input type="radio" id="star5" name="rating" value="5" /><label for="star5" title="5 stars">★</label>
+            <input type="radio" id="star4" name="rating" value="4" /><label for="star4" title="4 stars">★</label>
+            <input type="radio" id="star3" name="rating" value="3" /><label for="star3" title="3 stars">★</label>
+            <input type="radio" id="star2" name="rating" value="2" /><label for="star2" title="2 stars">★</label>
+            <input type="radio" id="star1" name="rating" value="1" /><label for="star1" title="1 star">★</label>
+          </div>
+          <span class="field-err" data-err="rating"></span>
+        </div>
+        <div class="contact-row">
+          <div class="field">
+            <label for="rv-name">Name</label>
+            <input id="rv-name" name="name" type="text" placeholder="Jane Doe" required />
+            <span class="field-err" data-err="name"></span>
+          </div>
+          <div class="field">
+            <label for="rv-role">Company / role <span style="opacity:.6;">(optional)</span></label>
+            <input id="rv-role" name="role" type="text" placeholder="Owner, Acme Inc." />
+          </div>
+        </div>
+        <div class="field">
+          <label for="rv-text">Your review</label>
+          <textarea id="rv-text" name="text" placeholder="What was it like working with us?" required></textarea>
+          <span class="field-err" data-err="text"></span>
+        </div>
+        <div class="hp-field" aria-hidden="true">
+          <label for="rv-website">Website</label>
+          <input id="rv-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+        <button type="submit" class="btn btn-dark btn-glow btn-block" id="reviewSubmit">
+          <span class="btn-label">Submit review</span>
+        </button>
+        <p class="contact-status" id="reviewStatus" role="status" aria-live="polite"></p>
+      </form>
+    </div>
+
+    <div class="review-form-card thank-you" id="thankYou" style="display:none;">
+      <div class="check">✓</div>
+      <h2>Thank you!</h2>
+      <p>Your review has been received. We really appreciate you taking the time.<br /><span id="closeHint"></span></p>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var form = document.getElementById('reviewForm');
+      var btn = document.getElementById('reviewSubmit');
+      var label = btn.querySelector('.btn-label');
+      var status = document.getElementById('reviewStatus');
+      var card = document.getElementById('reviewCard');
+      var thankYou = document.getElementById('thankYou');
+      var closeHint = document.getElementById('closeHint');
+      var defaultLabel = label.textContent;
+
+      function clearErrors() {
+        form.querySelectorAll('.field-err').forEach(function (el) { el.textContent = ''; });
+        form.querySelectorAll('.field.invalid').forEach(function (el) { el.classList.remove('invalid'); });
+      }
+      function showError(key, msg) {
+        var el = form.querySelector('.field-err[data-err="' + key + '"]');
+        if (el) { el.textContent = msg; var f = el.closest('.field'); if (f) f.classList.add('invalid'); }
+      }
+      function setStatus(msg, kind) {
+        status.textContent = msg;
+        status.className = 'contact-status' + (kind ? ' ' + kind : '');
+      }
+
+      form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+        clearErrors();
+        setStatus('', '');
+        var data = Object.fromEntries(new FormData(form).entries());
+        btn.disabled = true;
+        label.textContent = 'Sending…';
+        try {
+          var res = await fetch('/reviews', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify(data),
+          });
+          var json = await res.json().catch(function () { return {}; });
+          if (res.ok && json.ok) {
+            card.style.display = 'none';
+            thankYou.style.display = 'block';
+            closeHint.textContent = 'You can close this tab now.';
+            return;
+          }
+          if (json.errors) {
+            Object.entries(json.errors).forEach(function (pair) { showError(pair[0], pair[1]); });
+            setStatus('Please fix the highlighted fields.', 'error');
+          } else {
+            setStatus(json.error || 'Something went wrong. Please try again.', 'error');
+          }
+        } catch (_) {
+          setStatus('Network error — please try again.', 'error');
+        }
+        label.textContent = defaultLabel;
+        btn.disabled = false;
+      });
+    })();
+  </script>
+</body>
+</html>
