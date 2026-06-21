@@ -72,6 +72,7 @@ router.post('/new', requireAdmin, async (req, res, next) => {
       taxRate: body.taxRate,
       discount: body.discount,
       notes: body.notes || '',
+      viaIngenium: Boolean(body.viaIngenium),
     });
 
     // Send invoice email — but don't let a mail failure lose the invoice.
@@ -132,7 +133,18 @@ router.post('/:id/edit', requireAdmin, async (req, res, next) => {
       taxRate: body.taxRate,
       discount: body.discount,
       notes: body.notes || '',
+      viaIngenium: Boolean(body.viaIngenium),
     });
+    res.redirect('/admin/invoices?updated=1');
+  } catch (err) { next(err); }
+});
+
+/* Quick toggle of the "Thru Ingenium" flag from the invoice list. */
+router.post('/:id/ingenium', requireAdmin, async (req, res, next) => {
+  try {
+    const invoice = await getInvoice(req.params.id);
+    if (!invoice) return res.status(404).send('Invoice not found');
+    await updateInvoiceStatus(invoice.id, invoice.status, { viaIngenium: !invoice.viaIngenium });
     res.redirect('/admin/invoices?updated=1');
   } catch (err) { next(err); }
 });

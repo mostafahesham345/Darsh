@@ -87,16 +87,23 @@ router.get('/analytics', requireAdmin, async (req, res, next) => {
     ]);
 
     // --- Revenue ---
-    let collected = 0, outstanding = 0, paidCount = 0, unpaidCount = 0;
+    // Income billed through Ingenium is tracked separately: Ingenium issues a
+    // 1099, so it's excluded from our own income-tax estimate.
+    let collectedDirect = 0, collectedIngenium = 0, outstanding = 0, paidCount = 0, unpaidCount = 0;
     invoices.forEach((inv) => {
       const t = invoiceTotal(inv);
-      if (inv.status === 'paid') { collected += t; paidCount += 1; }
-      else { outstanding += t; unpaidCount += 1; }
+      if (inv.status === 'paid') {
+        if (inv.viaIngenium) collectedIngenium += t;
+        else collectedDirect += t;
+        paidCount += 1;
+      } else { outstanding += t; unpaidCount += 1; }
     });
+    const collected = collectedDirect + collectedIngenium;
     const totalInvoiced = collected + outstanding;
     const taxRate = Math.max(0, Math.min(60, Number(req.query.taxRate) || Number(process.env.TAX_RATE_ESTIMATE) || 25));
-    const estTax = collected * (taxRate / 100);
-    const afterTax = collected - estTax;
+    // Tax is estimated only on direct (non-Ingenium) collected income.
+    const estTax = collectedDirect * (taxRate / 100);
+    const afterTax = (collectedDirect - estTax) + collectedIngenium;
 
     // --- Projects ---
     const completedProjects = projects.filter((p) => p.stage === 'done').length;
@@ -121,7 +128,7 @@ router.get('/analytics', requireAdmin, async (req, res, next) => {
       firebaseReady: isReady(),
       money,
       taxRate,
-      revenue: { collected, outstanding, totalInvoiced, estTax, afterTax },
+      revenue: { collected, collectedDirect, collectedIngenium, outstanding, totalInvoiced, estTax, afterTax },
       invoices: { paidCount, unpaidCount, total: invoices.length },
       projects: { active: activeProjects, pending: pendingProjects, completed: completedProjects, total: projects.length, byStage: projectsByStage },
       counts: {

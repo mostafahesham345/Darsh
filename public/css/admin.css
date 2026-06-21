@@ -169,7 +169,7 @@ input, textarea, select { font: inherit; color: inherit; }
    Dashboard stats
    ========================================================================= */
 .stats-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(178px, 1fr));
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr));
   gap: 16px; margin-bottom: 28px;
 }
 .stat-card {
@@ -177,7 +177,7 @@ input, textarea, select { font: inherit; color: inherit; }
   position: relative; overflow: hidden;
 }
 .stat-card .label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; margin-bottom: 8px; }
-.stat-card .value { font-family: "Space Grotesk", sans-serif; font-size: 2.2rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1; }
+.stat-card .value { font-family: "Space Grotesk", sans-serif; font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; }
 .stat-card .sub { font-size: 0.82rem; color: var(--muted); margin-top: 8px; }
 .stat-card .trend { font-size: 0.82rem; margin-top: 8px; }
 .stat-card .trend.up { color: var(--ok); }

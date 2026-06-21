@@ -60,10 +60,16 @@
                   <% } else { %>
                     <span class="badge badge-muted">Draft</span>
                   <% } %>
+                  <% if (inv.viaIngenium) { %>
+                    <span class="badge" style="background:#eef2ff;color:#3730a3;">Ingenium</span>
+                  <% } %>
                 </td>
                 <td>
                   <div style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:flex-end;">
                     <a href="/admin/invoices/<%= inv.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                    <form method="post" action="/admin/invoices/<%= inv.id %>/ingenium" style="margin:0;" title="Toggle whether this invoice is billed through Ingenium (excluded from tax estimate)">
+                      <button type="submit" class="btn btn-ghost btn-sm"><%= inv.viaIngenium ? '✓ Ingenium' : 'Ingenium' %></button>
+                    </form>
                     <a href="/admin/invoices/<%= inv.id %>/download" class="btn btn-ghost btn-sm">PDF</a>
                     <form method="post" action="/admin/invoices/<%= inv.id %>/resend" style="margin:0;">
                       <button type="submit" class="btn btn-ghost btn-sm">Resend</button>

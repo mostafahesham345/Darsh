@@ -100,6 +100,14 @@
         <textarea id="notes" name="notes" placeholder="Thank-you message, payment instructions, reference info — anything that should appear on the invoice."><%= isEdit ? (inv.notes || '') : '' %></textarea>
       </div>
 
+      <div class="field" style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:14px 16px;">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin:0;">
+          <input type="checkbox" name="viaIngenium" value="1" style="width:18px;height:18px;flex-shrink:0;" <%= (isEdit && inv.viaIngenium) ? 'checked' : '' %> />
+          <span>Thru Ingenium</span>
+        </label>
+        <div class="help" style="margin-top:8px;">Check this if the income is billed through Ingenium. Ingenium issues a 1099, so this invoice is excluded from the income-tax estimate in Analytics and counted separately.</div>
+      </div>
+
       <div class="form-actions">
         <a href="/admin/invoices" class="btn btn-ghost">Cancel</a>
         <button type="submit" class="btn btn-yellow"><%= isEdit ? 'Save changes' : 'Create & email invoice' %></button>

@@ -40,12 +40,17 @@
         <div class="stat-card" style="border-left:3px solid var(--danger);">
           <div class="label">Est. tax to set aside</div>
           <div class="value"><%= money(revenue.estTax, 'USD') %></div>
-          <div class="sub">~<%= taxRate %>% of collected revenue</div>
+          <div class="sub">~<%= taxRate %>% of direct collected (<%= money(revenue.collectedDirect, 'USD') %>)</div>
         </div>
-        <div class="stat-card">
-          <div class="label">Est. take-home</div>
-          <div class="value"><%= money(revenue.afterTax, 'USD') %></div>
-          <div class="sub">Collected minus estimated tax</div>
+        <div class="stat-card" style="border-left:3px solid var(--ok);">
+          <div class="label">Take-home — Direct</div>
+          <div class="value"><%= money(revenue.collectedDirect - revenue.estTax, 'USD') %></div>
+          <div class="sub">Non-Ingenium collected, minus estimated tax</div>
+        </div>
+        <div class="stat-card" style="border-left:3px solid #6366f1;">
+          <div class="label">Take-home — Ingenium</div>
+          <div class="value"><%= money(revenue.collectedIngenium, 'USD') %></div>
+          <div class="sub">1099 income — no tax estimated here</div>
         </div>
       </div>
       <form method="get" action="/admin/analytics" style="display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;">
