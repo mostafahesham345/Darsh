@@ -10,6 +10,14 @@ import { sendMail, emailShell, escapeHtml, mailReady } from '../lib/mail.js';
 
 const router = Router();
 
+/* The project form posts section rows as parallel arrays; zip them into objects. */
+function sectionsFromBody(body) {
+  const names = [].concat(body.sectionName || []);
+  const tools = [].concat(body.sectionTool || []);
+  const owners = [].concat(body.sectionOwner || []);
+  return names.map((n, i) => ({ name: n, tool: tools[i] || '', owner: owners[i] || '' }));
+}
+
 router.get('/', requireAdmin, async (req, res, next) => {
   try {
     const projects = isReady() ? await listProjects() : [];
@@ -56,6 +64,8 @@ router.post('/new', requireAdmin, async (req, res, next) => {
       startDate: body.startDate,
       targetDate: body.targetDate,
       budget: body.budget,
+      ownership: body.ownership,
+      sections: sectionsFromBody(body),
     });
     const mailed = await safeSend(() => sendStageEmail(project, body.stage || 'discovery', 'Project initialized.'));
     res.redirect(`/admin/projects?created=1${mailed ? '' : '&mailfailed=1'}`);
@@ -105,6 +115,8 @@ router.post('/:id/edit', requireAdmin, async (req, res, next) => {
       startDate: body.startDate,
       targetDate: body.targetDate,
       budget: body.budget,
+      ownership: body.ownership,
+      sections: sectionsFromBody(body),
     });
     res.redirect('/admin/projects?edited=1');
   } catch (err) { next(err); }

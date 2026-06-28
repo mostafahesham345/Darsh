@@ -15,6 +15,16 @@
     <% } %>
 
     <form method="post" action="<%= isEdit ? '/admin/contracts/' + c.id + '/edit' : '/admin/contracts/generate' %>" class="form" id="contractForm">
+      <!-- Structured engagement object from the Client Call Guide. Saved with the contract. -->
+      <input type="hidden" name="engagement" id="engagement" value="<%= c.engagement ? JSON.stringify(c.engagement).replace(/"/g, '&quot;') : '' %>" />
+      <div id="engagementSummary" class="cg-attached" style="<%= c.engagement ? '' : 'display:none;' %>">
+        <div class="cg-attached-head">
+          <strong>📋 Call Guide engagement attached</strong>
+          <button type="button" class="btn btn-ghost btn-sm" id="engagementClear">Remove</button>
+        </div>
+        <div id="engagementBody" class="cg-attached-body"></div>
+      </div>
+
       <h2>Contract details</h2>
       <p class="hint">All fields support sensible defaults. Provide as much as you want for a more detailed document.</p>
 
@@ -170,6 +180,71 @@
       document.getElementById('clientAddress').value = opt.dataset.address || '';
     });
   }
+
+  /* ---- Client Call Guide handoff ---- */
+  (function () {
+    const hidden = document.getElementById('engagement');
+    const summary = document.getElementById('engagementSummary');
+    const body = document.getElementById('engagementBody');
+    const clearBtn = document.getElementById('engagementClear');
+
+    function esc(s) { return String(s == null ? '' : s).replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c])); }
+
+    function renderSummary(e) {
+      if (!e) { summary.style.display = 'none'; return; }
+      const p = e.pricing || {};
+      const priceLine = p.type === 'managed'
+        ? `Managed plan: ${esc(p.managedPlan)}`
+        : `Build: ${esc(p.buildPrice)}${p.maintenancePrice ? ` · Maintenance: ${esc(p.maintenancePrice)}` : ''}`;
+      body.innerHTML = `
+        <div><span>Model</span><b>${esc(e.model)}</b></div>
+        <div><span>Domain</span><b>${e.hasDomain ? 'Has one' : 'We register'}${e.domainNote ? ' — ' + esc(e.domainNote) : ''}</b></div>
+        <div><span>Traffic</span><b>${esc(e.trafficTier)} — ${esc(e.stack)}</b></div>
+        <div><span>Infra est.</span><b>${esc(e.estimatedInfraCost)}</b></div>
+        <div><span>Payments</span><b>${e.takesPayments ? "Yes — Stripe in client's name" : 'No'}</b></div>
+        <div><span>Pricing</span><b>${priceLine}</b></div>`;
+      summary.style.display = '';
+    }
+
+    function toAdditionalTerms(e) {
+      const addl = document.getElementById('additionalTerms');
+      if (!addl || addl.value.trim()) return; // don't clobber existing text
+      const p = e.pricing || {};
+      const priceLine = p.type === 'managed'
+        ? `Managed plan: ${p.managedPlan}`
+        : `Build price: ${p.buildPrice}${p.maintenancePrice ? `; Maintenance: ${p.maintenancePrice}` : ''}`;
+      addl.value =
+        `Engagement summary (from Call Guide):\n` +
+        `• Ownership model: ${e.model}\n` +
+        `• Domain: ${e.hasDomain ? 'Client-provided' + (e.domainNote ? ' (' + e.domainNote + ')' : '') : 'Registered by provider'}\n` +
+        `• Traffic tier: ${e.trafficTier} — Stack: ${e.stack}\n` +
+        `• Estimated infrastructure cost: ${e.estimatedInfraCost}\n` +
+        `• Online payments: ${e.takesPayments ? "Yes (Stripe in client's name)" : 'No'}\n` +
+        `• ${priceLine}`;
+    }
+
+    // 1) Edit mode: render the engagement already saved on the contract.
+    if (hidden && hidden.value) {
+      try { renderSummary(JSON.parse(hidden.value)); } catch (_) {}
+    }
+
+    // 2) New contract coming from the wizard: pull it out of sessionStorage.
+    try {
+      const raw = sessionStorage.getItem('callGuideEngagement');
+      if (raw && (!hidden.value)) {
+        const e = JSON.parse(raw);
+        hidden.value = raw;
+        renderSummary(e);
+        toAdditionalTerms(e);
+        sessionStorage.removeItem('callGuideEngagement');
+      }
+    } catch (_) {}
+
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+      hidden.value = '';
+      summary.style.display = 'none';
+    });
+  })();
 </script>
 </body>
 </html>

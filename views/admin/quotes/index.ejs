@@ -1,0 +1,81 @@
+<%- include('../_head', { pageTitle: 'Quotes' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'quotes', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head" style="display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap;">
+      <div>
+        <h1>Quotes</h1>
+        <p>Build a quote from priced sections, then send it straight to the client by email.</p>
+      </div>
+      <a href="/admin/quotes/new" class="btn btn-yellow">+ New quote</a>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn"><strong>Firebase not connected.</strong> Quotes can't be saved yet.</div>
+    <% } %>
+    <% if (!mailReady) { %>
+      <div class="alert alert-warn"><strong>Email not configured.</strong> Quotes can be saved but won't send until SMTP is set up.</div>
+    <% } %>
+    <% if (flash) { %><div class="alert <%= (typeof flashWarn !== 'undefined' && flashWarn) ? 'alert-warn' : 'alert-ok' %>"><%= flash %></div><% } %>
+    <% if (typeof mailfailed !== 'undefined' && mailfailed) { %><div class="alert alert-warn">The email could not be sent — check SMTP settings, then use “Send”.</div><% } %>
+
+    <% if (!quotes.length) { %>
+      <div class="form" style="text-align:center;padding:56px 28px;">
+        <div style="font-size:2.6rem;margin-bottom:12px;">📝</div>
+        <h2 style="margin:0 0 6px;">No quotes yet</h2>
+        <p class="hint" style="margin-bottom:18px;">Create a quote with sections and pricing, then send it to your client.</p>
+        <a href="/admin/quotes/new" class="btn btn-yellow">+ Create quote</a>
+      </div>
+    <% } else { %>
+      <div class="data-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Quote</th>
+              <th>Client</th>
+              <th>Issued</th>
+              <th style="text-align:right;">Total</th>
+              <th>Status</th>
+              <th style="text-align:right;width:300px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% quotes.forEach(function(q) {
+                 const total = quoteTotal(q);
+                 const currency = q.currency || 'USD';
+            %>
+              <tr>
+                <td><strong><%= q.quoteNumber %></strong><div class="hint" style="font-size:0.8rem;"><%= q.title || 'Project Quote' %></div></td>
+                <td><%= q.clientName || '—' %><%= q.clientCompany ? ' — ' + q.clientCompany : '' %></td>
+                <td><%= q.issueDate || '—' %></td>
+                <td style="text-align:right;font-variant-numeric:tabular-nums;"><%= currency %> <%= total.toFixed(2) %></td>
+                <td>
+                  <% if (q.status === 'sent') { %>
+                    <span class="badge badge-info">Sent</span>
+                  <% } else { %>
+                    <span class="badge badge-muted">Draft</span>
+                  <% } %>
+                </td>
+                <td>
+                  <div style="display:flex;flex-wrap:nowrap;gap:6px;align-items:center;justify-content:flex-end;">
+                    <a href="/admin/quotes/<%= q.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+                    <form method="post" action="/admin/quotes/<%= q.id %>/send" style="margin:0;" onsubmit="return confirm('Send this quote to <%= q.clientEmail || 'the client' %>?');">
+                      <button type="submit" class="btn btn-yellow btn-sm" <%= q.clientEmail ? '' : 'disabled title=\"No client email on this quote\"' %>><%= q.status === 'sent' ? 'Resend' : 'Send to client' %></button>
+                    </form>
+                    <form method="post" action="/admin/quotes/<%= q.id %>/delete" style="margin:0;" onsubmit="return confirm('Delete this quote permanently?');">
+                      <button type="submit" class="btn btn-danger btn-sm">×</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</div>
+</body>
+</html>

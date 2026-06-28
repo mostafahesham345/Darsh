@@ -51,6 +51,38 @@
       </div>
     </div>
 
+    <div class="form">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+        <h2 style="margin:0;">Build &amp; ownership</h2>
+        <a href="/admin/projects/<%= project.id %>/edit" class="btn btn-ghost btn-sm">Edit</a>
+      </div>
+      <% const secs = Array.isArray(project.sections) ? project.sections : []; %>
+      <% if (project.ownership) { %>
+        <p style="margin:12px 0 4px;">
+          <span style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:600;">Overall ownership</span><br/>
+          <span class="badge <%= project.ownership === 'Managed' ? 'badge-info' : 'badge-ok' %>" style="font-size:0.9rem;margin-top:4px;"><%= project.ownership %></span>
+        </p>
+      <% } %>
+      <% if (secs.length) { %>
+        <div class="data-table" style="margin-top:14px;">
+          <table>
+            <thead><tr><th>Section</th><th>Tool / provider</th><th>Owner</th></tr></thead>
+            <tbody>
+              <% secs.forEach(function(s) { %>
+                <tr>
+                  <td><strong><%= s.name || '—' %></strong></td>
+                  <td><%= s.tool || '—' %></td>
+                  <td><%= s.owner || '—' %></td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else if (!project.ownership) { %>
+        <p class="hint" style="margin-top:12px;">Not captured yet. Use <strong>Edit</strong> to record who owns what and the tools behind each section — you can do this anytime, even after the project is done.</p>
+      <% } %>
+    </div>
+
     <form method="post" action="/admin/projects/<%= project.id %>/stage" class="form">
       <h2>Advance to next stage</h2>
       <p class="hint">The client will receive an email with the new stage, a progress bar, and your optional note.</p>

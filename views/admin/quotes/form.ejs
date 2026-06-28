@@ -1,0 +1,165 @@
+<% const isEdit = typeof mode !== 'undefined' && mode === 'edit'; const q = typeof quote !== 'undefined' ? quote : {}; %>
+<%- include('../_head', { pageTitle: isEdit ? 'Edit quote' : 'New quote' }) %>
+
+<div class="app-shell">
+  <%- include('../_sidebar', { active: 'quotes', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1><%= isEdit ? 'Edit quote' : 'New quote' %></h1>
+      <p><a href="/admin/quotes" style="color:var(--muted);">← Back to quotes</a> · Build the sections and pricing, then save — or save and send it to the client right away.</p>
+    </div>
+
+    <% if (!firebaseReady) { %>
+      <div class="alert alert-warn">Firebase not connected — saving is disabled.</div>
+    <% } %>
+
+    <form method="post" action="<%= isEdit ? '/admin/quotes/' + q.id + '/edit' : '/admin/quotes/new' %>" class="form" id="quoteForm">
+      <div class="row-2">
+        <div class="field">
+          <label for="quoteNumber">Quote number</label>
+          <input id="quoteNumber" name="quoteNumber" type="text" value="<%= isEdit ? (q.quoteNumber || '') : nextNum %>" />
+        </div>
+        <div class="field">
+          <label for="title">Quote title</label>
+          <input id="title" name="title" type="text" value="<%= isEdit ? (q.title || 'Project Quote') : 'Project Quote' %>" />
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="issueDate">Issue date</label>
+          <input id="issueDate" name="issueDate" type="text" value="<%= isEdit ? (q.issueDate || '') : '' %>" placeholder="e.g. June 28, 2026" />
+        </div>
+        <div class="field">
+          <label for="validUntil">Valid until (optional)</label>
+          <input id="validUntil" name="validUntil" type="text" value="<%= isEdit ? (q.validUntil || '') : '' %>" placeholder="e.g. July 28, 2026" />
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px;">Client</h2>
+      <% if (clients.length) { %>
+        <div class="field">
+          <label for="clientId">Pick a client</label>
+          <select id="clientId" name="clientId">
+            <option value="">— Enter manually —</option>
+            <% clients.forEach(function(c) { %>
+              <option value="<%= c.id %>"
+                <%= isEdit && q.clientId === c.id ? 'selected' : '' %>
+                data-name="<%= c.name || '' %>"
+                data-company="<%= c.company || '' %>"
+                data-email="<%= c.email || '' %>"><%= c.name %><%= c.company ? ' — ' + c.company : '' %></option>
+            <% }); %>
+          </select>
+          <div class="help">Selecting a client autofills the fields below.</div>
+        </div>
+      <% } else { %>
+        <div class="alert alert-info" style="margin-bottom:16px;">No clients saved yet — <a href="/admin/clients/new">add one</a> for easier autofill, or enter details manually below.</div>
+      <% } %>
+
+      <div class="row-2">
+        <div class="field">
+          <label for="clientName">Client name</label>
+          <input id="clientName" name="clientName" type="text" value="<%= isEdit ? (q.clientName || '') : '' %>" />
+        </div>
+        <div class="field">
+          <label for="clientCompany">Company</label>
+          <input id="clientCompany" name="clientCompany" type="text" value="<%= isEdit ? (q.clientCompany || '') : '' %>" />
+        </div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label for="clientEmail">Client email</label>
+          <input id="clientEmail" name="clientEmail" type="email" value="<%= isEdit ? (q.clientEmail || '') : '' %>" />
+          <div class="help">The quote is sent here when you "Send to client".</div>
+        </div>
+        <div class="field">
+          <label for="currency">Currency</label>
+          <input id="currency" name="currency" type="text" value="<%= isEdit ? (q.currency || 'USD') : 'USD' %>" />
+        </div>
+      </div>
+
+      <h2 style="margin-top:18px;">Sections</h2>
+      <p class="hint">Each section is a line on the quote with its own price. The total is the sum of all sections.</p>
+      <div id="sections"></div>
+      <button type="button" class="repeater-add" id="addSection">+ Add section</button>
+
+      <div class="cg-attached" style="margin-top:18px;display:flex;justify-content:space-between;align-items:center;">
+        <strong>Total</strong>
+        <strong id="quoteTotal" style="font-size:1.3rem;font-family:'Space Grotesk',sans-serif;">0.00</strong>
+      </div>
+
+      <div class="field" style="margin-top:18px;">
+        <label for="notes">Notes</label>
+        <textarea id="notes" name="notes" placeholder="Anything the client should know — scope caveats, timeline, payment terms."><%= isEdit ? (q.notes || '') : '' %></textarea>
+      </div>
+
+      <div class="form-actions">
+        <a href="/admin/quotes" class="btn btn-ghost">Cancel</a>
+        <button type="submit" name="sendNow" value="0" class="btn btn-ghost"><%= isEdit ? 'Save changes' : 'Save draft' %></button>
+        <button type="submit" name="sendNow" value="1" class="btn btn-yellow" id="sendBtn">Save &amp; send to client</button>
+      </div>
+    </form>
+  </main>
+</div>
+
+<script>
+  const sectionsWrap = document.getElementById('sections');
+  const totalEl = document.getElementById('quoteTotal');
+
+  function recalcTotal() {
+    let total = 0;
+    sectionsWrap.querySelectorAll('input[name="sectionPrice"]').forEach((inp) => { total += Number(inp.value) || 0; });
+    totalEl.textContent = total.toFixed(2);
+  }
+
+  function addSection(title = '', description = '', price = '') {
+    const row = document.createElement('div');
+    row.className = 'repeater-item';
+    const safe = (s) => String(s).replace(/"/g, '&quot;');
+    row.innerHTML = `
+      <button type="button" class="remove-btn">Remove</button>
+      <div class="row-2">
+        <div class="field"><label>Section title</label><input type="text" name="sectionTitle" value="${safe(title)}" placeholder="e.g. Homepage design" /></div>
+        <div class="field"><label>Price</label><input type="number" name="sectionPrice" step="0.01" min="0" value="${price}" placeholder="0.00" /></div>
+      </div>
+      <div class="field"><label>Description (optional)</label><textarea name="sectionDesc" rows="2" placeholder="What this section includes.">${safe(description)}</textarea></div>`;
+    row.querySelector('.remove-btn').addEventListener('click', () => { row.remove(); recalcTotal(); });
+    row.querySelector('input[name="sectionPrice"]').addEventListener('input', recalcTotal);
+    sectionsWrap.appendChild(row);
+  }
+
+  document.getElementById('addSection').addEventListener('click', () => addSection());
+
+  <% if (isEdit && Array.isArray(q.sections) && q.sections.length) { %>
+    <% q.sections.forEach(function(s) { %>
+      addSection(<%- JSON.stringify(s.title || '') %>, <%- JSON.stringify(s.description || '') %>, <%= Number(s.price) || 0 %>);
+    <% }); %>
+  <% } else { %>
+    addSection();
+  <% } %>
+  recalcTotal();
+
+  // Don't let "Save & send" go out without a client email.
+  document.getElementById('quoteForm').addEventListener('submit', (e) => {
+    const sendNow = e.submitter && e.submitter.value === '1';
+    const email = document.getElementById('clientEmail').value.trim();
+    if (sendNow && !email) {
+      e.preventDefault();
+      alert('Add a client email before sending. You can still "Save draft" without one.');
+    }
+  });
+
+  const picker = document.getElementById('clientId');
+  if (picker) {
+    picker.addEventListener('change', (e) => {
+      const opt = e.target.options[e.target.selectedIndex];
+      if (!opt || !opt.value) return;
+      document.getElementById('clientName').value = opt.dataset.name || '';
+      document.getElementById('clientCompany').value = opt.dataset.company || '';
+      document.getElementById('clientEmail').value = opt.dataset.email || '';
+    });
+  }
+</script>
+</body>
+</html>

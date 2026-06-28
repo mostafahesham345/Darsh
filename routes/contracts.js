@@ -87,6 +87,7 @@ router.post('/generate', requireAdmin, async (req, res, next) => {
       confidentialityClause: body.confidentialityClause,
       terminationClause: body.terminationClause,
       additionalTerms: body.additionalTerms,
+      engagement: body.engagement,
     };
 
     let saved = null;
@@ -147,6 +148,7 @@ router.post('/:id/edit', requireAdmin, async (req, res, next) => {
       confidentialityClause: body.confidentialityClause,
       terminationClause: body.terminationClause,
       additionalTerms: body.additionalTerms,
+      engagement: body.engagement,
     });
     res.redirect('/admin/contracts?updated=1');
   } catch (err) { next(err); }

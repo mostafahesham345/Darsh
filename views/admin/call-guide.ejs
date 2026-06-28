@@ -1,0 +1,343 @@
+<%- include('_head', { pageTitle: 'Client Call Guide' }) %>
+
+<div class="app-shell">
+  <%- include('_sidebar', { active: 'call-guide', adminEmail }) %>
+
+  <main class="main">
+    <div class="page-head">
+      <h1>Client Call Guide</h1>
+      <p>Walk through this live on a call. Each step branches based on the last answer, and prices appear as you go. At the end you can attach a structured summary to a new contract.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="cg-progress" id="cgProgress"></div>
+
+    <div class="cg-layout">
+      <!-- Question card -->
+      <div class="cg-card form" id="cgCard"><!-- rendered by JS --></div>
+
+      <!-- Running selections / prices -->
+      <aside class="cg-side">
+        <h3>Selections</h3>
+        <dl id="cgRunning" class="cg-running"><div class="cg-empty">Answers will appear here as you go.</div></dl>
+      </aside>
+    </div>
+
+    <!-- Nav -->
+    <div class="cg-nav">
+      <button type="button" class="btn btn-ghost" id="cgBack">← Back</button>
+      <button type="button" class="btn btn-yellow" id="cgNext">Next →</button>
+    </div>
+  </main>
+</div>
+
+<script>
+(function () {
+  /* ----------------------------- Reference data ----------------------------- */
+  const TRAFFIC = {
+    Small:  { label: 'A little, mostly info',                          stack: 'Vercel/Netlify (hobby tier) + Cloudflare DNS + managed form/email', cost: '$8–15/mo' },
+    Medium: { label: 'Steady visitors / photo-heavy / small store',    stack: 'Vercel or Render + managed Postgres + Cloudinary/R2 media + Cloudflare', cost: '$20–60/mo' },
+    High:   { label: 'High volume / busy store',                       stack: 'Containers/dedicated host + managed DB cluster + CDN + object storage', cost: '$80–300+/mo' },
+  };
+  const BUILD_TIERS = [
+    { key: 'simple',   label: 'Simple',   range: '$800–1,500' },
+    { key: 'standard', label: 'Standard', range: '$1,500–4,000' },
+    { key: 'custom',   label: 'Custom',   range: '$4,000+' },
+  ];
+  const MANAGED_PLANS = [
+    { key: 'essential', name: 'Essential', price: '$99/mo' },
+    { key: 'growth',    name: 'Growth',    price: '$199–249/mo' },
+    { key: 'premium',   name: 'Premium',   price: '$399–499/mo' },
+  ];
+  const MAINTENANCE_GUIDE = '$75–250/mo';
+
+  /* ------------------------------- State ------------------------------- */
+  const state = {
+    model: null,            // 'Client-Owned' | 'Managed'
+    modelChoice: null,      // 'own' | 'managed' | 'notsure'
+    tiebreaker: null,       // 'handles' | 'never'
+    hasDomain: null,        // true | false
+    domainNote: '',
+    trafficTier: null,      // 'Small' | 'Medium' | 'High'
+    takesPayments: null,    // true | false
+    buildPrice: '',
+    maintenance: false,
+    maintenancePrice: MAINTENANCE_GUIDE,
+    managedPlan: '',        // e.g. "Growth — $199–249/mo"
+  };
+
+  const STEPS = ['model', 'domain', 'traffic', 'payments', 'pricing', 'summary'];
+  const STEP_TITLES = {
+    model: 'Ownership', domain: 'Domain', traffic: 'Traffic', payments: 'Payments', pricing: 'Pricing', summary: 'Summary',
+  };
+  let stepIndex = 0;
+
+  const card = document.getElementById('cgCard');
+  const backBtn = document.getElementById('cgBack');
+  const nextBtn = document.getElementById('cgNext');
+  const progressEl = document.getElementById('cgProgress');
+  const runningEl = document.getElementById('cgRunning');
+
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+
+  /* ------------------------------ Renderers ------------------------------ */
+  function render() {
+    const step = STEPS[stepIndex];
+    renderProgress();
+    if (step === 'model') renderModel();
+    else if (step === 'domain') renderDomain();
+    else if (step === 'traffic') renderTraffic();
+    else if (step === 'payments') renderPayments();
+    else if (step === 'pricing') renderPricing();
+    else if (step === 'summary') renderSummary();
+    renderRunning();
+    renderNav();
+  }
+
+  function renderProgress() {
+    progressEl.innerHTML = STEPS.map((s, i) =>
+      `<div class="cg-step ${i === stepIndex ? 'is-active' : ''} ${i < stepIndex ? 'is-done' : ''}">
+        <span class="cg-step-num">${i < stepIndex ? '✓' : i + 1}</span>${STEP_TITLES[s]}
+      </div>`).join('<span class="cg-step-sep"></span>');
+  }
+
+  function optionButton(active, value, title, sub, priceTag) {
+    return `<button type="button" class="cg-option ${active ? 'is-selected' : ''}" data-val="${esc(value)}">
+      <div class="cg-option-main"><span class="cg-option-title">${esc(title)}</span>${sub ? `<span class="cg-option-sub">${esc(sub)}</span>` : ''}</div>
+      ${priceTag ? `<span class="cg-price-tag">${esc(priceTag)}</span>` : ''}
+    </button>`;
+  }
+
+  function renderModel() {
+    card.innerHTML = `
+      <div class="cg-q">Do you want to own everything yourself, or do you want us to own it and you pay a monthly subscription?</div>
+      <div class="cg-options" id="cgModelOpts">
+        ${optionButton(state.modelChoice === 'own', 'own', "I'll own it myself", 'Client-Owned — you hold all the accounts')}
+        ${optionButton(state.modelChoice === 'managed', 'managed', "You own it, I'll pay monthly", 'Managed — we host & maintain it')}
+        ${optionButton(state.modelChoice === 'notsure', 'notsure', 'Not sure', "Let's figure it out")}
+      </div>
+      <div id="cgTiebreak" style="${state.modelChoice === 'notsure' ? '' : 'display:none;'}">
+        <div class="cg-q cg-q-sub">Do you want to log into accounts and handle renewals, or never think about it?</div>
+        <div class="cg-options">
+          ${optionButton(state.tiebreaker === 'handles', 'handles', "I'll handle it", '→ Client-Owned')}
+          ${optionButton(state.tiebreaker === 'never', 'never', 'Never think about it', '→ Managed')}
+        </div>
+      </div>`;
+    card.querySelector('#cgModelOpts').addEventListener('click', (e) => {
+      const b = e.target.closest('.cg-option'); if (!b) return;
+      state.modelChoice = b.dataset.val;
+      if (b.dataset.val === 'own') { state.model = 'Client-Owned'; state.tiebreaker = null; }
+      else if (b.dataset.val === 'managed') { state.model = 'Managed'; state.tiebreaker = null; }
+      else { state.model = null; }
+      render();
+    });
+    const tb = card.querySelector('#cgTiebreak');
+    if (tb) tb.addEventListener('click', (e) => {
+      const b = e.target.closest('.cg-option'); if (!b) return;
+      state.tiebreaker = b.dataset.val;
+      state.model = b.dataset.val === 'handles' ? 'Client-Owned' : 'Managed';
+      render();
+    });
+  }
+
+  function renderDomain() {
+    card.innerHTML = `
+      <div class="cg-q">Do you already have a domain?</div>
+      <div class="cg-options">
+        ${optionButton(state.hasDomain === true, 'yes', 'Yes, I have one', 'Capture the registrar / login note below')}
+        ${optionButton(state.hasDomain === false, 'no', 'No', "We'll register one for you")}
+      </div>
+      <div id="cgDomainNote" class="field" style="${state.hasDomain === true ? '' : 'display:none;'}margin-top:14px;">
+        <label for="cgDomainInput">Registrar / login note</label>
+        <input id="cgDomainInput" type="text" placeholder="e.g. GoDaddy, login is client's — will share access" value="${esc(state.domainNote)}" />
+      </div>`;
+    card.querySelector('.cg-options').addEventListener('click', (e) => {
+      const b = e.target.closest('.cg-option'); if (!b) return;
+      state.hasDomain = b.dataset.val === 'yes';
+      if (!state.hasDomain) state.domainNote = '';
+      render();
+      const inp = card.querySelector('#cgDomainInput');
+      if (inp) inp.focus();
+    });
+    const inp = card.querySelector('#cgDomainInput');
+    if (inp) inp.addEventListener('input', (e) => { state.domainNote = e.target.value; renderRunning(); });
+  }
+
+  function renderTraffic() {
+    card.innerHTML = `
+      <div class="cg-q">How much traffic do you expect? This sets the stack and running cost.</div>
+      <div class="cg-options">
+        ${Object.keys(TRAFFIC).map((k) => optionButton(state.trafficTier === k, k, k + ' — ' + TRAFFIC[k].label, TRAFFIC[k].stack, TRAFFIC[k].cost)).join('')}
+      </div>`;
+    card.querySelector('.cg-options').addEventListener('click', (e) => {
+      const b = e.target.closest('.cg-option'); if (!b) return;
+      state.trafficTier = b.dataset.val;
+      render();
+    });
+  }
+
+  function renderPayments() {
+    card.innerHTML = `
+      <div class="cg-q">Are you taking payments online?</div>
+      <div class="cg-options">
+        ${optionButton(state.takesPayments === true, 'yes', 'Yes', "Stripe — always set up in the client's name")}
+        ${optionButton(state.takesPayments === false, 'no', 'No', 'No online checkout needed')}
+      </div>`;
+    card.querySelector('.cg-options').addEventListener('click', (e) => {
+      const b = e.target.closest('.cg-option'); if (!b) return;
+      state.takesPayments = b.dataset.val === 'yes';
+      render();
+    });
+  }
+
+  function renderPricing() {
+    if (state.model === 'Client-Owned') {
+      card.innerHTML = `
+        <div class="cg-q">Client-Owned pricing — build is one-time. Pick the tier (ranges are guidance) and set the agreed price.</div>
+        <div class="cg-options cg-options-tight">
+          ${BUILD_TIERS.map((t) => optionButton(false, t.key, t.label, '', t.range)).join('')}
+        </div>
+        <div class="field" style="margin-top:14px;">
+          <label for="cgBuildPrice">Agreed build price</label>
+          <input id="cgBuildPrice" type="text" placeholder="e.g. $2,500" value="${esc(state.buildPrice)}" />
+          <div class="help">Tap a tier above to prefill, then edit to the exact agreed number.</div>
+        </div>
+        <div class="cg-maint">
+          <label class="cg-check"><input type="checkbox" id="cgMaint" ${state.maintenance ? 'checked' : ''} /> Add an optional maintenance retainer</label>
+          <div class="field" id="cgMaintField" style="${state.maintenance ? '' : 'display:none;'}margin-top:10px;">
+            <label for="cgMaintPrice">Maintenance / month <span style="opacity:.6;">(guide ${MAINTENANCE_GUIDE})</span></label>
+            <input id="cgMaintPrice" type="text" value="${esc(state.maintenancePrice)}" />
+          </div>
+        </div>`;
+      card.querySelector('.cg-options').addEventListener('click', (e) => {
+        const b = e.target.closest('.cg-option'); if (!b) return;
+        const t = BUILD_TIERS.find((x) => x.key === b.dataset.val);
+        state.buildPrice = t ? t.range : state.buildPrice;
+        card.querySelector('#cgBuildPrice').value = state.buildPrice;
+        renderRunning(); renderNav();
+      });
+      card.querySelector('#cgBuildPrice').addEventListener('input', (e) => { state.buildPrice = e.target.value; renderRunning(); renderNav(); });
+      card.querySelector('#cgMaint').addEventListener('change', (e) => {
+        state.maintenance = e.target.checked;
+        card.querySelector('#cgMaintField').style.display = state.maintenance ? '' : 'none';
+        renderRunning();
+      });
+      card.querySelector('#cgMaintPrice').addEventListener('input', (e) => { state.maintenancePrice = e.target.value; renderRunning(); });
+    } else {
+      card.innerHTML = `
+        <div class="cg-q">Managed pricing — pick a monthly plan.</div>
+        <div class="cg-options">
+          ${MANAGED_PLANS.map((p) => optionButton(state.managedPlan === (p.name + ' — ' + p.price), p.key, p.name, '', p.price)).join('')}
+        </div>`;
+      card.querySelector('.cg-options').addEventListener('click', (e) => {
+        const b = e.target.closest('.cg-option'); if (!b) return;
+        const p = MANAGED_PLANS.find((x) => x.key === b.dataset.val);
+        state.managedPlan = p ? (p.name + ' — ' + p.price) : '';
+        render();
+      });
+    }
+  }
+
+  function buildObject() {
+    const t = TRAFFIC[state.trafficTier] || {};
+    const pricing = {};
+    if (state.model === 'Client-Owned') {
+      pricing.type = state.maintenance ? 'build+maintenance' : 'build';
+      pricing.buildPrice = state.buildPrice;
+      pricing.maintenancePrice = state.maintenance ? state.maintenancePrice : '';
+      pricing.managedPlan = '';
+    } else {
+      pricing.type = 'managed';
+      pricing.buildPrice = '';
+      pricing.maintenancePrice = '';
+      pricing.managedPlan = state.managedPlan;
+    }
+    return {
+      model: state.model,
+      hasDomain: !!state.hasDomain,
+      domainNote: state.domainNote || '',
+      trafficTier: state.trafficTier,
+      stack: t.stack || '',
+      estimatedInfraCost: t.cost || '',
+      takesPayments: !!state.takesPayments,
+      pricing,
+      generatedAt: new Date().toISOString(),
+    };
+  }
+
+  function renderSummary() {
+    const obj = buildObject();
+    card.innerHTML = `
+      <div class="cg-q">All set — here's the engagement summary.</div>
+      <div class="cg-summary-grid">
+        <div><span>Model</span><b>${esc(obj.model)}</b></div>
+        <div><span>Domain</span><b>${obj.hasDomain ? 'Client has one' : 'We register'}${obj.domainNote ? ' — ' + esc(obj.domainNote) : ''}</b></div>
+        <div><span>Traffic</span><b>${esc(obj.trafficTier)}</b></div>
+        <div><span>Stack</span><b>${esc(obj.stack)}</b></div>
+        <div><span>Infra est.</span><b>${esc(obj.estimatedInfraCost)}</b></div>
+        <div><span>Payments</span><b>${obj.takesPayments ? "Yes — Stripe in client's name" : 'No'}</b></div>
+        <div><span>Pricing</span><b>${obj.pricing.type === 'managed' ? 'Managed: ' + esc(obj.pricing.managedPlan) : 'Build: ' + esc(obj.pricing.buildPrice) + (obj.pricing.maintenancePrice ? ' · Maint: ' + esc(obj.pricing.maintenancePrice) : '')}</b></div>
+      </div>
+      <details class="cg-json"><summary>View structured object</summary><pre>${esc(JSON.stringify(obj, null, 2))}</pre></details>
+      <div class="cg-actions">
+        <button type="button" class="btn btn-ghost" id="cgCopy">Copy JSON</button>
+        <button type="button" class="btn btn-yellow" id="cgAttach">Attach to a new contract →</button>
+      </div>
+      <p class="cg-status" id="cgStatus" role="status"></p>`;
+
+    card.querySelector('#cgCopy').addEventListener('click', async () => {
+      try { await navigator.clipboard.writeText(JSON.stringify(obj, null, 2)); setStatus('Copied to clipboard.'); }
+      catch (_) { setStatus('Copy failed — open "View structured object" and copy manually.'); }
+    });
+    card.querySelector('#cgAttach').addEventListener('click', () => {
+      try {
+        sessionStorage.setItem('callGuideEngagement', JSON.stringify(obj));
+        window.location.href = '/admin/contracts/new?fromGuide=1';
+      } catch (_) { setStatus('Could not hand off — try Copy JSON instead.'); }
+    });
+  }
+
+  function setStatus(msg) { const s = document.getElementById('cgStatus'); if (s) s.textContent = msg; }
+
+  /* --------------------------- Running selections --------------------------- */
+  function renderRunning() {
+    const rows = [];
+    if (state.model) rows.push(['Model', state.model]);
+    if (state.hasDomain !== null) rows.push(['Domain', state.hasDomain ? ('Has one' + (state.domainNote ? ' — ' + state.domainNote : '')) : 'We register']);
+    if (state.trafficTier) { rows.push(['Traffic', state.trafficTier]); rows.push(['Infra', TRAFFIC[state.trafficTier].cost]); }
+    if (state.takesPayments !== null) rows.push(['Payments', state.takesPayments ? 'Yes (Stripe)' : 'No']);
+    if (state.model === 'Client-Owned' && state.buildPrice) rows.push(['Build', state.buildPrice]);
+    if (state.model === 'Client-Owned' && state.maintenance && state.maintenancePrice) rows.push(['Maintenance', state.maintenancePrice]);
+    if (state.model === 'Managed' && state.managedPlan) rows.push(['Plan', state.managedPlan]);
+
+    runningEl.innerHTML = rows.length
+      ? rows.map(([k, v]) => `<div class="cg-run-row"><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join('')
+      : '<div class="cg-empty">Answers will appear here as you go.</div>';
+  }
+
+  /* ------------------------------- Navigation ------------------------------- */
+  function stepComplete() {
+    const step = STEPS[stepIndex];
+    if (step === 'model') return !!state.model;
+    if (step === 'domain') return state.hasDomain !== null;
+    if (step === 'traffic') return !!state.trafficTier;
+    if (step === 'payments') return state.takesPayments !== null;
+    if (step === 'pricing') return state.model === 'Client-Owned' ? !!state.buildPrice.trim() : !!state.managedPlan;
+    return true;
+  }
+
+  function renderNav() {
+    backBtn.disabled = stepIndex === 0;
+    const onSummary = STEPS[stepIndex] === 'summary';
+    nextBtn.style.display = onSummary ? 'none' : '';
+    nextBtn.disabled = !stepComplete();
+  }
+
+  backBtn.addEventListener('click', () => { if (stepIndex > 0) { stepIndex--; render(); } });
+  nextBtn.addEventListener('click', () => { if (stepComplete() && stepIndex < STEPS.length - 1) { stepIndex++; render(); } });
+
+  render();
+})();
+</script>
+</body>
+</html>

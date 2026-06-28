@@ -73,6 +73,24 @@
         </div>
       </div>
 
+      <h2 style="margin-top:18px;">Build &amp; ownership</h2>
+      <p class="hint">Who owns what, and the tool/provider behind each part of the site. Optional — you can fill or change this anytime, even after the project is done.</p>
+
+      <div class="field">
+        <label for="ownership">Overall ownership</label>
+        <select id="ownership" name="ownership">
+          <% const own = isEdit ? (p.ownership || '') : ''; %>
+          <option value="" <%= own === '' ? 'selected' : '' %>>— Not set —</option>
+          <option value="Client-Owned" <%= own === 'Client-Owned' ? 'selected' : '' %>>Client-Owned (client holds the accounts)</option>
+          <option value="Managed" <%= own === 'Managed' ? 'selected' : '' %>>Managed (we host &amp; maintain)</option>
+        </select>
+      </div>
+
+      <label style="display:block;font-weight:600;margin:6px 0 8px;">Sections &amp; tools</label>
+      <p class="help" style="margin-top:-4px;">For each part of the site, note the tool/provider and who owns it.</p>
+      <div id="sections"></div>
+      <button type="button" class="repeater-add" id="addSection">+ Add section</button>
+
       <div class="form-actions">
         <a href="/admin/projects" class="btn btn-ghost">Cancel</a>
         <button type="submit" class="btn btn-yellow" <%= (clients.length || isEdit) ? '' : 'disabled' %>><%= isEdit ? 'Save changes' : 'Create & notify client' %></button>
@@ -80,5 +98,47 @@
     </form>
   </main>
 </div>
+
+<script>
+  const OWNER_OPTS = ['', 'Client', 'Provider (us)', 'Shared'];
+  const sectionsWrap = document.getElementById('sections');
+
+  function addSection(name = '', tool = '', owner = '') {
+    const row = document.createElement('div');
+    row.className = 'repeater-item';
+    const ownerOptions = OWNER_OPTS.map((o) =>
+      `<option value="${o.replace(/"/g, '&quot;')}" ${o === owner ? 'selected' : ''}>${o || '— Owner —'}</option>`).join('');
+    const safe = (s) => String(s).replace(/"/g, '&quot;');
+    row.innerHTML = `
+      <button type="button" class="remove-btn">Remove</button>
+      <div class="row-2">
+        <div class="field"><label>Section</label><input type="text" name="sectionName" value="${safe(name)}" placeholder="e.g. Hosting, Domain, Payments" /></div>
+        <div class="field"><label>Tool / provider</label><input type="text" name="sectionTool" value="${safe(tool)}" placeholder="e.g. Render, GoDaddy, Stripe" /></div>
+      </div>
+      <div class="field"><label>Owner</label><select name="sectionOwner">${ownerOptions}</select></div>`;
+    row.querySelector('.remove-btn').addEventListener('click', () => row.remove());
+    sectionsWrap.appendChild(row);
+  }
+
+  document.getElementById('addSection').addEventListener('click', () => addSection());
+
+  <% if (isEdit && Array.isArray(p.sections) && p.sections.length) { %>
+    <% p.sections.forEach(function(s) { %>
+      addSection(<%- JSON.stringify(s.name || '') %>, <%- JSON.stringify(s.tool || '') %>, <%- JSON.stringify(s.owner || '') %>);
+    <% }); %>
+  <% } else if (!isEdit) { %>
+    // Starter rows for a fresh project (just guidance — edit or remove freely).
+    ['Domain', 'Hosting / Server', 'Email', 'Payments', 'Content / CMS', 'Media / Storage', 'Analytics']
+      .forEach((s) => addSection(s, '', ''));
+  <% } %>
+
+  const projPicker = document.getElementById('clientId');
+  if (projPicker) {
+    projPicker.addEventListener('change', (e) => {
+      const opt = e.target.options[e.target.selectedIndex];
+      // (client name/email are resolved server-side from clientId on submit)
+    });
+  }
+</script>
 </body>
 </html>

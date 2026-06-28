@@ -141,6 +141,14 @@ router.get('/analytics', requireAdmin, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+/* ---------- Client Call Guide wizard ---------- */
+router.get('/call-guide', requireAdmin, (req, res) => {
+  res.render('admin/call-guide', {
+    adminEmail: req.session.admin.email,
+    firebaseReady: isReady(),
+  });
+});
+
 /* ---------- Website Content index ---------- */
 router.get('/content', requireAdmin, (req, res) => {
   res.render('admin/content_index', {
