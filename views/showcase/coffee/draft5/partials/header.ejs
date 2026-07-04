@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= content.brand.name %> · <%= content.brand.tagline %></title>
+  <meta name="description" content="<%= content.hero.subtitle %>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="<%= prefix %>/css/style.css" />
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <a href="<%= prefix %>/" class="nav__brand">
+      <span class="nav__logo"><%= content.brand.logoText %></span>
+      <span class="nav__name"><%= content.brand.name %></span>
+    </a>
+    <ul class="nav__links">
+      <li><a href="<%= prefix %>/#about">Hi!</a></li>
+      <li><a href="<%= prefix %>/menu">Menu</a></li>
+      <li><a href="<%= prefix %>/#gallery">Shop</a></li>
+      <li><a href="<%= prefix %>/#testimonials">Love</a></li>
+      <li><a href="<%= prefix %>/#contact">Visit</a></li>
+    </ul>
+    <a href="<%= prefix %>/#contact" class="nav__cta">Say hi ✿</a>
+    <button class="nav__burger" id="burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= content.brand.name %> · <%= content.brand.tagline %></title>
+  <meta name="description" content="<%= content.hero.subtitle %>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="<%= content.brand.fontUrl %>" rel="stylesheet" />
+  <link rel="stylesheet" href="/__cat_common/style.css" />
+  <link rel="stylesheet" href="<%= prefix %>/css/style.css" />
+  <style>
+    :root {
+      --c-bg: <%= content.brand.bg %>;
+      --c-fg: <%= content.brand.fg %>;
+      --c-accent: <%= content.brand.accent %>;
+      --c-accent-2: <%= content.brand.accent2 %>;
+      --c-muted: <%= content.brand.muted %>;
+    }
+  </style>
+</head>
+<body class="theme-<%= theme %>">
+  <header class="topbar">
+    <a href="<%= prefix %>/" class="brand">
+      <span class="brand__mark"><%= content.brand.logoText %></span>
+      <span class="brand__name"><%= content.brand.name %></span>
+    </a>
+    <nav class="topnav">
+      <a href="<%= prefix %>/#featured"><%= (content.nav && content.nav.featured) || 'Picks' %></a>
+      <a href="<%= prefix %>/menu"><%= (content.nav && content.nav.items) || 'Full menu' %></a>
+      <a href="<%= prefix %>/#about"><%= (content.nav && content.nav.about) || 'About' %></a>
+      <a href="<%= prefix %>/#locations"><%= (content.nav && content.nav.locations) || 'Visit' %></a>
+    </nav>
+    <a href="<%= prefix %>/menu" class="cta-pill"><%= (content.nav && content.nav.cta) || 'Order now →' %></a>
+  </header>

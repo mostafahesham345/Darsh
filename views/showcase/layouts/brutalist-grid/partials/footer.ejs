@@ -1,0 +1,21 @@
+  <footer class="bru-foot">
+    <div class="bru-foot__grid">
+      <div class="bru-foot__cell">
+        <p>// CONTACT</p>
+        <p><%= content.contact.address %></p>
+        <p><%= content.contact.phone %></p>
+        <p><%= content.contact.email %></p>
+      </div>
+      <div class="bru-foot__cell">
+        <p>// HOURS</p>
+        <p style="white-space: pre-line;"><%= content.contact.hours %></p>
+      </div>
+      <div class="bru-foot__cell bru-foot__cell--big">
+        <p>[<%= content.brand.logoText %>]</p>
+        <p><%= content.brand.name.toUpperCase() %></p>
+      </div>
+    </div>
+    <p class="bru-foot__strip">© <%= new Date().getFullYear() %> · <%= content.brand.name.toUpperCase() %> · NO RIGHTS RESERVED · <%= content.contact.instagram %></p>
+  </footer>
+</body>
+</html>

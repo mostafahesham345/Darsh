@@ -1,0 +1,93 @@
+/* EDITORIAL MAGAZINE — large serif type, multi-column, byline-driven.
+   Per-design CSS overrides colors and font-display. */
+
+.layout-editorial { font-family: var(--font-body, 'Inter', sans-serif); }
+
+.mag-top { padding: 24px 6vw 0; }
+.mag-top__rule { height: 2px; background: var(--c-fg); }
+.mag-top__bar {
+  display: grid; grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 18px 0;
+  gap: 30px;
+}
+.mag-top__date { font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-muted); }
+.mag-top__masthead { text-align: center; text-decoration: none; color: var(--c-fg); display: flex; flex-direction: column; gap: 4px; }
+.mag-top__name { font-family: var(--font-display, 'Fraunces', serif); font-size: 2.4rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1; }
+.mag-top__sub { font-size: 0.78rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-muted); }
+.mag-top__nav { justify-self: end; display: flex; gap: 22px; font-size: 0.85rem; }
+.mag-top__nav a { color: var(--c-fg); text-decoration: none; }
+.mag-top__nav a:hover { color: var(--c-accent); }
+
+.mag-feature { max-width: 980px; margin: 80px auto 30px; padding: 0 6vw; text-align: center; }
+.mag-eyebrow { font-size: 0.78rem; letter-spacing: 0.32em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 28px; font-weight: 600; }
+.mag-eyebrow--small { font-size: 0.72rem; letter-spacing: 0.28em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 14px; font-weight: 600; }
+.mag-title {
+  font-family: var(--font-display, 'Fraunces', serif);
+  font-weight: 600;
+  font-size: clamp(2.6rem, 6vw, 5rem);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+  margin-bottom: 24px;
+}
+.mag-deck { font-size: 1.3rem; max-width: 760px; margin: 0 auto 18px; color: var(--c-fg); line-height: 1.45; font-style: italic; font-family: var(--font-display, 'Fraunces', serif); font-weight: 400; }
+.mag-byline { font-size: 0.82rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c-muted); margin-top: 22px; }
+
+.mag-leadart { max-width: 1280px; margin: 60px auto 0; padding: 0 6vw; }
+.mag-leadart img { width: 100%; aspect-ratio: 16/9; object-fit: cover; }
+.mag-leadart figcaption { font-size: 0.85rem; color: var(--c-muted); margin-top: 12px; padding: 12px 0; border-top: 1px solid color-mix(in srgb, var(--c-fg) 15%, transparent); font-style: italic; }
+
+.mag-cols { max-width: 1280px; margin: 80px auto; padding: 0 6vw; display: grid; grid-template-columns: 2fr 1fr; gap: 60px; }
+.mag-cols__body { columns: 2; column-gap: 36px; font-size: 1.05rem; line-height: 1.75; color: var(--c-fg); }
+.mag-cols__body p { margin-bottom: 18px; break-inside: avoid; }
+.mag-dropcap::first-letter {
+  font-family: var(--font-display, 'Fraunces', serif);
+  font-size: 4.6rem;
+  font-weight: 600;
+  float: left;
+  line-height: 0.9;
+  margin: 6px 12px 0 0;
+  color: var(--c-accent);
+}
+.mag-cols__aside { padding-left: 32px; border-left: 2px solid var(--c-accent); }
+.mag-aside__title { font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-muted); margin-bottom: 18px; font-weight: 600; }
+.mag-cols__aside ul { list-style: none; padding: 0; margin-bottom: 28px; }
+.mag-cols__aside li { display: flex; align-items: baseline; gap: 14px; padding: 12px 0; border-bottom: 1px solid color-mix(in srgb, var(--c-fg) 10%, transparent); }
+.mag-cols__aside strong { font-family: var(--font-display, 'Fraunces', serif); font-size: 1.8rem; font-weight: 600; color: var(--c-accent); }
+.mag-cols__aside span { color: var(--c-muted); font-size: 0.9rem; }
+.mag-aside__pull { font-family: var(--font-display, 'Fraunces', serif); font-style: italic; font-size: 1.4rem; line-height: 1.3; color: var(--c-fg); padding-top: 18px; }
+
+.mag-features { max-width: 1280px; margin: 80px auto; padding: 0 6vw; }
+.mag-section-head { text-align: center; margin-bottom: 50px; padding-bottom: 24px; border-bottom: 2px solid var(--c-fg); }
+.mag-section-head h2 { font-family: var(--font-display, 'Fraunces', serif); font-weight: 600; font-size: clamp(1.8rem, 4vw, 2.8rem); letter-spacing: -0.02em; }
+.mag-issues { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 50px 32px; }
+.mag-issue__num { font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 14px; font-weight: 600; }
+.mag-issue__img { aspect-ratio: 4/5; overflow: hidden; margin-bottom: 16px; }
+.mag-issue__img img { width: 100%; height: 100%; object-fit: cover; }
+.mag-issue__cat { font-size: 0.75rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-muted); margin-bottom: 6px; }
+.mag-issue h3 { font-family: var(--font-display, 'Fraunces', serif); font-weight: 600; font-size: 1.5rem; line-height: 1.2; margin-bottom: 10px; }
+.mag-issue__body { color: var(--c-muted); margin-bottom: 16px; line-height: 1.6; }
+.mag-issue__meta { display: flex; align-items: center; gap: 14px; font-size: 0.85rem; color: var(--c-fg); padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--c-fg) 12%, transparent); }
+.mag-issue__rule { flex: 1; height: 1px; background: color-mix(in srgb, var(--c-fg) 20%, transparent); }
+
+.mag-visit { max-width: 1280px; margin: 80px auto; padding: 0 6vw; }
+.mag-visit h2 { font-family: var(--font-display, 'Fraunces', serif); font-weight: 600; font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: -0.02em; margin-bottom: 36px; }
+.mag-visit__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; padding-top: 36px; border-top: 2px solid var(--c-fg); }
+.mag-visit__label { font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 12px; font-weight: 600; }
+.mag-visit__big { font-family: var(--font-display, 'Fraunces', serif); font-size: 1.5rem; font-weight: 500; line-height: 1.3; margin-bottom: 6px; }
+
+.mag-foot { max-width: 1280px; margin: 80px auto 40px; padding: 0 6vw; }
+.mag-foot__rule { height: 2px; background: var(--c-fg); margin-bottom: 36px; }
+.mag-foot__inner { display: grid; grid-template-columns: repeat(3, 1fr); gap: 36px; margin-bottom: 36px; }
+.mag-foot__title { font-size: 0.78rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--c-accent); margin-bottom: 14px; font-weight: 600; }
+.mag-foot__big { font-family: var(--font-display, 'Fraunces', serif); font-size: 1.6rem; font-weight: 600; }
+.mag-foot__col p { margin-bottom: 4px; line-height: 1.5; }
+.mag-foot__legal { padding-top: 24px; border-top: 1px solid color-mix(in srgb, var(--c-fg) 15%, transparent); font-size: 0.78rem; color: var(--c-muted); text-align: center; }
+
+@media (max-width: 900px) {
+  .mag-top__bar { grid-template-columns: 1fr; text-align: center; }
+  .mag-top__nav { justify-self: center; }
+  .mag-cols, .mag-visit__grid, .mag-foot__inner { grid-template-columns: 1fr; }
+  .mag-cols__body { columns: 1; }
+  .mag-cols__aside { padding-left: 0; border-left: none; border-top: 2px solid var(--c-accent); padding-top: 24px; }
+}

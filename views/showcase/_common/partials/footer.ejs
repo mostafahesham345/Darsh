@@ -1,0 +1,25 @@
+  <footer class="foot">
+    <div class="foot__inner">
+      <div>
+        <p class="foot__brand"><%= content.brand.logoText %> <%= content.brand.name %></p>
+        <p class="muted"><%= content.brand.tagline %></p>
+      </div>
+      <div>
+        <p class="foot__title">Visit</p>
+        <p><%= content.contact.address %></p>
+        <p><%= content.contact.phone %></p>
+      </div>
+      <div>
+        <p class="foot__title">Hours</p>
+        <p style="white-space: pre-line;"><%= content.contact.hours %></p>
+      </div>
+      <div>
+        <p class="foot__title">Follow</p>
+        <p><%= content.contact.instagram %></p>
+        <p><%= content.contact.email %></p>
+      </div>
+    </div>
+    <p class="foot__legal">© <%= new Date().getFullYear() %> <%= content.brand.name %>. All flavors reserved.</p>
+  </footer>
+</body>
+</html>

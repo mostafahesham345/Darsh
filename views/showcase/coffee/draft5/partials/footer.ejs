@@ -1,0 +1,32 @@
+  <footer class="footer">
+    <div class="footer__inner">
+      <div class="footer__brand">
+        <span class="nav__logo"><%= content.brand.logoText %></span>
+        <h3><%= content.brand.name %></h3>
+        <p class="footer__tagline"><%= content.brand.tagline %></p>
+      </div>
+      <div class="footer__col">
+        <h4>Visit</h4>
+        <p><%= content.contact.address %></p>
+        <p><%- (content.contact.hours || '').replace(/\n/g,'<br/>') %></p>
+      </div>
+      <div class="footer__col">
+        <h4>Talk to us</h4>
+        <p><%= content.contact.phone %></p>
+        <p><%= content.contact.email %></p>
+        <p>Instagram <%= content.contact.instagram %></p>
+      </div>
+      <div class="footer__col footer__sign">
+        <p class="caveat">Made with steam &amp; care.</p>
+        <a class="footer__admin" href="<%= prefix %>/admin/login">staff login</a>
+        <a class="footer__admin" href="/" style="margin-left:14px">← all drafts</a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© <%= new Date().getFullYear() %> <%= content.brand.name %>. All rights reserved.</span>
+      <span>Crafted as a draft preview.</span>
+    </div>
+  </footer>
+  <script src="<%= prefix %>/js/main.js"></script>
+</body>
+</html>

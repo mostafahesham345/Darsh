@@ -1,0 +1,74 @@
+<%- include('partials/header') %>
+
+<article class="mag-feature">
+  <p class="mag-eyebrow"><%= content.hero.eyebrow %></p>
+  <h1 class="mag-title"><%= content.hero.title %></h1>
+  <p class="mag-deck"><%= content.hero.subtitle %></p>
+  <p class="mag-byline">By the editors · Photographs from <%= content.brand.name %></p>
+</article>
+
+<figure class="mag-leadart">
+  <img src="<%= content.hero.image %>" alt="" />
+  <figcaption><%= content.hero.sticker %> — <%= content.featured.subtitle %></figcaption>
+</figure>
+
+<section class="mag-cols">
+  <div class="mag-cols__body">
+    <p class="mag-dropcap"><%= content.about.body %></p>
+    <p><%= content.featured.subtitle %></p>
+  </div>
+  <aside class="mag-cols__aside">
+    <p class="mag-aside__title">By the numbers</p>
+    <ul>
+      <li><strong><%= content.about.stat1Number %></strong><span><%= content.about.stat1Label %></span></li>
+      <li><strong><%= content.about.stat2Number %></strong><span><%= content.about.stat2Label %></span></li>
+      <li><strong><%= content.about.stat3Number %></strong><span><%= content.about.stat3Label %></span></li>
+    </ul>
+    <div class="mag-aside__pull">"<%= content.hero.title %>"</div>
+  </aside>
+</section>
+
+<section id="about" class="mag-features">
+  <header class="mag-section-head">
+    <p class="mag-eyebrow--small"><%= content.featured.eyebrow %></p>
+    <h2><%= content.featured.title %></h2>
+  </header>
+  <div class="mag-issues">
+    <% menu.slice(0, 6).forEach(function(item, i){ %>
+      <article class="mag-issue">
+        <span class="mag-issue__num">No. <%= String(i+1).padStart(2,'0') %></span>
+        <div class="mag-issue__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <p class="mag-issue__cat"><%= item.category %></p>
+        <h3><%= item.name %></h3>
+        <p class="mag-issue__body"><%= item.description %></p>
+        <div class="mag-issue__meta">
+          <span><%= item.price %></span>
+          <span class="mag-issue__rule"></span>
+          <span>Read on →</span>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section id="visit" class="mag-visit">
+  <p class="mag-eyebrow--small"><%= content.contact.eyebrow %></p>
+  <h2><%= content.contact.title %></h2>
+  <div class="mag-visit__grid">
+    <div>
+      <p class="mag-visit__label">Address</p>
+      <p class="mag-visit__big"><%= content.contact.address %></p>
+    </div>
+    <div>
+      <p class="mag-visit__label">Hours</p>
+      <p class="mag-visit__big" style="white-space: pre-line;"><%= content.contact.hours %></p>
+    </div>
+    <div>
+      <p class="mag-visit__label">Reach</p>
+      <p class="mag-visit__big"><%= content.contact.phone %></p>
+      <p><%= content.contact.email %></p>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

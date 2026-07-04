@@ -12,6 +12,7 @@ import projectsRoutes from './routes/projects.js';
 import leadsRoutes from './routes/leads.js';
 import reviewsRoutes from './routes/reviews.js';
 import portalRoutes from './routes/portal.js';
+import showcaseRoutes from './routes/showcase.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -38,6 +39,17 @@ app.use(
     },
   })
 );
+
+// Showcase design library — dynamic design renderer runs BEFORE static so it
+// owns /showcase/designs/* (other /showcase/* paths fall through to static).
+app.use('/showcase', showcaseRoutes);
+
+// Shared CSS mounts for the rendered designs.
+const SHOWCASE_THEME = path.join(__dirname, 'public', 'showcase', 'theme');
+app.use('/__cat_common', express.static(path.join(SHOWCASE_THEME, '_common')));
+for (const layout of ['editorial-magazine', 'brutalist-grid', 'sidebar-fixed', 'fullscreen-scroll']) {
+  app.use(`/__layout_${layout}`, express.static(path.join(SHOWCASE_THEME, 'layouts', layout)));
+}
 
 app.use(express.static(path.join(__dirname, 'public')));
 

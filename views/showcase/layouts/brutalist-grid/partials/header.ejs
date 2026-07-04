@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= content.brand.name %> · <%= content.brand.tagline %></title>
+  <meta name="description" content="<%= content.hero.subtitle %>" />
+  <link href="<%= content.brand.fontUrl %>" rel="stylesheet" />
+  <link rel="stylesheet" href="/__cat_common/style.css" />
+  <link rel="stylesheet" href="/__layout_brutalist-grid/style.css" />
+  <link rel="stylesheet" href="<%= prefix %>/css/style.css" />
+  <style>
+    :root {
+      --c-bg: <%= content.brand.bg %>;
+      --c-fg: <%= content.brand.fg %>;
+      --c-accent: <%= content.brand.accent %>;
+      --c-accent-2: <%= content.brand.accent2 %>;
+      --c-muted: <%= content.brand.muted %>;
+    }
+  </style>
+</head>
+<body class="layout-brutalist theme-<%= theme %>">
+  <header class="bru-top">
+    <a href="<%= prefix %>/" class="bru-mark">
+      <span>[<%= content.brand.logoText %>]</span>
+      <span class="bru-mark__name"><%= content.brand.name.toUpperCase() %></span>
+    </a>
+    <nav class="bru-nav">
+      <a href="<%= prefix %>/menu">→ <%= (content.nav && content.nav.items) || 'LIST' %></a>
+      <a href="<%= prefix %>/#about">→ ABOUT</a>
+      <a href="<%= prefix %>/#visit">→ VISIT</a>
+    </nav>
+    <span class="bru-meta">EST · <%= new Date().getFullYear() - 5 %> // ZONE 01 // PUBLIC</span>
+  </header>

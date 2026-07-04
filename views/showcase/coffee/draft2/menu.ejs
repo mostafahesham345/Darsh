@@ -1,0 +1,39 @@
+<%- include('partials/header') %>
+
+<header class="page-hero">
+  <div class="hero__steam"><span></span><span></span><span></span></div>
+  <div class="page-hero__inner">
+    <p class="eyebrow reveal"><%= content.menuSection.eyebrow %></p>
+    <h1 class="page-hero__title reveal"><%= content.menuSection.title %></h1>
+    <p class="lead reveal"><%= content.menuSection.subtitle %></p>
+  </div>
+</header>
+
+<section class="section menu-full">
+  <div class="menu-filters reveal">
+    <button class="chip is-active" data-filter="All">All</button>
+    <% const cats = [...new Set(menu.map(m => m.category))]; %>
+    <% cats.forEach(function(c){ %>
+      <button class="chip" data-filter="<%= c %>"><%= c %></button>
+    <% }) %>
+  </div>
+
+  <div class="menu-grid menu-grid--full">
+    <% menu.forEach(function(item, i){ %>
+      <article class="menu-card reveal" data-cat="<%= item.category %>" style="--d:<%= i * 50 %>ms">
+        <div class="menu-card__img" style="background-image:url('<%= item.image %>')">
+          <span class="menu-card__cat"><%= item.category %></span>
+        </div>
+        <div class="menu-card__body">
+          <div class="menu-card__head">
+            <h3><%= item.name %></h3>
+            <span class="menu-card__price">$<%= item.price %></span>
+          </div>
+          <p><%= item.description %></p>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,771 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0a1f44" />
+  <title>See what we can build · Darsh</title>
+  <meta name="description" content="Website designs, booking, payments, invoicing, analytics, an online store, and an admin dashboard — live demos of everything Darsh can build for your business." />
+  <link rel="icon" type="image/png" href="/images/Logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/landing.css" />
+</head>
+<body>
+
+  <!-- NAV (navy) -->
+  <header class="sc-nav" id="top">
+    <a href="/" class="sc-nav__brand" aria-label="Back to Darsh home"><img src="/images/LogoNav.png" alt="Darsh" /></a>
+    <a href="/" class="sc-nav__back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m11 18-6-6 6-6"/></svg>
+      Back to Darsh
+    </a>
+  </header>
+
+  <!-- HERO (white) -->
+  <section class="mk-hero mk-hero--compact">
+    <span class="mk-hero__orb mk-hero__orb--1" aria-hidden="true"></span>
+    <div class="mk-hero__inner">
+      <span class="mk-eyebrow">Explore what we can do</span>
+      <h1 class="mk-hero__title">Everything your business needs, <span class="mk-hero__grad">in one place.</span></h1>
+      <p class="mk-hero__lead">Not just pretty pages — real, working features. Pick a tab below and try each one live: designs, booking, payments, invoicing, analytics, a store, and an admin dashboard you control.</p>
+      <div class="mk-hero__cta">
+        <a class="btn-primary btn-lg" href="/#contact">Start a project →</a>
+        <a class="btn-ghost" href="#designs">See the demos ↓</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB BAR -->
+  <nav class="tabbar" role="tablist" aria-label="Capabilities">
+    <div class="tabbar__inner">
+      <button class="tab on" data-tab="designs" role="tab" aria-selected="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg><span>Designs</span></button>
+      <button class="tab" data-tab="appointments" role="tab" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg><span>Appointments</span></button>
+      <button class="tab" data-tab="store" role="tab" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg><span>Online store</span></button>
+      <button class="tab" data-tab="payments" role="tab" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg><span>Payments</span></button>
+      <button class="tab" data-tab="invoicing" role="tab" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M9 13h6M9 17h6"/></svg><span>Invoicing</span></button>
+      <button class="tab" data-tab="analytics" role="tab" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m7 14 3-4 4 3 5-7"/></svg><span>Analytics</span></button>
+      <button class="tab" data-tab="dashboard" role="tab" aria-selected="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg><span>Admin</span></button>
+    </div>
+  </nav>
+
+  <!-- PANELS -->
+  <main class="sc-panels">
+      <section class="tabpanel" id="panel-designs" role="tabpanel">
+        <div class="panel-head"><h2>Pick a look — we build the whole site</h2><p>A hundred hand-crafted directions across every kind of business. Choose one and open it live — this is the quality we deliver.</p></div>
+        <div class="sc-picker">
+          <label for="catSelect" class="sc-picker__label">Browse by category</label>
+          <div class="select-wrap">
+            <select id="catSelect">
+          <option value="cat-coffee" selected>☕  Coffee shops</option>
+          <option value="cat-fastfood">🍔  Fast food</option>
+          <option value="cat-bakery">🥐  Bakeries</option>
+          <option value="cat-cardealership">🚗  Car dealerships</option>
+          <option value="cat-barbershop">✂️  Barbers &amp; salons</option>
+          <option value="cat-icecream">🍦  Ice cream parlors</option>
+          <option value="cat-bookstore">📚  Bookstores</option>
+          <option value="cat-restaurant">🍽️  Restaurants</option>
+          <option value="cat-pizzeria">🍕  Pizzerias</option>
+          <option value="cat-sushi">🍣  Sushi &amp; Japanese</option>
+          <option value="cat-winery">🍷  Wineries &amp; wine bars</option>
+          <option value="cat-brewery">🍺  Breweries &amp; taprooms</option>
+          <option value="cat-juicebar">🥤  Juice &amp; smoothie bars</option>
+          <option value="cat-florist">🌸  Florists</option>
+          <option value="cat-gym">🏋️  Gyms &amp; fitness</option>
+          <option value="cat-spa">🧖  Spas &amp; wellness</option>
+          <option value="cat-dental">🦷  Dental clinics</option>
+          <option value="cat-lawfirm">⚖️  Law firms</option>
+          <option value="cat-realestate">🏡  Real estate</option>
+          <option value="cat-photography">📷  Photography studios</option>
+            </select>
+            <svg class="select-caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+          </div>
+        </div>
+        <div class="cat-panels">
+          <section class="cat" id="cat-coffee">
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">☕</span>Coffee shops</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/coffee/draft1" target="_blank" rel="noopener" style="--accent:#6f4e37;--bg:#f6efe6">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Brewhaven</span><span class="card__swatches"><span style="background:#f6efe6"></span><span style="background:#6f4e37"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/coffee/draft2" target="_blank" rel="noopener" style="--accent:#c5ff00;--bg:#0a0a0a">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Obsidian</span><span class="card__swatches"><span style="background:#0a0a0a"></span><span style="background:#c5ff00"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/coffee/draft3" target="_blank" rel="noopener" style="--accent:#c2562a;--bg:#f4ebdd">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Solea</span><span class="card__swatches"><span style="background:#f4ebdd"></span><span style="background:#c2562a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/coffee/draft4" target="_blank" rel="noopener" style="--accent:#c9a35d;--bg:#0e2a23">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Velvet</span><span class="card__swatches"><span style="background:#0e2a23"></span><span style="background:#c9a35d"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/coffee/draft5" target="_blank" rel="noopener" style="--accent:#ff7a8a;--bg:#fff7ec">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Tinker</span><span class="card__swatches"><span style="background:#fff7ec"></span><span style="background:#ff7a8a"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-fastfood" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍔</span>Fast food</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/fastfood/design1" target="_blank" rel="noopener" style="--accent:#ff2e2e;--bg:#fff8e7">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Bolt</span><span class="card__swatches"><span style="background:#fff8e7"></span><span style="background:#ff2e2e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/fastfood/design2" target="_blank" rel="noopener" style="--accent:#5a8351;--bg:#f4f1ea">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Greenhaus</span><span class="card__swatches"><span style="background:#f4f1ea"></span><span style="background:#5a8351"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/fastfood/design3" target="_blank" rel="noopener" style="--accent:#ff5b00;--bg:#0e0e0e">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Smashbar</span><span class="card__swatches"><span style="background:#0e0e0e"></span><span style="background:#ff5b00"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/fastfood/design4" target="_blank" rel="noopener" style="--accent:#c54226;--bg:#fef4ea">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Chika Tacos</span><span class="card__swatches"><span style="background:#fef4ea"></span><span style="background:#c54226"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/fastfood/design5" target="_blank" rel="noopener" style="--accent:#d63a3a;--bg:#fafafa">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Bao+</span><span class="card__swatches"><span style="background:#fafafa"></span><span style="background:#d63a3a"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-bakery" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🥐</span>Bakeries</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/bakery/design1" target="_blank" rel="noopener" style="--accent:#a86932;--bg:#fbf6ee">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Crumb &amp; Co.</span><span class="card__swatches"><span style="background:#fbf6ee"></span><span style="background:#a86932"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bakery/design2" target="_blank" rel="noopener" style="--accent:#c84a5a;--bg:#fff5f3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Petit Beurre</span><span class="card__swatches"><span style="background:#fff5f3"></span><span style="background:#c84a5a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bakery/design3" target="_blank" rel="noopener" style="--accent:#111111;--bg:#fefefe">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Loaf</span><span class="card__swatches"><span style="background:#fefefe"></span><span style="background:#111111"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bakery/design4" target="_blank" rel="noopener" style="--accent:#e84c8c;--bg:#fff0f7">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Sugar &amp; Sprinkle</span><span class="card__swatches"><span style="background:#fff0f7"></span><span style="background:#e84c8c"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bakery/design5" target="_blank" rel="noopener" style="--accent:#d2a04d;--bg:#1f1a14">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Wild Grain</span><span class="card__swatches"><span style="background:#1f1a14"></span><span style="background:#d2a04d"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-cardealership" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🚗</span>Car dealerships</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/cardealership/design1" target="_blank" rel="noopener" style="--accent:#e6b32a;--bg:#0e1116">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Apex Motors</span><span class="card__swatches"><span style="background:#0e1116"></span><span style="background:#e6b32a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/cardealership/design2" target="_blank" rel="noopener" style="--accent:#8b7349;--bg:#f7f4ee">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Marquee Auto</span><span class="card__swatches"><span style="background:#f7f4ee"></span><span style="background:#8b7349"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/cardealership/design3" target="_blank" rel="noopener" style="--accent:#1da25c;--bg:#f1faf3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">VoltLot</span><span class="card__swatches"><span style="background:#f1faf3"></span><span style="background:#1da25c"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/cardealership/design4" target="_blank" rel="noopener" style="--accent:#c9512c;--bg:#1a1715">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Garage 88</span><span class="card__swatches"><span style="background:#1a1715"></span><span style="background:#c9512c"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/cardealership/design5" target="_blank" rel="noopener" style="--accent:#ff3d57;--bg:#fafafa">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Drift</span><span class="card__swatches"><span style="background:#fafafa"></span><span style="background:#ff3d57"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-barbershop" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">✂️</span>Barbers &amp; salons</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/barbershop/design1" target="_blank" rel="noopener" style="--accent:#9c2a2a;--bg:#f6f1e7">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">The Old Shop</span><span class="card__swatches"><span style="background:#f6f1e7"></span><span style="background:#9c2a2a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/barbershop/design2" target="_blank" rel="noopener" style="--accent:#c47755;--bg:#f5f1ec">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Salon Lune</span><span class="card__swatches"><span style="background:#f5f1ec"></span><span style="background:#c47755"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/barbershop/design3" target="_blank" rel="noopener" style="--accent:#ff5b3a;--bg:#f4f5f7">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Fade Lab</span><span class="card__swatches"><span style="background:#f4f5f7"></span><span style="background:#ff5b3a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/barbershop/design4" target="_blank" rel="noopener" style="--accent:#e07a32;--bg:#fff7eb">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Curl Society</span><span class="card__swatches"><span style="background:#fff7eb"></span><span style="background:#e07a32"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/barbershop/design5" target="_blank" rel="noopener" style="--accent:#bda06f;--bg:#080808">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Blackout Cuts</span><span class="card__swatches"><span style="background:#080808"></span><span style="background:#bda06f"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-icecream" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍦</span>Ice cream parlors</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/icecream/design1" target="_blank" rel="noopener" style="--accent:#e85d75;--bg:#fff5f0">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Scoopline</span><span class="card__swatches"><span style="background:#fff5f0"></span><span style="background:#e85d75"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/icecream/design2" target="_blank" rel="noopener" style="--accent:#c43eba;--bg:#fff0fa">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Pop &amp; Cone</span><span class="card__swatches"><span style="background:#fff0fa"></span><span style="background:#c43eba"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/icecream/design3" target="_blank" rel="noopener" style="--accent:#1a6d3f;--bg:#f6f0e3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Gelateria Verdi</span><span class="card__swatches"><span style="background:#f6f0e3"></span><span style="background:#1a6d3f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/icecream/design4" target="_blank" rel="noopener" style="--accent:#0aa9a0;--bg:#eef7f6">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Frostpop</span><span class="card__swatches"><span style="background:#eef7f6"></span><span style="background:#0aa9a0"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/icecream/design5" target="_blank" rel="noopener" style="--accent:#7df9ff;--bg:#0d0d12">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Liquid Nitrogen Lab</span><span class="card__swatches"><span style="background:#0d0d12"></span><span style="background:#7df9ff"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-bookstore" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">📚</span>Bookstores</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/bookstore/design1" target="_blank" rel="noopener" style="--accent:#1c3556;--bg:#f5f1e8">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Page Turn</span><span class="card__swatches"><span style="background:#f5f1e8"></span><span style="background:#1c3556"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bookstore/design2" target="_blank" rel="noopener" style="--accent:#9a6e2f;--bg:#f3eee2">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">The Archive</span><span class="card__swatches"><span style="background:#f3eee2"></span><span style="background:#9a6e2f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bookstore/design3" target="_blank" rel="noopener" style="--accent:#e91e63;--bg:#0a0a0a">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Volumes</span><span class="card__swatches"><span style="background:#0a0a0a"></span><span style="background:#e91e63"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bookstore/design4" target="_blank" rel="noopener" style="--accent:#3b82f6;--bg:#fff8e1">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Tiny Reader</span><span class="card__swatches"><span style="background:#fff8e1"></span><span style="background:#3b82f6"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/bookstore/design5" target="_blank" rel="noopener" style="--accent:#8b5cf6;--bg:#0d0a1f">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Midnight Books</span><span class="card__swatches"><span style="background:#0d0a1f"></span><span style="background:#8b5cf6"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-restaurant" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍽️</span>Restaurants</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/restaurant/design1" target="_blank" rel="noopener" style="--accent:#9a3b2e;--bg:#f6efe4">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Laurent</span><span class="card__swatches"><span style="background:#f6efe4"></span><span style="background:#9a3b2e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/restaurant/design2" target="_blank" rel="noopener" style="--accent:#5c6e3a;--bg:#eef0e6">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Field &amp; Furrow</span><span class="card__swatches"><span style="background:#eef0e6"></span><span style="background:#5c6e3a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/restaurant/design3" target="_blank" rel="noopener" style="--accent:#e23b1f;--bg:#f4f4f1">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Salt Index</span><span class="card__swatches"><span style="background:#f4f4f1"></span><span style="background:#e23b1f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/restaurant/design4" target="_blank" rel="noopener" style="--accent:#c79a4b;--bg:#13100c">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Holloway's Chophouse</span><span class="card__swatches"><span style="background:#13100c"></span><span style="background:#c79a4b"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/restaurant/design5" target="_blank" rel="noopener" style="--accent:#b8895a;--bg:#0c0c0e">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Atelier Nord</span><span class="card__swatches"><span style="background:#0c0c0e"></span><span style="background:#b8895a"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-pizzeria" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍕</span>Pizzerias</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/pizzeria/design1" target="_blank" rel="noopener" style="--accent:#d6271f;--bg:#fff8f0">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Tony's Corner Slice</span><span class="card__swatches"><span style="background:#fff8f0"></span><span style="background:#d6271f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/pizzeria/design2" target="_blank" rel="noopener" style="--accent:#2e7d4f;--bg:#faf6ee">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Forno Vero</span><span class="card__swatches"><span style="background:#faf6ee"></span><span style="background:#2e7d4f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/pizzeria/design3" target="_blank" rel="noopener" style="--accent:#ff2e88;--bg:#0a0a0f">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Midnight Pie</span><span class="card__swatches"><span style="background:#0a0a0f"></span><span style="background:#ff2e88"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/pizzeria/design4" target="_blank" rel="noopener" style="--accent:#d2691e;--bg:#221913">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Emberwood</span><span class="card__swatches"><span style="background:#221913"></span><span style="background:#d2691e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/pizzeria/design5" target="_blank" rel="noopener" style="--accent:#e8861a;--bg:#160d08">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Deep &amp; Heavy</span><span class="card__swatches"><span style="background:#160d08"></span><span style="background:#e8861a"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-sushi" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍣</span>Sushi &amp; Japanese</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/sushi/design1" target="_blank" rel="noopener" style="--accent:#1f7a8c;--bg:#f6faf9">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Aoyama Sushi</span><span class="card__swatches"><span style="background:#f6faf9"></span><span style="background:#1f7a8c"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/sushi/design2" target="_blank" rel="noopener" style="--accent:#9a3b2e;--bg:#f4f1ea">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Hana Omakase</span><span class="card__swatches"><span style="background:#f4f1ea"></span><span style="background:#9a3b2e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/sushi/design3" target="_blank" rel="noopener" style="--accent:#ff2e6d;--bg:#0d0b14">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Yatai 88</span><span class="card__swatches"><span style="background:#0d0b14"></span><span style="background:#ff2e6d"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/sushi/design4" target="_blank" rel="noopener" style="--accent:#c4421f;--bg:#fbf3ea">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Hashi Ramen</span><span class="card__swatches"><span style="background:#fbf3ea"></span><span style="background:#c4421f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/sushi/design5" target="_blank" rel="noopener" style="--accent:#c8a24a;--bg:#0a0a0c">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">KUROBA</span><span class="card__swatches"><span style="background:#0a0a0c"></span><span style="background:#c8a24a"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-winery" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍷</span>Wineries &amp; wine bars</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/winery/design1" target="_blank" rel="noopener" style="--accent:#7c1f37;--bg:#fbf3ee">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Hollowbrook Estate</span><span class="card__swatches"><span style="background:#fbf3ee"></span><span style="background:#7c1f37"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/winery/design2" target="_blank" rel="noopener" style="--accent:#9a6a3c;--bg:#f4efe3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Skin &amp; Sediment</span><span class="card__swatches"><span style="background:#f4efe3"></span><span style="background:#9a6a3c"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/winery/design3" target="_blank" rel="noopener" style="--accent:#d6483b;--bg:#ededea">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Concrete &amp; Vine</span><span class="card__swatches"><span style="background:#ededea"></span><span style="background:#d6483b"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/winery/design4" target="_blank" rel="noopener" style="--accent:#b8893f;--bg:#1a1410">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">The Oak Cellar</span><span class="card__swatches"><span style="background:#1a1410"></span><span style="background:#b8893f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/winery/design5" target="_blank" rel="noopener" style="--accent:#c9a24b;--bg:#0f1a14">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Solenne</span><span class="card__swatches"><span style="background:#0f1a14"></span><span style="background:#c9a24b"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-brewery" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🍺</span>Breweries &amp; taprooms</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/brewery/design1" target="_blank" rel="noopener" style="--accent:#d9822b;--bg:#f6f1e7">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Iron Tap Brewing</span><span class="card__swatches"><span style="background:#f6f1e7"></span><span style="background:#d9822b"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/brewery/design2" target="_blank" rel="noopener" style="--accent:#8a5a2b;--bg:#f3eee2">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Oak &amp; Wild</span><span class="card__swatches"><span style="background:#f3eee2"></span><span style="background:#8a5a2b"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/brewery/design3" target="_blank" rel="noopener" style="--accent:#c6ff00;--bg:#0d0d0d">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Half Batch</span><span class="card__swatches"><span style="background:#0d0d0d"></span><span style="background:#c6ff00"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/brewery/design4" target="_blank" rel="noopener" style="--accent:#e0a526;--bg:#1a1209">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Hofbräu Eichel</span><span class="card__swatches"><span style="background:#1a1209"></span><span style="background:#e0a526"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/brewery/design5" target="_blank" rel="noopener" style="--accent:#3f9d4f;--bg:#fdf6e3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Sunday Garden</span><span class="card__swatches"><span style="background:#fdf6e3"></span><span style="background:#3f9d4f"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-juicebar" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🥤</span>Juice &amp; smoothie bars</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/juicebar/design1" target="_blank" rel="noopener" style="--accent:#f5a623;--bg:#fffaf0">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Pressed &amp; Co.</span><span class="card__swatches"><span style="background:#fffaf0"></span><span style="background:#f5a623"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/juicebar/design2" target="_blank" rel="noopener" style="--accent:#4f7c42;--bg:#f3f6ef">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Verdure</span><span class="card__swatches"><span style="background:#f3f6ef"></span><span style="background:#4f7c42"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/juicebar/design3" target="_blank" rel="noopener" style="--accent:#c6ff00;--bg:#0d0f10">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">FUEL/LAB</span><span class="card__swatches"><span style="background:#0d0f10"></span><span style="background:#c6ff00"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/juicebar/design4" target="_blank" rel="noopener" style="--accent:#e83a8c;--bg:#fff0f6">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Bowl Bowl</span><span class="card__swatches"><span style="background:#fff0f6"></span><span style="background:#e83a8c"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/juicebar/design5" target="_blank" rel="noopener" style="--accent:#c9a86a;--bg:#10130f">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">RESET Cleanse</span><span class="card__swatches"><span style="background:#10130f"></span><span style="background:#c9a86a"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-florist" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🌸</span>Florists</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/florist/design1" target="_blank" rel="noopener" style="--accent:#d96a8a;--bg:#fdf4f3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Petal &amp; Post</span><span class="card__swatches"><span style="background:#fdf4f3"></span><span style="background:#d96a8a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/florist/design2" target="_blank" rel="noopener" style="--accent:#9a7b4f;--bg:#f6f1e7">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Fleurie</span><span class="card__swatches"><span style="background:#f6f1e7"></span><span style="background:#9a7b4f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/florist/design3" target="_blank" rel="noopener" style="--accent:#c4f000;--bg:#f4f4ef">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">STEM/STUDIO</span><span class="card__swatches"><span style="background:#f4f4ef"></span><span style="background:#c4f000"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/florist/design4" target="_blank" rel="noopener" style="--accent:#c8881f;--bg:#faf4e8">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Everlast Dried Co.</span><span class="card__swatches"><span style="background:#faf4e8"></span><span style="background:#c8881f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/florist/design5" target="_blank" rel="noopener" style="--accent:#ff3d8b;--bg:#fff6fb">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Bloom Bar</span><span class="card__swatches"><span style="background:#fff6fb"></span><span style="background:#ff3d8b"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-gym" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🏋️</span>Gyms &amp; fitness</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/gym/design1" target="_blank" rel="noopener" style="--accent:#e8451f;--bg:#13151a">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Iron Yard CrossFit</span><span class="card__swatches"><span style="background:#13151a"></span><span style="background:#e8451f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/gym/design2" target="_blank" rel="noopener" style="--accent:#b07a6e;--bg:#f3ece6">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Mara Reformer Studio</span><span class="card__swatches"><span style="background:#f3ece6"></span><span style="background:#b07a6e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/gym/design3" target="_blank" rel="noopener" style="--accent:#ff5a1f;--bg:#1a1916">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Crag Works Climbing</span><span class="card__swatches"><span style="background:#1a1916"></span><span style="background:#ff5a1f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/gym/design4" target="_blank" rel="noopener" style="--accent:#7d8a64;--bg:#ede8df">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Bedrock Strength</span><span class="card__swatches"><span style="background:#ede8df"></span><span style="background:#7d8a64"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/gym/design5" target="_blank" rel="noopener" style="--accent:#16f5b8;--bg:#0a0a12">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Voltage 24/7</span><span class="card__swatches"><span style="background:#0a0a12"></span><span style="background:#16f5b8"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-spa" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🧖</span>Spas &amp; wellness</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/spa/design1" target="_blank" rel="noopener" style="--accent:#b08d5b;--bg:#f5efe6">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Sève &amp; Sable</span><span class="card__swatches"><span style="background:#f5efe6"></span><span style="background:#b08d5b"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/spa/design2" target="_blank" rel="noopener" style="--accent:#d98a8a;--bg:#fbf2f1">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Lumen</span><span class="card__swatches"><span style="background:#fbf2f1"></span><span style="background:#d98a8a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/spa/design3" target="_blank" rel="noopener" style="--accent:#0fb5a3;--bg:#eef4f3">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Subzero Lab</span><span class="card__swatches"><span style="background:#eef4f3"></span><span style="background:#0fb5a3"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/spa/design4" target="_blank" rel="noopener" style="--accent:#c2622d;--bg:#f3ece1">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Terra Bodywork</span><span class="card__swatches"><span style="background:#f3ece1"></span><span style="background:#c2622d"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/spa/design5" target="_blank" rel="noopener" style="--accent:#7fb0a8;--bg:#101a1d">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Vapor &amp; Vale</span><span class="card__swatches"><span style="background:#101a1d"></span><span style="background:#7fb0a8"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-dental" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🦷</span>Dental clinics</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/dental/design1" target="_blank" rel="noopener" style="--accent:#2a7de1;--bg:#f4f9ff">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Brightwell Family Dental</span><span class="card__swatches"><span style="background:#f4f9ff"></span><span style="background:#2a7de1"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/dental/design2" target="_blank" rel="noopener" style="--accent:#b08d57;--bg:#faf6f1">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Sourire</span><span class="card__swatches"><span style="background:#faf6f1"></span><span style="background:#b08d57"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/dental/design3" target="_blank" rel="noopener" style="--accent:#00c87a;--bg:#eafff4">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">NODE Dental</span><span class="card__swatches"><span style="background:#eafff4"></span><span style="background:#00c87a"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/dental/design4" target="_blank" rel="noopener" style="--accent:#ff7aa2;--bg:#fffaf0">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Tiny Teeth Club</span><span class="card__swatches"><span style="background:#fffaf0"></span><span style="background:#ff7aa2"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/dental/design5" target="_blank" rel="noopener" style="--accent:#46d6c4;--bg:#0c1116">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Meridian Implant Studio</span><span class="card__swatches"><span style="background:#0c1116"></span><span style="background:#46d6c4"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-lawfirm" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">⚖️</span>Law firms</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/lawfirm/design1" target="_blank" rel="noopener" style="--accent:#1d4e89;--bg:#f4f6f9">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Hartwell &amp; Crane</span><span class="card__swatches"><span style="background:#f4f6f9"></span><span style="background:#1d4e89"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/lawfirm/design2" target="_blank" rel="noopener" style="--accent:#7a2e2e;--bg:#f7f3ec">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Marchetti Vale</span><span class="card__swatches"><span style="background:#f7f3ec"></span><span style="background:#7a2e2e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/lawfirm/design3" target="_blank" rel="noopener" style="--accent:#ff4d2e;--bg:#f2f2ef">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">NORTH/CASE</span><span class="card__swatches"><span style="background:#f2f2ef"></span><span style="background:#ff4d2e"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/lawfirm/design4" target="_blank" rel="noopener" style="--accent:#9a6b4f;--bg:#fbf5ee">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Rowan &amp; Hale</span><span class="card__swatches"><span style="background:#fbf5ee"></span><span style="background:#9a6b4f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/lawfirm/design5" target="_blank" rel="noopener" style="--accent:#37c6c0;--bg:#0d1117">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Meridian Global</span><span class="card__swatches"><span style="background:#0d1117"></span><span style="background:#37c6c0"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-realestate" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">🏡</span>Real estate</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/realestate/design1" target="_blank" rel="noopener" style="--accent:#4f7a3f;--bg:#f6f3ec">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Hearth &amp; Home Realty</span><span class="card__swatches"><span style="background:#f6f3ec"></span><span style="background:#4f7a3f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/realestate/design2" target="_blank" rel="noopener" style="--accent:#9c8466;--bg:#f3efe8">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Vautrin</span><span class="card__swatches"><span style="background:#f3efe8"></span><span style="background:#9c8466"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/realestate/design3" target="_blank" rel="noopener" style="--accent:#e8521f;--bg:#e7e4df">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">CONCRETE NORTH</span><span class="card__swatches"><span style="background:#e7e4df"></span><span style="background:#e8521f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/realestate/design4" target="_blank" rel="noopener" style="--accent:#1f7ae0;--bg:#f4f7f9">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Keystone Rentals</span><span class="card__swatches"><span style="background:#f4f7f9"></span><span style="background:#1f7ae0"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/realestate/design5" target="_blank" rel="noopener" style="--accent:#46c5c2;--bg:#0c1f2b">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Tidewater</span><span class="card__swatches"><span style="background:#0c1f2b"></span><span style="background:#46c5c2"></span></span></span>
+            </a>
+            </div>
+          </section>
+          <section class="cat" id="cat-photography" hidden>
+            <header class="cat__head"><h2 class="cat__title"><span class="cat__emoji">📷</span>Photography studios</h2></header>
+            <div class="grid">
+            <a class="card" href="/showcase/designs/photography/design1" target="_blank" rel="noopener" style="--accent:#c08552;--bg:#fbf3ee">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Evergreen &amp; Vow</span><span class="card__swatches"><span style="background:#fbf3ee"></span><span style="background:#c08552"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/photography/design2" target="_blank" rel="noopener" style="--accent:#7a6a52;--bg:#f6f5f2">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Atelier Noir</span><span class="card__swatches"><span style="background:#f6f5f2"></span><span style="background:#7a6a52"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/photography/design3" target="_blank" rel="noopener" style="--accent:#ff3b1f;--bg:#f2f2f0">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Shutter Lab</span><span class="card__swatches"><span style="background:#f2f2f0"></span><span style="background:#ff3b1f"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/photography/design4" target="_blank" rel="noopener" style="--accent:#5f7470;--bg:#eceae5">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Salt &amp; Silver</span><span class="card__swatches"><span style="background:#eceae5"></span><span style="background:#5f7470"></span></span></span>
+            </a>
+            <a class="card" href="/showcase/designs/photography/design5" target="_blank" rel="noopener" style="--accent:#c9a14a;--bg:#0d0b0e">
+              <span class="card__preview"><span class="card__preview-glow"></span><span class="card__open">Open preview →</span></span>
+              <span class="card__body"><span class="card__name">Maison Lumière</span><span class="card__swatches"><span style="background:#0d0b0e"></span><span style="background:#c9a14a"></span></span></span>
+            </a>
+            </div>
+          </section>
+        </div>
+      </section>
+      <section class="tabpanel" id="panel-appointments" role="tabpanel" hidden>
+        <div class="panel-head"><h2>Let customers book themselves in</h2><p>Visitors choose a service, a day and a time — and it lands on your calendar instantly. Try the live demo.</p></div>
+        <ul class="feat__list feat__list--row"><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Real-time availability</li><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Auto-confirmations by email</li><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Syncs to Google Calendar</li></ul>
+        <div class="booking">
+          <div class="surface booking__widget">
+            <span class="surface__tag">Customer view</span>
+            <h3>Book an appointment</h3>
+            <label class="fld"><span>Service</span>
+              <div class="select-wrap select-wrap--sm"><select id="bkService"></select><svg class="select-caret" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </label>
+            <div class="cal">
+              <div class="cal__bar"><button type="button" id="bkPrev" aria-label="Previous month">‹</button><span id="bkMonth"></span><button type="button" id="bkNext" aria-label="Next month">›</button></div>
+              <div class="cal__dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+              <div class="cal__grid" id="bkGrid"></div>
+            </div>
+            <div class="slots" id="bkSlots"><p class="slots__hint">Pick a day to see available times.</p></div>
+            <label class="fld"><span>Your name</span><input id="bkName" type="text" placeholder="Jane Doe" /></label>
+            <button class="btn-primary btn-block" id="bkBook">Book appointment</button>
+          </div>
+          <div class="surface booking__cal">
+            <span class="surface__tag surface__tag--navy">Business calendar</span>
+            <h3>Upcoming appointments</h3>
+            <div id="bkAgenda" class="agenda"></div>
+          </div>
+        </div>
+      </section>
+      <section class="tabpanel" id="panel-store" role="tabpanel" hidden>
+        <div class="panel-head"><h2>Sell online, take orders, get paid</h2><p>Turn your site into a storefront — add items to the cart and check out. Real products, real payments on your live site.</p></div>
+        <ul class="feat__list feat__list--row"><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Cart &amp; instant checkout</li><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Stripe &amp; Apple Pay ready</li><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Orders straight to your dashboard</li></ul>
+        <div class="store">
+          <div class="store__grid" id="storeGrid"></div>
+          <aside class="surface store__cart">
+            <h3>Your order</h3>
+            <div id="cartItems" class="cart__items"><p class="cart__empty">Your cart is empty — add something tasty.</p></div>
+            <div class="cart__foot"><div class="cart__total"><span>Total</span><strong id="cartTotal">$0.00</strong></div><button class="btn-primary btn-block" id="checkout" disabled>Checkout</button></div>
+          </aside>
+        </div>
+      </section>
+      <section class="tabpanel" id="panel-payments" role="tabpanel" hidden>
+        <div class="panel-head"><h2>Take payments in seconds</h2><p>A real checkout — cards, Apple Pay, subscriptions. This demo runs a mock Stripe payment; on your site it&rsquo;s live and secure.</p></div>
+        <ul class="feat__list feat__list--row"><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> PCI-compliant &amp; secure</li><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Cards, Apple Pay, Google Pay</li><li><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Instant payouts to your bank</li></ul>
+        <div class="pay">
+          <div class="surface pay__card">
+            <span class="surface__tag">Checkout</span>
+            <div class="pay__amount"><span>Amount due</span><strong id="payAmount">$49.00</strong></div>
+            <label class="fld"><span>Card number</span>
+              <div class="pay__cardnum"><input id="payCard" inputmode="numeric" autocomplete="cc-number" placeholder="4242 4242 4242 4242" maxlength="19" /><span class="pay__brand" id="payBrand">VISA</span></div>
+            </label>
+            <div class="pay__row">
+              <label class="fld"><span>Expiry</span><input id="payExp" inputmode="numeric" placeholder="MM / YY" maxlength="7" /></label>
+              <label class="fld"><span>CVC</span><input id="payCvc" inputmode="numeric" placeholder="123" maxlength="4" /></label>
+            </div>
+            <label class="fld"><span>Name on card</span><input id="payName" placeholder="Jane Doe" /></label>
+            <button class="btn-primary btn-block pay__btn" id="payBtn"><span class="pay__btnlabel">Pay $49.00</span></button>
+            <p class="pay__secure"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Secured by <b>Stripe</b> · test card <b>4242 4242 4242 4242</b></p>
+          </div>
+          <div class="surface pay__side">
+            <span class="surface__tag surface__tag--navy">Payments</span>
+            <h3>Recent payments</h3>
+            <div id="payList" class="pay__list"></div>
+          </div>
+        </div>
+      </section>
+      <section class="tabpanel" id="panel-invoicing" role="tabpanel" hidden>
+        <div class="panel-head"><h2>Send professional invoices</h2><p>Build an invoice, watch the total add up, and send it — your client pays online in one click. Edit the lines and see it update live.</p></div>
+        <div class="inv">
+          <div class="surface inv__form">
+            <span class="surface__tag">New invoice</span>
+            <label class="fld"><span>Bill to</span><input id="invClient" value="Acme Co." /></label>
+            <div class="inv__labels"><span>Description</span><span>Qty</span><span>Price</span><span></span></div>
+            <div class="inv__items" id="invItems"></div>
+            <button type="button" class="inv__add" id="invAdd">+ Add line item</button>
+            <div class="inv__total"><span>Total</span><strong id="invTotal">$0.00</strong></div>
+            <button class="btn-primary btn-block" id="invSend">Send invoice</button>
+          </div>
+          <div class="inv__previewwrap">
+            <span class="surface__tag">Live preview</span>
+            <div class="inv-doc">
+              <div class="inv-doc__top"><div class="inv-doc__title">INVOICE<span id="ivNo">#INV-1042</span></div><div class="inv-doc__brand">Darsh</div></div>
+              <div class="inv-doc__to">BILLED TO<br /><b id="ivClient">Acme Co.</b></div>
+              <table class="inv-doc__table"><tbody id="ivRows"></tbody></table>
+              <div class="inv-doc__total"><span>Total due</span><strong id="ivTotal">$0.00</strong></div>
+              <div class="inv-doc__pay">Pay online →</div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="tabpanel" id="panel-analytics" role="tabpanel" hidden>
+        <div class="panel-head"><h2>Know exactly what&rsquo;s working</h2><p>Traffic, revenue and conversions in one clear view — so you make decisions with data, not guesses.</p></div>
+        <div class="analytics">
+          <div class="kpis">
+            <div class="kpi"><span class="kpi__label">Revenue (30d)</span><span class="kpi__num">$24,850</span><span class="kpi__delta up">▲ 18%</span></div>
+            <div class="kpi"><span class="kpi__label">Visitors</span><span class="kpi__num">12,480</span><span class="kpi__delta up">▲ 9%</span></div>
+            <div class="kpi"><span class="kpi__label">Conversion</span><span class="kpi__num">3.8%</span><span class="kpi__delta up">▲ 0.4</span></div>
+            <div class="kpi"><span class="kpi__label">Orders</span><span class="kpi__num">412</span><span class="kpi__delta up">▲ 12%</span></div>
+          </div>
+          <div class="an-grid">
+            <div class="surface an-main"><div class="chart-card__head"><h3>Revenue — last 6 months</h3><span>USD</span></div><div class="area-chart" id="anArea"></div></div>
+            <div class="surface an-side"><h3>Traffic sources</h3><div class="an-sources" id="anSources"></div></div>
+          </div>
+          <div class="surface"><h3 style="margin-bottom:14px;">Top products</h3><div class="table-wrap"><table class="dtable"><thead><tr><th>Product</th><th>Units</th><th>Revenue</th><th>Share</th></tr></thead><tbody id="anTop"></tbody></table></div></div>
+        </div>
+      </section>
+      <section class="tabpanel" id="panel-dashboard" role="tabpanel" hidden>
+        <div class="panel-head"><h2>You&rsquo;re in control of everything</h2><p>Track your site, manage every booking, and edit any word on your pages yourself — no code, no waiting on us.</p></div>
+        <div class="dash">
+          <aside class="dash__side">
+            <button class="dash__navbtn on" data-view="overview"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg> Overview</button>
+            <button class="dash__navbtn" data-view="bookings"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg> Bookings <span class="dash__badge" id="dashBookCount">0</span></button>
+            <button class="dash__navbtn" data-view="pages"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg> Pages &amp; content</button>
+            <button class="dash__navbtn" data-view="messages"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Messages <span class="dash__badge">3</span></button>
+          </aside>
+          <div class="dash__main">
+            <div class="dash__view" data-panel="overview">
+              <div class="kpis">
+                <div class="kpi"><span class="kpi__label">Visitors (30d)</span><span class="kpi__num">4,812</span><span class="kpi__delta up">▲ 12%</span></div>
+                <div class="kpi"><span class="kpi__label">Bookings</span><span class="kpi__num" id="kpiBookings">0</span><span class="kpi__delta up">▲ 8%</span></div>
+                <div class="kpi"><span class="kpi__label">Revenue</span><span class="kpi__num">$9,240</span><span class="kpi__delta up">▲ 5%</span></div>
+                <div class="kpi"><span class="kpi__label">Messages</span><span class="kpi__num">3</span><span class="kpi__delta">new</span></div>
+              </div>
+              <div class="surface chart-card"><div class="chart-card__head"><h3>Visitors this week</h3><span>Mon–Sun</span></div><div class="chart" id="dashChart"></div></div>
+            </div>
+            <div class="dash__view" data-panel="bookings" hidden>
+              <div class="surface"><h3 style="margin-bottom:14px;">All bookings</h3><div class="table-wrap"><table class="dtable"><thead><tr><th>Customer</th><th>Service</th><th>Date</th><th>Time</th><th>Status</th></tr></thead><tbody id="dashBookRows"></tbody></table></div></div>
+            </div>
+            <div class="dash__view" data-panel="pages" hidden>
+              <div class="editor">
+                <div class="surface editor__form">
+                  <h3>Edit your homepage</h3>
+                  <p class="editor__hint">Change anything below — the preview updates live.</p>
+                  <label class="fld"><span>Headline</span><input id="edTitle" type="text" value="Fresh coffee, roasted daily" /></label>
+                  <label class="fld"><span>Sub-headline</span><input id="edSub" type="text" value="Small-batch beans, cozy corner, friendly faces." /></label>
+                  <label class="fld"><span>Button label</span><input id="edCta" type="text" value="View our menu" /></label>
+                  <label class="fld"><span>About paragraph</span><textarea id="edAbout" rows="3">We've been pouring the neighborhood's favorite cup since 2015 — come say hi.</textarea></label>
+                  <label class="fld"><span>Brand color</span><input id="edColor" type="color" value="#6f4e37" class="fld__color" /></label>
+                  <button class="btn-primary" id="edSave">Save &amp; publish</button>
+                </div>
+                <div class="editor__preview">
+                  <span class="surface__tag">Live preview</span>
+                  <div class="mini" id="edMini">
+                    <div class="mini__bar"><span></span><span></span><span></span></div>
+                    <div class="mini__hero"><span class="mini__badge" id="pvBadge">Now open</span><h4 id="pvTitle">Fresh coffee, roasted daily</h4><p id="pvSub">Small-batch beans, cozy corner, friendly faces.</p><span class="mini__btn" id="pvCta">View our menu</span></div>
+                    <div class="mini__about"><p id="pvAbout">We've been pouring the neighborhood's favorite cup since 2015 — come say hi.</p></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="dash__view" data-panel="messages" hidden>
+              <div class="surface"><h3 style="margin-bottom:14px;">Inbox</h3><ul class="msgs">
+                <li><div class="msgs__who"><strong>Sarah Miller</strong><span>2h ago</span></div><p>Hi! Do you cater for office events? Looking for ~30 people next Friday.</p></li>
+                <li><div class="msgs__who"><strong>James Carter</strong><span>Yesterday</span></div><p>Loved the new site. Can I book the back room for a birthday?</p></li>
+                <li><div class="msgs__who"><strong>Aisha Khan</strong><span>2 days ago</span></div><p>What are your holiday opening hours? Thanks!</p></li>
+              </ul></div>
+            </div>
+          </div>
+        </div>
+      </section>
+  </main>
+
+  <!-- CLOSING CTA (navy) -->
+  <section class="more">
+    <div class="more__wrap">
+      <div class="more__cta">
+        <h2>Like what you see? Let's build yours.</h2>
+        <p>Booking, payments, invoicing, analytics, a store, a dashboard — whatever your business needs, tailored to you.</p>
+        <a href="/#contact" class="btn-primary btn-lg">Start a project →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER (navy) -->
+  <footer class="sc-footer">
+    <div class="sc-footer__inner">
+      <a href="/" class="sc-footer__home"><img src="/images/LogoNav.png" alt="Darsh" /></a>
+      <a href="/" class="sc-footer__back">← Back to Darsh</a>
+    </div>
+  </footer>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <a href="#top" class="sc-top" aria-label="Back to top"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg></a>
+
+  <script src="assets/js/showcase.js" defer></script>
+</body>
+</html>

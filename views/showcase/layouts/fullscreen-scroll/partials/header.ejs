@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= content.brand.name %> · <%= content.brand.tagline %></title>
+  <meta name="description" content="<%= content.hero.subtitle %>" />
+  <link href="<%= content.brand.fontUrl %>" rel="stylesheet" />
+  <link rel="stylesheet" href="/__cat_common/style.css" />
+  <link rel="stylesheet" href="/__layout_fullscreen-scroll/style.css" />
+  <link rel="stylesheet" href="<%= prefix %>/css/style.css" />
+  <style>
+    :root {
+      --c-bg: <%= content.brand.bg %>;
+      --c-fg: <%= content.brand.fg %>;
+      --c-accent: <%= content.brand.accent %>;
+      --c-accent-2: <%= content.brand.accent2 %>;
+      --c-muted: <%= content.brand.muted %>;
+    }
+  </style>
+</head>
+<body class="layout-fullscreen theme-<%= theme %>">
+  <header class="fs-top">
+    <a href="<%= prefix %>/" class="fs-brand">
+      <span class="fs-brand__mark"><%= content.brand.logoText %></span>
+      <span class="fs-brand__name"><%= content.brand.name %></span>
+    </a>
+    <nav class="fs-nav">
+      <a href="#scene1">01</a>
+      <a href="#scene2">02</a>
+      <a href="#scene3">03</a>
+      <a href="<%= prefix %>/menu">→ <%= (content.nav && content.nav.items) || 'Menu' %></a>
+    </nav>
+  </header>
+  <div class="fs-pages">

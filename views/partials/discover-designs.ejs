@@ -1,0 +1,236 @@
+<%
+  /*
+   * "What we can do for you" — the Why Darsh section.
+   * Self-contained: markup + scoped styles live here so the home page only
+   * needs a single include. Links out to the static showcase served at /showcase/.
+   */
+%>
+<section class="dd" id="why">
+  <span class="dd-orb dd-orb-a" aria-hidden="true"></span>
+  <span class="dd-orb dd-orb-b" aria-hidden="true"></span>
+
+  <div class="container dd-inner">
+    <div class="dd-copy reveal">
+      <span class="dd-eyebrow">Why Darsh</span>
+      <h2 class="dd-title">What we can do for you</h2>
+      <p class="dd-lede">
+        A few examples of what we build — beautiful websites, online booking,
+        storefronts, and an admin dashboard you control. Take a look, then
+        picture it for your business.
+      </p>
+
+      <div class="dd-cta">
+        <a href="/showcase/" target="_blank" rel="noopener" class="btn btn-yellow btn-glow dd-btn">
+          <span>See what we can do</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+        <span class="dd-cta-note">Opens the full showcase in a new tab</span>
+      </div>
+    </div>
+
+    <a href="/showcase/" target="_blank" rel="noopener" class="dd-preview reveal" aria-label="Open the design showcase">
+      <div class="dd-window">
+        <div class="dd-window-bar">
+          <span></span><span></span><span></span>
+          <span class="dd-window-url">darsh / showcase</span>
+        </div>
+        <div class="dd-window-body">
+          <div class="dd-tile dd-tile--web">
+            <span class="dd-tile__ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></span>
+            <span class="dd-tile__art dd-art-web"><i></i><i></i><i></i></span>
+            <span class="dd-tile__label">Websites</span>
+          </div>
+          <div class="dd-tile dd-tile--book">
+            <span class="dd-tile__ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>
+            <span class="dd-tile__art dd-art-cal"><i></i><i></i><i></i><i></i><i class="on"></i><i></i><i></i><i></i></span>
+            <span class="dd-tile__label">Booking</span>
+          </div>
+          <div class="dd-tile dd-tile--dash">
+            <span class="dd-tile__ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg></span>
+            <span class="dd-tile__art dd-art-bars"><i style="--h:40%"></i><i style="--h:70%"></i><i style="--h:55%"></i><i style="--h:90%"></i></span>
+            <span class="dd-tile__label">Dashboard</span>
+          </div>
+          <div class="dd-tile dd-tile--store">
+            <span class="dd-tile__ico"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6"/></svg></span>
+            <span class="dd-tile__art dd-art-store"><b>$4.50</b><span>Add to cart</span></span>
+            <span class="dd-tile__label">Store</span>
+          </div>
+        </div>
+        <div class="dd-window-foot">
+          <span class="dd-foot-line"></span>
+          <span class="dd-foot-pill">See it live →</span>
+        </div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<style>
+  .dd {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(72px, 9vw, 128px) 0;
+    background:
+      radial-gradient(120% 120% at 100% 0%, var(--navy-3) 0%, var(--navy-2) 40%, var(--navy) 100%);
+    color: #fff;
+  }
+  .dd-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .dd-orb-a { width: 420px; height: 420px; top: -140px; right: -80px; background: rgba(247, 226, 126, 0.35); }
+  .dd-orb-b { width: 360px; height: 360px; bottom: -160px; left: -120px; background: rgba(26, 58, 122, 0.9); }
+
+  .dd-inner {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  .dd-eyebrow {
+    display: inline-block;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--yellow);
+    margin-bottom: 18px;
+  }
+  .dd-title {
+    color: #fff;
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    margin-bottom: 18px;
+  }
+  .dd-lede {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 1.075rem;
+    line-height: 1.7;
+    max-width: 46ch;
+    margin: 0 0 28px;
+  }
+  .dd-lede strong { color: #fff; font-weight: 600; }
+
+  .dd-copy .dd-lede { margin-bottom: 34px; }
+  .dd-cta { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+  .dd-btn { flex: none; }
+  .dd-cta-note { font-size: 0.85rem; color: rgba(255, 255, 255, 0.55); }
+
+  /* ---- Preview window ---- */
+  .dd-preview {
+    display: block;
+    transition: transform 0.5s var(--easing);
+    will-change: transform;
+  }
+  .dd-preview:hover { transform: translateY(-6px); }
+
+  .dd-window {
+    border-radius: 18px;
+    overflow: hidden;
+    background: #0b1c3d;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.45);
+  }
+  .dd-window-bar {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .dd-window-bar > span { width: 11px; height: 11px; border-radius: 50%; background: rgba(255, 255, 255, 0.22); }
+  .dd-window-bar .dd-window-url {
+    width: auto;
+    height: auto;
+    margin-left: 12px;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.4);
+    background: none;
+  }
+
+  .dd-window-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    padding: 20px;
+  }
+  /* capability tiles (not just designs) */
+  .dd-tile {
+    position: relative;
+    border-radius: 12px;
+    aspect-ratio: 16 / 10;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden;
+  }
+  .dd-tile__ico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--yellow);
+    color: var(--navy);
+  }
+  .dd-tile__label { font-size: 0.82rem; font-weight: 600; color: #fff; }
+  .dd-tile__art { position: absolute; right: 12px; top: 12px; }
+
+  /* websites: stacked lines */
+  .dd-art-web { display: flex; flex-direction: column; gap: 4px; align-items: flex-end; }
+  .dd-art-web i { display: block; height: 5px; border-radius: 3px; background: rgba(255,255,255,0.5); }
+  .dd-art-web i:nth-child(1) { width: 44px; background: var(--yellow); }
+  .dd-art-web i:nth-child(2) { width: 34px; }
+  .dd-art-web i:nth-child(3) { width: 40px; }
+
+  /* booking: mini calendar dots */
+  .dd-art-cal { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3px; width: 46px; }
+  .dd-art-cal i { aspect-ratio: 1; border-radius: 3px; background: rgba(255,255,255,0.22); }
+  .dd-art-cal i.on { background: var(--yellow); }
+
+  /* dashboard: bars */
+  .dd-art-bars { display: flex; align-items: flex-end; gap: 4px; height: 34px; }
+  .dd-art-bars i { width: 7px; height: var(--h); border-radius: 2px 2px 0 0; background: var(--yellow); }
+  .dd-art-bars i:nth-child(odd) { background: rgba(255,255,255,0.4); }
+
+  /* store: price chip */
+  .dd-art-store { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .dd-art-store b { font-size: 0.8rem; color: #fff; }
+  .dd-art-store span { font-size: 0.6rem; font-weight: 600; color: var(--navy); background: var(--yellow); padding: 2px 7px; border-radius: 999px; }
+
+  .dd-window-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px 20px;
+  }
+  .dd-foot-line { height: 8px; width: 45%; border-radius: 999px; background: rgba(255, 255, 255, 0.12); }
+  .dd-foot-pill {
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 999px;
+    background: var(--yellow);
+    color: var(--navy);
+  }
+
+  @media (max-width: 860px) {
+    .dd-inner { grid-template-columns: 1fr; }
+    .dd-preview { order: -1; }
+    .dd-lede { max-width: none; }
+  }
+  @media (max-width: 480px) {
+    .dd-cta-note { display: none; }
+  }
+</style>

@@ -1,0 +1,86 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <div class="hero__copy">
+    <p class="eyebrow"><%= content.hero.eyebrow %></p>
+    <h1 class="hero__title"><%= content.hero.title %></h1>
+    <p class="hero__sub"><%= content.hero.subtitle %></p>
+    <div class="hero__cta">
+      <a href="<%= prefix %>/menu" class="btn btn--primary"><%= content.hero.ctaPrimary %></a>
+      <a href="<%= prefix %>/#locations" class="btn btn--ghost"><%= content.hero.ctaSecondary %></a>
+    </div>
+    <ul class="hero__badges">
+      <li><span><%= content.hero.badge1 %></span></li>
+      <li><span><%= content.hero.badge2 %></span></li>
+      <li><span><%= content.hero.badge3 %></span></li>
+    </ul>
+  </div>
+  <div class="hero__art">
+    <img src="<%= content.hero.image %>" alt="" />
+    <div class="hero__sticker"><%= content.hero.sticker %></div>
+  </div>
+</section>
+
+<section class="strip">
+  <% (content.strip.items || []).forEach(function(s){ %>
+    <span><%= s %></span>
+  <% }) %>
+</section>
+
+<section id="featured" class="featured">
+  <header class="section-head">
+    <p class="eyebrow"><%= content.featured.eyebrow %></p>
+    <h2><%= content.featured.title %></h2>
+    <p class="muted"><%= content.featured.subtitle %></p>
+  </header>
+  <div class="featured__grid">
+    <% menu.slice(0, 6).forEach(function(item){ %>
+      <article class="dish">
+        <div class="dish__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <div class="dish__body">
+          <span class="dish__cat"><%= item.category %></span>
+          <h3><%= item.name %></h3>
+          <p><%= item.description %></p>
+          <p class="dish__price">$<%= item.price %></p>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+  <div class="section-cta">
+    <a href="<%= prefix %>/menu" class="btn btn--primary">See the full menu →</a>
+  </div>
+</section>
+
+<section id="about" class="about">
+  <div class="about__img"><img src="<%= content.about.image %>" alt="" /></div>
+  <div class="about__copy">
+    <p class="eyebrow"><%= content.about.eyebrow %></p>
+    <h2><%= content.about.title %></h2>
+    <p><%= content.about.body %></p>
+    <ul class="about__stats">
+      <li><strong><%= content.about.stat1Number %></strong><span><%= content.about.stat1Label %></span></li>
+      <li><strong><%= content.about.stat2Number %></strong><span><%= content.about.stat2Label %></span></li>
+      <li><strong><%= content.about.stat3Number %></strong><span><%= content.about.stat3Label %></span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="locations" class="locations">
+  <header class="section-head">
+    <p class="eyebrow"><%= content.contact.eyebrow %></p>
+    <h2><%= content.contact.title %></h2>
+  </header>
+  <div class="locations__grid">
+    <div class="loc-card">
+      <h3><%= content.contact.address %></h3>
+      <p style="white-space: pre-line;"><%= content.contact.hours %></p>
+      <p><%= content.contact.phone %></p>
+      <p><%= content.contact.email %></p>
+    </div>
+    <div class="loc-card loc-card--map">
+      <iframe src="<%= content.contact.mapEmbed %>" loading="lazy"></iframe>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

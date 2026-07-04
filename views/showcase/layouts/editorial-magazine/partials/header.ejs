@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= content.brand.name %> · <%= content.brand.tagline %></title>
+  <meta name="description" content="<%= content.hero.subtitle %>" />
+  <link href="<%= content.brand.fontUrl %>" rel="stylesheet" />
+  <link rel="stylesheet" href="/__cat_common/style.css" />
+  <link rel="stylesheet" href="/__layout_editorial-magazine/style.css" />
+  <link rel="stylesheet" href="<%= prefix %>/css/style.css" />
+  <style>
+    :root {
+      --c-bg: <%= content.brand.bg %>;
+      --c-fg: <%= content.brand.fg %>;
+      --c-accent: <%= content.brand.accent %>;
+      --c-accent-2: <%= content.brand.accent2 %>;
+      --c-muted: <%= content.brand.muted %>;
+    }
+  </style>
+</head>
+<body class="layout-editorial theme-<%= theme %>">
+  <header class="mag-top">
+    <div class="mag-top__rule"></div>
+    <div class="mag-top__bar">
+      <span class="mag-top__date"><%= new Date().toLocaleDateString('en', { weekday:'long', month:'long', day:'numeric' }) %></span>
+      <a href="<%= prefix %>/" class="mag-top__masthead">
+        <span class="mag-top__name"><%= content.brand.name %></span>
+        <span class="mag-top__sub"><%= content.brand.tagline %></span>
+      </a>
+      <nav class="mag-top__nav">
+        <a href="<%= prefix %>/menu"><%= (content.nav && content.nav.items) || 'The list' %></a>
+        <a href="<%= prefix %>/#about">About</a>
+        <a href="<%= prefix %>/#visit">Visit</a>
+      </nav>
+    </div>
+    <div class="mag-top__rule"></div>
+  </header>

@@ -1,0 +1,72 @@
+<%- include('partials/header') %>
+
+<section id="hero" class="sf-hero">
+  <p class="sf-eyebrow"><%= content.hero.eyebrow %></p>
+  <h1><%= content.hero.title %></h1>
+  <p class="sf-lede"><%= content.hero.subtitle %></p>
+  <div class="sf-cta">
+    <a href="<%= prefix %>/menu" class="sf-btn"><%= content.hero.ctaPrimary %> →</a>
+    <a href="<%= prefix %>/#about" class="sf-btn sf-btn--ghost"><%= content.hero.ctaSecondary %></a>
+  </div>
+  <figure class="sf-hero__art">
+    <img src="<%= content.hero.image %>" alt="" />
+    <figcaption><%= content.hero.sticker %></figcaption>
+  </figure>
+</section>
+
+<section id="featured" class="sf-featured">
+  <header class="sf-section-head">
+    <p class="sf-eyebrow"><%= content.featured.eyebrow %></p>
+    <h2><%= content.featured.title %></h2>
+    <p class="sf-section-sub"><%= content.featured.subtitle %></p>
+  </header>
+  <div class="sf-list">
+    <% menu.slice(0, 6).forEach(function(item, i){ %>
+      <article class="sf-item">
+        <span class="sf-item__num"><%= String(i+1).padStart(2,'0') %></span>
+        <div class="sf-item__body">
+          <p class="sf-item__cat"><%= item.category %></p>
+          <h3><%= item.name %></h3>
+          <p><%= item.description %></p>
+        </div>
+        <div class="sf-item__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <p class="sf-item__price">$<%= item.price %></p>
+      </article>
+    <% }) %>
+  </div>
+</section>
+
+<section id="about" class="sf-about">
+  <p class="sf-eyebrow"><%= content.about.eyebrow %></p>
+  <h2><%= content.about.title %></h2>
+  <p class="sf-about__body"><%= content.about.body %></p>
+  <ul class="sf-stats">
+    <li><strong><%= content.about.stat1Number %></strong><span><%= content.about.stat1Label %></span></li>
+    <li><strong><%= content.about.stat2Number %></strong><span><%= content.about.stat2Label %></span></li>
+    <li><strong><%= content.about.stat3Number %></strong><span><%= content.about.stat3Label %></span></li>
+  </ul>
+  <div class="sf-about__img"><img src="<%= content.about.image %>" alt="" /></div>
+</section>
+
+<section id="visit" class="sf-visit">
+  <p class="sf-eyebrow"><%= content.contact.eyebrow %></p>
+  <h2><%= content.contact.title %></h2>
+  <div class="sf-visit__grid">
+    <div>
+      <p class="sf-visit__label">Address</p>
+      <p><%= content.contact.address %></p>
+    </div>
+    <div>
+      <p class="sf-visit__label">Hours</p>
+      <p style="white-space: pre-line;"><%= content.contact.hours %></p>
+    </div>
+    <div>
+      <p class="sf-visit__label">Reach</p>
+      <p><%= content.contact.phone %></p>
+      <p><%= content.contact.email %></p>
+    </div>
+  </div>
+  <iframe class="sf-visit__map" src="<%= content.contact.mapEmbed %>" loading="lazy"></iframe>
+</section>
+
+<%- include('partials/footer') %>

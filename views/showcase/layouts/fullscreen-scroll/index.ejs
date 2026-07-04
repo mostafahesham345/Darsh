@@ -1,0 +1,63 @@
+<%- include('partials/header') %>
+
+<section id="scene1" class="fs-scene fs-scene--hero" style="background-image: linear-gradient(180deg, color-mix(in srgb, var(--c-fg) 35%, transparent), color-mix(in srgb, var(--c-fg) 65%, transparent)), url('<%= content.hero.image %>')">
+  <div class="fs-scene__inner">
+    <p class="fs-eyebrow"><%= content.hero.eyebrow %></p>
+    <h1 class="fs-title"><%= content.hero.title %></h1>
+    <p class="fs-sub"><%= content.hero.subtitle %></p>
+    <div class="fs-cta">
+      <a href="<%= prefix %>/menu" class="fs-btn"><%= content.hero.ctaPrimary %></a>
+      <a href="#scene2" class="fs-btn fs-btn--ghost">Keep scrolling ↓</a>
+    </div>
+  </div>
+  <div class="fs-scene__sticker"><%= content.hero.sticker %></div>
+</section>
+
+<section id="scene2" class="fs-scene fs-scene--featured">
+  <div class="fs-scene__inner">
+    <p class="fs-eyebrow fs-eyebrow--alt"><%= content.featured.eyebrow %></p>
+    <h2 class="fs-title fs-title--alt"><%= content.featured.title %></h2>
+    <p class="fs-sub fs-sub--alt"><%= content.featured.subtitle %></p>
+    <div class="fs-rail">
+      <% menu.slice(0, 6).forEach(function(item){ %>
+        <article class="fs-card">
+          <div class="fs-card__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+          <p class="fs-card__cat"><%= item.category %></p>
+          <h3><%= item.name %></h3>
+          <p><%= item.description %></p>
+          <p class="fs-card__price">$<%= item.price %></p>
+        </article>
+      <% }) %>
+    </div>
+    <p class="fs-rail__hint">← swipe / scroll →</p>
+  </div>
+</section>
+
+<section id="scene3" class="fs-scene fs-scene--about" style="background-image: linear-gradient(120deg, color-mix(in srgb, var(--c-fg) 65%, transparent), color-mix(in srgb, var(--c-fg) 35%, transparent)), url('<%= content.about.image %>')">
+  <div class="fs-scene__inner fs-scene__inner--split">
+    <div>
+      <p class="fs-eyebrow"><%= content.about.eyebrow %></p>
+      <h2 class="fs-title"><%= content.about.title %></h2>
+      <p class="fs-sub"><%= content.about.body %></p>
+    </div>
+    <ul class="fs-stats">
+      <li><strong><%= content.about.stat1Number %></strong><span><%= content.about.stat1Label %></span></li>
+      <li><strong><%= content.about.stat2Number %></strong><span><%= content.about.stat2Label %></span></li>
+      <li><strong><%= content.about.stat3Number %></strong><span><%= content.about.stat3Label %></span></li>
+    </ul>
+  </div>
+</section>
+
+<section id="scene4" class="fs-scene fs-scene--visit">
+  <div class="fs-scene__inner">
+    <p class="fs-eyebrow fs-eyebrow--alt"><%= content.contact.eyebrow %></p>
+    <h2 class="fs-title fs-title--alt"><%= content.contact.title %></h2>
+    <div class="fs-visit">
+      <p class="fs-visit__big"><%= content.contact.address %></p>
+      <p class="fs-visit__hours" style="white-space: pre-line;"><%= content.contact.hours %></p>
+      <p class="fs-visit__reach"><%= content.contact.phone %> · <%= content.contact.email %> · <%= content.contact.instagram %></p>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

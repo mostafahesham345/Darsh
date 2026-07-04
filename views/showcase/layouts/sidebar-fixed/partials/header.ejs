@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title><%= content.brand.name %> · <%= content.brand.tagline %></title>
+  <meta name="description" content="<%= content.hero.subtitle %>" />
+  <link href="<%= content.brand.fontUrl %>" rel="stylesheet" />
+  <link rel="stylesheet" href="/__cat_common/style.css" />
+  <link rel="stylesheet" href="/__layout_sidebar-fixed/style.css" />
+  <link rel="stylesheet" href="<%= prefix %>/css/style.css" />
+  <style>
+    :root {
+      --c-bg: <%= content.brand.bg %>;
+      --c-fg: <%= content.brand.fg %>;
+      --c-accent: <%= content.brand.accent %>;
+      --c-accent-2: <%= content.brand.accent2 %>;
+      --c-muted: <%= content.brand.muted %>;
+    }
+  </style>
+</head>
+<body class="layout-sidebar theme-<%= theme %>">
+  <aside class="side">
+    <div class="side__top">
+      <a href="<%= prefix %>/" class="side__brand">
+        <span class="side__mark"><%= content.brand.logoText %></span>
+        <span class="side__name"><%= content.brand.name %></span>
+        <span class="side__tagline"><%= content.brand.tagline %></span>
+      </a>
+      <nav class="side__nav">
+        <a href="<%= prefix %>/#hero">— Welcome</a>
+        <a href="<%= prefix %>/#featured">— <%= (content.nav && content.nav.featured) || 'Featured' %></a>
+        <a href="<%= prefix %>/menu">— <%= (content.nav && content.nav.items) || 'Full menu' %></a>
+        <a href="<%= prefix %>/#about">— About</a>
+        <a href="<%= prefix %>/#visit">— Visit</a>
+      </nav>
+    </div>
+    <div class="side__bottom">
+      <p class="side__label">Hours</p>
+      <p class="side__small" style="white-space: pre-line;"><%= content.contact.hours %></p>
+      <p class="side__label">Find us</p>
+      <p class="side__small"><%= content.contact.address %></p>
+      <p class="side__small"><%= content.contact.phone %></p>
+      <p class="side__small"><%= content.contact.instagram %></p>
+    </div>
+  </aside>
+  <main class="side-main">

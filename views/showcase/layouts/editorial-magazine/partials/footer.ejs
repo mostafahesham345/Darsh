@@ -1,0 +1,24 @@
+  <footer class="mag-foot">
+    <div class="mag-foot__rule"></div>
+    <div class="mag-foot__inner">
+      <div class="mag-foot__col">
+        <p class="mag-foot__title">Masthead</p>
+        <p class="mag-foot__big"><%= content.brand.name %></p>
+        <p><%= content.brand.tagline %></p>
+      </div>
+      <div class="mag-foot__col">
+        <p class="mag-foot__title">Visit</p>
+        <p><%= content.contact.address %></p>
+        <p style="white-space: pre-line;"><%= content.contact.hours %></p>
+      </div>
+      <div class="mag-foot__col">
+        <p class="mag-foot__title">Correspondence</p>
+        <p><%= content.contact.phone %></p>
+        <p><%= content.contact.email %></p>
+        <p><%= content.contact.instagram %></p>
+      </div>
+    </div>
+    <p class="mag-foot__legal">© <%= new Date().getFullYear() %> · <%= content.brand.name %> · Volume <%= new Date().getFullYear() - 2010 %>, Issue <%= ((new Date().getMonth() % 12) + 1) %></p>
+  </footer>
+</body>
+</html>
