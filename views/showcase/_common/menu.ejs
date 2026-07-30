@@ -8,13 +8,15 @@
   </header>
 
   <% const groups = {}; menu.forEach(function(m){ (groups[m.category] = groups[m.category] || []).push(m); }); %>
+  <% let shown = 0; // only the first few rows are above the fold — the rest load lazily %>
   <% Object.keys(groups).forEach(function(g){ %>
     <section class="menu-group">
       <h2 class="menu-group__title"><%= g %></h2>
       <div class="menu-group__grid">
         <% groups[g].forEach(function(item){ %>
+          <% shown++; %>
           <article class="dish dish--list">
-            <div class="dish__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+            <div class="dish__img"><img src="<%= item.image %>" alt="<%= item.name %>"<% if (shown > 3) { %> loading="lazy"<% } %> decoding="async" /></div>
             <div class="dish__body">
               <h3><%= item.name %></h3>
               <p><%= item.description %></p>

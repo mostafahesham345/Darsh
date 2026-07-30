@@ -9,7 +9,7 @@
     <a href="<%= prefix %>/#about" class="sf-btn sf-btn--ghost"><%= content.hero.ctaSecondary %></a>
   </div>
   <figure class="sf-hero__art">
-    <img src="<%= content.hero.image %>" alt="" />
+    <img src="<%= content.hero.image %>" alt="<%= content.brand.name %> — <%= content.hero.eyebrow %>" decoding="async" />
     <figcaption><%= content.hero.sticker %></figcaption>
   </figure>
 </section>
@@ -29,7 +29,7 @@
           <h3><%= item.name %></h3>
           <p><%= item.description %></p>
         </div>
-        <div class="sf-item__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <div class="sf-item__img"><img src="<%= item.image %>" alt="<%= item.name %>" loading="lazy" decoding="async" /></div>
         <p class="sf-item__price">$<%= item.price %></p>
       </article>
     <% }) %>
@@ -45,7 +45,7 @@
     <li><strong><%= content.about.stat2Number %></strong><span><%= content.about.stat2Label %></span></li>
     <li><strong><%= content.about.stat3Number %></strong><span><%= content.about.stat3Label %></span></li>
   </ul>
-  <div class="sf-about__img"><img src="<%= content.about.image %>" alt="" /></div>
+  <div class="sf-about__img"><img src="<%= content.about.image %>" alt="<%= content.brand.name %> — <%= content.about.eyebrow %>" loading="lazy" decoding="async" /></div>
 </section>
 
 <section id="visit" class="sf-visit">

@@ -16,7 +16,7 @@
     </ul>
   </div>
   <div class="hero__art">
-    <img src="<%= content.hero.image %>" alt="" />
+    <img src="<%= content.hero.image %>" alt="<%= content.brand.name %> — <%= content.hero.eyebrow %>" decoding="async" />
     <div class="hero__sticker"><%= content.hero.sticker %></div>
   </div>
 </section>
@@ -36,7 +36,7 @@
   <div class="featured__grid">
     <% menu.slice(0, 6).forEach(function(item){ %>
       <article class="dish">
-        <div class="dish__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <div class="dish__img"><img src="<%= item.image %>" alt="<%= item.name %>" loading="lazy" decoding="async" /></div>
         <div class="dish__body">
           <span class="dish__cat"><%= item.category %></span>
           <h3><%= item.name %></h3>
@@ -52,7 +52,7 @@
 </section>
 
 <section id="about" class="about">
-  <div class="about__img"><img src="<%= content.about.image %>" alt="" /></div>
+  <div class="about__img"><img src="<%= content.about.image %>" alt="<%= content.brand.name %> — <%= content.about.eyebrow %>" loading="lazy" decoding="async" /></div>
   <div class="about__copy">
     <p class="eyebrow"><%= content.about.eyebrow %></p>
     <h2><%= content.about.title %></h2>

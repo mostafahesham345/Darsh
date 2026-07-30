@@ -86,7 +86,7 @@
   <div class="gallery__grid">
     <% content.gallery.images.forEach(function(src, i){ %>
       <div class="gallery__item reveal" style="--d:<%= i * 50 %>ms">
-        <img src="<%= src %>" alt="shop <%= i + 1 %>" loading="lazy" />
+        <img src="<%= src %>" alt="Inside <%= content.brand.name %> — photo <%= i + 1 %> of <%= content.gallery.images.length %>" loading="lazy" decoding="async" />
       </div>
     <% }) %>
   </div>

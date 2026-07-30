@@ -3,9 +3,46 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leave a review — <%= businessName %></title>
+  <%
+    // Absolute URLs for the link preview shown when this page is shared (the
+    // review link goes out by email/WhatsApp). BASE_URL is per-environment.
+    // TODO: cleaner would be a single `app.locals.baseUrl` set in server.js;
+    // that file is outside the scope of this change.
+    var baseUrl = (process.env.BASE_URL || '').replace(/\/+$/, '');
+    var pageUrl = baseUrl + '/review';
+    var pageTitle = 'Leave a review — ' + businessName;
+    var pageDescription = 'Worked with ' + businessName + '? Share how it went — it only takes a minute.';
+    var shareImagePath = process.env.BUSINESS_LOGO_URL || faviconUrl || '/images/Logo.png';
+    var shareImage = /^https?:\/\//i.test(shareImagePath) ? shareImagePath : baseUrl + shareImagePath;
+    // Only the bundled logo has known intrinsic dimensions (500×500).
+    var shareImageIsLogo = /\/Logo\.png$/i.test(shareImagePath);
+  %>
+  <title><%= pageTitle %></title>
+  <meta name="description" content="<%= pageDescription %>" />
   <meta name="robots" content="noindex" />
   <link rel="icon" type="image/png" href="<%= faviconUrl %>" />
+  <link rel="canonical" href="<%= pageUrl %>" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp, Slack…) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="<%= businessName %>" />
+  <meta property="og:title" content="<%= pageTitle %>" />
+  <meta property="og:description" content="<%= pageDescription %>" />
+  <meta property="og:url" content="<%= pageUrl %>" />
+  <meta property="og:image" content="<%= shareImage %>" />
+  <meta property="og:image:alt" content="<%= businessName %> logo" />
+  <% if (shareImageIsLogo) { %>
+  <meta property="og:image:width" content="500" />
+  <meta property="og:image:height" content="500" />
+  <% } %>
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<%= pageTitle %>" />
+  <meta name="twitter:description" content="<%= pageDescription %>" />
+  <meta name="twitter:image" content="<%= shareImage %>" />
+  <meta name="twitter:image:alt" content="<%= businessName %> logo" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -27,7 +64,7 @@
 <body>
   <div class="review-page-wrap">
     <div class="review-brand">
-      <img src="/images/LogoDark.png" alt="<%= businessName %>" />
+      <img src="/images/LogoDark.png" alt="<%= businessName %> logo" decoding="async" />
     </div>
 
     <div class="review-form-card" id="reviewCard">

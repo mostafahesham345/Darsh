@@ -8,7 +8,7 @@
 </article>
 
 <figure class="mag-leadart">
-  <img src="<%= content.hero.image %>" alt="" />
+  <img src="<%= content.hero.image %>" alt="<%= content.brand.name %> — <%= content.hero.eyebrow %>" decoding="async" />
   <figcaption><%= content.hero.sticker %> — <%= content.featured.subtitle %></figcaption>
 </figure>
 
@@ -37,7 +37,7 @@
     <% menu.slice(0, 6).forEach(function(item, i){ %>
       <article class="mag-issue">
         <span class="mag-issue__num">No. <%= String(i+1).padStart(2,'0') %></span>
-        <div class="mag-issue__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <div class="mag-issue__img"><img src="<%= item.image %>" alt="<%= item.name %>" loading="lazy" decoding="async" /></div>
         <p class="mag-issue__cat"><%= item.category %></p>
         <h3><%= item.name %></h3>
         <p class="mag-issue__body"><%= item.description %></p>

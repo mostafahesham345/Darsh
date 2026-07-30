@@ -8,6 +8,84 @@
   <meta name="description" content="<%= content.meta.fields.description %>" />
   <link rel="icon" type="image/png" href="<%= content.meta.images.favicon.url %>" />
 
+  <%
+    // Absolute URLs for sharing / SEO. BASE_URL is per-environment (a LAN IP in
+    // dev, the real domain on Render) so nothing is hardcoded here.
+    // TODO: cleaner would be a single `app.locals.baseUrl` set in server.js and
+    // used by every view; server.js is outside the scope of this change, so the
+    // env var is read directly for now.
+    var baseUrl = (process.env.BASE_URL || '').replace(/\/+$/, '');
+    function absUrl(u) {
+      if (!u) return '';
+      return /^https?:\/\//i.test(u) ? u : baseUrl + (u.charAt(0) === '/' ? u : '/' + u);
+    }
+    var pageUrl = baseUrl + '/';
+    var brandName = process.env.BUSINESS_NAME || content.footer.fields.brandName || 'Darsh';
+    var shareImagePath = process.env.BUSINESS_LOGO_URL || content.meta.images.favicon.url || '/images/Logo.png';
+    var shareImage = absUrl(shareImagePath);
+    // Only the bundled logo has known intrinsic dimensions (500×500).
+    var shareImageIsLogo = /\/Logo\.png$/i.test(shareImagePath);
+  %>
+
+  <link rel="canonical" href="<%= pageUrl %>" />
+
+  <!-- Open Graph (Facebook, LinkedIn, WhatsApp, Slack…) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="<%= brandName %>" />
+  <meta property="og:title" content="<%= content.meta.fields.title %>" />
+  <meta property="og:description" content="<%= content.meta.fields.description %>" />
+  <meta property="og:url" content="<%= pageUrl %>" />
+  <meta property="og:image" content="<%= shareImage %>" />
+  <meta property="og:image:alt" content="<%= brandName %> logo" />
+  <% if (shareImageIsLogo) { %>
+  <meta property="og:image:width" content="500" />
+  <meta property="og:image:height" content="500" />
+  <% } %>
+
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="<%= content.meta.fields.title %>" />
+  <meta name="twitter:description" content="<%= content.meta.fields.description %>" />
+  <meta name="twitter:image" content="<%= shareImage %>" />
+  <meta name="twitter:image:alt" content="<%= brandName %> logo" />
+
+  <%
+    // Structured data — driven by the same CMS content as the tags above.
+    var contactEmail = process.env.CONTACT_EMAIL || process.env.ADMIN_EMAIL || '';
+    // Any absolute link in the footer (social profiles, once they exist) becomes sameAs.
+    var sameAs = []
+      .concat(Array.isArray(content.footer.social) ? content.footer.social : [])
+      .concat(Array.isArray(content.footer.links) ? content.footer.links : [])
+      .map(function (l) { return typeof l === 'string' ? l : ((l && l.href) || ''); })
+      .filter(function (h) { return /^https?:\/\//i.test(h); });
+    var orgLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Organization',
+      name: brandName,
+      url: pageUrl,
+      logo: shareImage,
+      image: shareImage,
+      description: content.meta.fields.description,
+      slogan: process.env.BUSINESS_TAGLINE || content.footer.fields.brandTagline,
+    };
+    if (contactEmail) {
+      orgLd.email = contactEmail;
+      orgLd.contactPoint = [{
+        '@type': 'ContactPoint',
+        contactType: 'sales',
+        email: contactEmail,
+        url: pageUrl + '#contact',
+      }];
+    }
+    if (sameAs.length) orgLd.sameAs = sameAs;
+  %>
+  <script type="application/ld+json">
+    <%- JSON.stringify(orgLd).replace(/</g, '\\u003c') %>
+  </script>
+
+  <!-- Largest visible element on the page — fetch it as early as possible. -->
+  <link rel="preload" as="image" href="/images/BackgroundPic.webp" fetchpriority="high" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -32,7 +110,7 @@
 
   <!-- HERO -->
   <section class="hero" id="top">
-    <div class="hero-bg" style="background-image: url('/images/BackgroundPic.png');"></div>
+    <div class="hero-bg" style="background-image: url('/images/BackgroundPic.webp');"></div>
     <div class="hero-bg-veil"></div>
     <div class="hero-bg-grid"></div>
 
@@ -82,10 +160,10 @@
         <span class="hero-brands__label"><%= (content.brands.fields && content.brands.fields.title) || 'Trusted by' %></span>
         <div class="hero-brands__marquee">
           <div class="hero-brands__group">
-            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="<%= b.name || '' %>" loading="lazy" /></span><% }); %>
+            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="<%= b.name ? b.name + ' logo' : '' %>" loading="lazy" decoding="async" /></span><% }); %>
           </div>
           <div class="hero-brands__group" aria-hidden="true">
-            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="" loading="lazy" /></span><% }); %>
+            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="" loading="lazy" decoding="async" /></span><% }); %>
           </div>
         </div>
       </div>
@@ -187,7 +265,7 @@
                 <span class="work-frame-url"><%= displayUrl(card.url) %></span>
               </div>
               <div class="work-frame-shot">
-                <img src="<%= previewUrl(card) %>" alt="<%= card.title %>" loading="lazy" onerror="this.parentElement.classList.add('shot-error')" />
+                <img src="<%= previewUrl(card) %>" alt="Screenshot of the <%= card.title %> website built by <%= brandName %>" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('shot-error')" />
                 <div class="work-shot-fallback">preview unavailable</div>
               </div>
               <div class="work-overlay">

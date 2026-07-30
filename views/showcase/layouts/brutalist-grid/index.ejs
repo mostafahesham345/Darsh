@@ -15,7 +15,7 @@
       </div>
     </div>
     <div class="bru-hero__img">
-      <img src="<%= content.hero.image %>" alt="" />
+      <img src="<%= content.hero.image %>" alt="<%= content.brand.name %> — <%= content.hero.eyebrow %>" decoding="async" />
       <span class="bru-hero__sticker"><%= content.hero.sticker %></span>
     </div>
   </div>
@@ -35,7 +35,7 @@
     <% menu.slice(0, 6).forEach(function(item, i){ %>
       <article class="bru-item">
         <div class="bru-item__num"><%= String(i+1).padStart(2,'0') %></div>
-        <div class="bru-item__img"><img src="<%= item.image %>" alt="<%= item.name %>" /></div>
+        <div class="bru-item__img"><img src="<%= item.image %>" alt="<%= item.name %>" loading="lazy" decoding="async" /></div>
         <div class="bru-item__body">
           <p class="bru-item__cat">// <%= item.category.toUpperCase() %></p>
           <h3><%= item.name %></h3>
