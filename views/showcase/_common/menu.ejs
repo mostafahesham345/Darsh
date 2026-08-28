@@ -20,7 +20,7 @@
             <div class="dish__body">
               <h3><%= item.name %></h3>
               <p><%= item.description %></p>
-              <p class="dish__price">$<%= item.price %></p>
+              <p class="dish__price"><%= item.price === '0' ? 'Free' : '$' + item.price %></p>
             </div>
           </article>
         <% }) %>

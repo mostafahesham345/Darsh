@@ -30,7 +30,7 @@
           <p><%= item.description %></p>
         </div>
         <div class="sf-item__img"><img src="<%= item.image %>" alt="<%= item.name %>" loading="lazy" decoding="async" /></div>
-        <p class="sf-item__price">$<%= item.price %></p>
+        <p class="sf-item__price"><%= item.price === '0' ? 'Free' : '$' + item.price %></p>
       </article>
     <% }) %>
   </div>
