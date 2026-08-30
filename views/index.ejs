@@ -50,38 +50,55 @@
   <meta name="twitter:image:alt" content="<%= brandName %> logo" />
 
   <%
-    // Structured data — driven by the same CMS content as the tags above.
+    // Structured data — driven by the same CMS content as the tags above, but
+    // BUILT in lib/seo.js. The view only hands over data and serialises the
+    // result; which schema types are emitted (and which are deliberately not)
+    // is documented there, next to the code that decides it.
+    //
+    // Loading the module: an EJS template can't `import`, and the clean home
+    // for this is one line in server.js — `app.locals.seo = seo` — which is
+    // outside the scope of this change. So a `seo` local is preferred if a
+    // route ever supplies one, and otherwise the module is required directly
+    // off the views dir (settings.views is set by server.js). Wrapped in
+    // try/catch: missing structured data is a bad day for SEO, a 500 on the
+    // homepage is a worse one.
+    var seoLib = (typeof seo !== 'undefined' && seo) ? seo : (function () {
+      try {
+        var createRequire = process.getBuiltinModule('module').createRequire;
+        return createRequire(String(settings.views) + '/index.ejs')('../lib/seo.js');
+      } catch (err) {
+        console.warn('[index] structured data unavailable:', err.message);
+        return null;
+      }
+    })();
+
     var contactEmail = process.env.CONTACT_EMAIL || process.env.ADMIN_EMAIL || '';
-    // Any absolute link in the footer (social profiles, once they exist) becomes sameAs.
-    var sameAs = []
-      .concat(Array.isArray(content.footer.social) ? content.footer.social : [])
-      .concat(Array.isArray(content.footer.links) ? content.footer.links : [])
-      .map(function (l) { return typeof l === 'string' ? l : ((l && l.href) || ''); })
-      .filter(function (h) { return /^https?:\/\//i.test(h); });
-    var orgLd = {
-      '@context': 'https://schema.org',
-      '@type': 'Organization',
-      name: brandName,
-      url: pageUrl,
-      logo: shareImage,
-      image: shareImage,
+    var approvedReviews = (typeof reviews !== 'undefined' && Array.isArray(reviews)) ? reviews : [];
+    // Aggregate of the approved reviews this page renders — null when there
+    // are none, and nothing is claimed in that case. Also drives the visible
+    // rating line in the #reviews section, so the markup always matches
+    // something a human can read on the page.
+    var reviewSummary = seoLib ? seoLib.summarizeReviews(approvedReviews) : null;
+    var servicePageSlugs = seoLib ? seoLib.SERVICE_PAGE_SLUGS : [];
+    var linkedServices = (typeof services !== 'undefined' && Array.isArray(services))
+      ? services.filter(function (s) { return s && servicePageSlugs.indexOf(s.slug) !== -1; })
+      : [];
+  %>
+  <% if (seoLib) { %>
+  <script type="application/ld+json">
+    <%- seoLib.serializeJsonLd(seoLib.buildHomepageGraph({
+      baseUrl: baseUrl,
+      brandName: brandName,
       description: content.meta.fields.description,
       slogan: process.env.BUSINESS_TAGLINE || content.footer.fields.brandTagline,
-    };
-    if (contactEmail) {
-      orgLd.email = contactEmail;
-      orgLd.contactPoint = [{
-        '@type': 'ContactPoint',
-        contactType: 'sales',
-        email: contactEmail,
-        url: pageUrl + '#contact',
-      }];
-    }
-    if (sameAs.length) orgLd.sameAs = sameAs;
-  %>
-  <script type="application/ld+json">
-    <%- JSON.stringify(orgLd).replace(/</g, '\\u003c') %>
+      logoUrl: shareImage,
+      contactEmail: contactEmail,
+      sameAs: seoLib.collectSameAs(content.footer),
+      services: (typeof services !== 'undefined' && services) || [],
+      reviewSummary: reviewSummary,
+    })) %>
   </script>
+  <% } %>
 
   <!-- Largest visible element on the page — fetch it as early as possible. -->
   <link rel="preload" as="image" href="/images/BackgroundPic.webp" fetchpriority="high" />
@@ -94,6 +111,41 @@
   />
 
   <link rel="stylesheet" href="/css/landing.css" />
+
+  <!--
+    Two small additions that belong with this change: the internal-link row
+    under the services grid, and the visible rating line that backs the
+    AggregateRating markup. Scoped here rather than in public/css/landing.css
+    because that file is being edited elsewhere this session — move these into
+    it (next to the SERVICES SHOWCASE / REVIEWS blocks) when things settle.
+  -->
+  <style>
+    .svc-links {
+      display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+      gap: 8px; margin-top: 36px;
+    }
+    .svc-links__label {
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+      text-transform: uppercase; color: var(--ink-mute); margin-right: 4px;
+    }
+    .svc-links a {
+      font-size: 0.86rem; font-weight: 600; color: var(--ink);
+      background: #fff; border: 1px solid var(--line-strong); border-radius: 99px;
+      padding: 7px 14px; line-height: 1.2;
+      transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s var(--easing);
+    }
+    .svc-links a:hover { background: var(--navy); color: var(--soft); border-color: var(--navy); transform: translateY(-1px); }
+    .svc-links a.svc-links__all { background: var(--navy); color: var(--soft); border-color: var(--navy); }
+    .svc-links a.svc-links__all:hover { background: var(--navy-2); border-color: var(--navy-2); }
+    @media (max-width: 600px) { .svc-links a { font-size: 0.8rem; padding: 6px 12px; } }
+
+    .reviews-aggregate {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 10px; margin-top: 18px; font-size: 0.95rem; color: var(--ink-soft);
+    }
+    .reviews-aggregate .review-stars { font-size: 1rem; }
+    .reviews-aggregate strong { color: var(--ink); font-size: 1.05rem; }
+  </style>
 </head>
 <body>
 
@@ -182,6 +234,31 @@
       </div>
 
       <%- include('partials/services-grid', { services }) %>
+
+      <%
+        /*
+         * Internal links to the standalone service pages.
+         *
+         * These sit next to the grid rather than inside the cards because the
+         * card markup lives in views/partials/services-grid.ejs, which is
+         * shared with the /services page and is being edited elsewhere this
+         * session — wrapping each card in an <a> from here would collide (and
+         * risk nesting anchors if that partial gains its own links).
+         * Crawl-wise this does the same job: descriptive anchor text, one link
+         * per published service, plus the hub. Once the partial settles, the
+         * ideal shape is the card title itself linking to /services/<slug> and
+         * this row reducing to the single "All services" link.
+         */
+      %>
+      <% if (linkedServices.length) { %>
+      <nav class="svc-links reveal" aria-label="Service pages">
+        <span class="svc-links__label">Read more:</span>
+        <% linkedServices.forEach(function (s) { %>
+          <a href="/services/<%= s.slug %>"><%= s.title %></a>
+        <% }); %>
+        <a href="/services" class="svc-links__all">All services</a>
+      </nav>
+      <% } %>
 
       <div class="svc-cta reveal">
         <a href="#contact" class="btn btn-dark btn-glow">
@@ -300,6 +377,25 @@
         <span class="eyebrow">Reviews</span>
         <h2>Loved by the people we build for</h2>
         <p class="lede">See what our clients say — and if you've worked with us, add your own.</p>
+
+        <%
+          /*
+           * The visible half of the AggregateRating markup in <head>. Google
+           * requires the rating it reads to be readable on the page too, and
+           * this is computed from the very same approved reviews the carousel
+           * below renders — so the two can never drift. No reviews, no line:
+           * there is nothing to average and nothing is claimed.
+           */
+        %>
+        <% if (reviewSummary) { %>
+        <p class="reviews-aggregate">
+          <span class="review-stars" aria-hidden="true"><% for (var si = 1; si <= 5; si++) { %><span class="<%= si <= Math.round(reviewSummary.average) ? 'on' : '' %>">★</span><% } %></span>
+          <span>
+            <strong><%= reviewSummary.average.toFixed(1) %></strong> out of 5
+            from <%= reviewSummary.count %> client review<%= reviewSummary.count === 1 ? '' : 's' %>
+          </span>
+        </p>
+        <% } %>
       </div>
 
       <div class="reviews-layout<%= (reviews && reviews.length) ? '' : ' reviews-layout--solo' %>">

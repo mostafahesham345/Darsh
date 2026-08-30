@@ -5,7 +5,13 @@ import { isReady } from '../lib/firebase.js';
 import { trackVisit } from '../lib/analytics.js';
 import { createLead, createReview, listApprovedReviews } from '../lib/business.js';
 import { sendMail, emailShell, escapeHtml, mailReady } from '../lib/mail.js';
-import { services, servicesMeta } from '../lib/services-data.js';
+import {
+  services,
+  servicesMeta,
+  servicesIndexMeta,
+  getService,
+  getServiceDetail,
+} from '../lib/services-data.js';
 
 const router = Router();
 
@@ -214,6 +220,73 @@ router.post('/reviews', async (req, res) => {
   }
 });
 
+/* ------------------------------------------------------------------------ *
+ * Service pages — /services (index) and /services/<slug> (one per service)
+ *
+ * These exist so the site has more than one indexable page. The homepage cards
+ * are a summary; each service now also has a page of its own with a unique
+ * title, description, canonical URL and Service structured data, which is the
+ * unit search engines actually rank.
+ *
+ * Both render views/service.ejs — see the comment at the top of that file for
+ * why one template serves both the index and the detail pages.
+ * ------------------------------------------------------------------------ */
+
+/**
+ * Other services to link to from a detail page. Starts at the entry *after*
+ * the current one and wraps, so the internal links form a rotating ring rather
+ * than every page pointing at the same first three.
+ */
+function relatedServices(slug, count = 3) {
+  const idx = services.findIndex((s) => s.slug === slug);
+  if (idx < 0) return services.slice(0, count);
+  const out = [];
+  for (let i = 1; i < services.length && out.length < count; i += 1) {
+    out.push(services[(idx + i) % services.length]);
+  }
+  return out;
+}
+
+router.get('/services', async (req, res, next) => {
+  try {
+    const content = await getAllSections();
+    res.render('service', {
+      content,
+      services,
+      servicesMeta,
+      indexMeta: servicesIndexMeta,
+      service: null, // index mode
+      detail: null,
+      related: [],
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/services/:slug', async (req, res, next) => {
+  try {
+    const service = getService(req.params.slug);
+    // Unknown slug → hand off to the app-wide 404 in server.js instead of
+    // rendering an empty page. Same pattern routes/showcase.js uses for an
+    // unknown design, so there is one 404 response for the whole site.
+    if (!service) return next();
+
+    const content = await getAllSections();
+    res.render('service', {
+      content,
+      services,
+      servicesMeta,
+      indexMeta: servicesIndexMeta,
+      service,
+      detail: getServiceDetail(service.slug),
+      related: relatedServices(service.slug),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* Standalone "leave a review" page — the link emailed to clients. */
 router.get('/review', (req, res) => {
   res.render('review', {
@@ -273,6 +346,19 @@ const SITEMAP_PAGES = [
   // No <lastmod>: it's a checked-in static file, and its mtime is a deploy
   // artifact (it changes on every clone), not a real content-edit date.
   { path: '/showcase/' },
+
+  // The services index, and one page per service.
+  //
+  // Generated from the same `services` array the pages themselves render from,
+  // so adding a service to lib/services-data.js adds its page AND its sitemap
+  // entry in one edit — the two can't drift apart.
+  //
+  // No <lastmod> on any of them, for the same reason as /showcase/ above: this
+  // copy lives in a checked-in source file rather than the Firestore CMS, so
+  // there is no genuine content-edit timestamp to report. An mtime here would
+  // be a deploy artifact, and a wrong <lastmod> is worse than none.
+  { path: '/services' },
+  ...services.map((service) => ({ path: `/services/${service.slug}` })),
 ];
 
 /**

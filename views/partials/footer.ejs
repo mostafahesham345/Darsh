@@ -1,5 +1,22 @@
 <%
   function fHref(h) { return (!home && h && h.charAt(0) === '#') ? '/' + h : h; }
+
+  /*
+   * The footer is on every page, so it is the cheapest sitewide link to the
+   * services hub at /services — that is how the standalone service pages get
+   * crawled and how link authority reaches them.
+   *
+   * Appended rather than hardcoded into lib/defaults.js so the CMS stays the
+   * source of truth for the rest of the row, and skipped entirely if an editor
+   * has already added a /services link, so the two can't duplicate. Note the
+   * existing "Services" entry points at the #services anchor on the homepage,
+   * which is a different destination — hence the distinct label.
+   */
+  var footerLinks = (content.footer.links || []).slice();
+  var hasServicesLink = footerLinks.some(function (l) {
+    return l && typeof l.href === 'string' && /^\/services(\/|$)/.test(l.href.trim());
+  });
+  if (!hasServicesLink) footerLinks.push({ label: 'All services', href: '/services' });
 %>
 <footer class="footer">
   <div class="container footer-inner">
@@ -12,7 +29,7 @@
     </div>
 
     <nav class="footer-links">
-      <% (content.footer.links || []).forEach(function(link) { %>
+      <% footerLinks.forEach(function(link) { %>
         <a href="<%= fHref(link.href) %>"><%= link.label %></a>
       <% }); %>
     </nav>

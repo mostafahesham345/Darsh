@@ -1,0 +1,617 @@
+<%
+  /* ===========================================================================
+     Service pages — GET /services and GET /services/:slug
+     ---------------------------------------------------------------------------
+     One template, two modes, because both pages share the whole shell (head,
+     nav, hero, contact, footer) and only the middle differs:
+
+       service == null  →  the index at /services
+       service != null  →  the detail page at /services/<slug>
+
+     Everything visual is built out of the classes already in
+     public/css/landing.css (.section, .container, .section-head, .eyebrow,
+     .lede, .btn*, .process*, .section-contact, .contact-form…). The scoped
+     <style> at the bottom only adds the handful of `svcp-` classes these pages
+     need, in the same self-contained way views/partials/discover-designs.ejs
+     does — so no stylesheet outside this file has to change.
+
+     Locals (see routes/public.js):
+       content   CMS sections               service   one entry from `services`, or null
+       services  full service list          detail    long-form copy for `service`, or null
+       indexMeta servicesIndexMeta          related    other services to link to
+     =========================================================================== */
+
+  var isIndex = !service;
+
+  var baseUrl = (process.env.BASE_URL || '').replace(/\/+$/, '');
+  var brandName = process.env.BUSINESS_NAME || content.footer.fields.brandName || 'Darsh';
+
+  var pagePath = isIndex ? '/services' : '/services/' + service.slug;
+  var pageUrl = baseUrl + pagePath;
+
+  // Titles in lib/services-data.js carry no brand — it is appended here, from
+  // the same BUSINESS_NAME the rest of the site uses, so renaming the business
+  // is one env change rather than an edit to a dozen strings.
+  var pageTitle = (isIndex
+    ? indexMeta.seoTitle
+    : ((detail && detail.seoTitle) || service.title)) + ' — ' + brandName;
+
+  var pageDescription = isIndex
+    ? indexMeta.metaDescription
+    : ((detail && detail.metaDescription) || (service.tagline + ' Custom ' + service.title + ' software built and handed over by ' + brandName + '.'));
+
+  /* --- Structured data ------------------------------------------------------
+     Service + BreadcrumbList only. Organization / LocalBusiness are site-wide
+     and belong on the home page, so search engines see one definition of the
+     business rather than a copy per page. `provider` below is a plain reference
+     inside the Service node, not a second Organization definition. */
+  var jsonLd = [];
+
+  var crumbs = [{ name: 'Home', item: baseUrl + '/' }, { name: 'Services', item: baseUrl + '/services' }];
+  if (!isIndex) crumbs.push({ name: service.title, item: pageUrl });
+  jsonLd.push({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: crumbs.map(function (c, i) {
+      return { '@type': 'ListItem', position: i + 1, name: c.name, item: c.item };
+    }),
+  });
+
+  if (isIndex) {
+    jsonLd.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: 'Software services by ' + brandName,
+      itemListElement: services.map(function (s, i) {
+        return {
+          '@type': 'ListItem',
+          position: i + 1,
+          name: s.title,
+          url: baseUrl + '/services/' + s.slug,
+        };
+      }),
+    });
+  } else {
+    var serviceLd = {
+      '@context': 'https://schema.org',
+      '@type': 'Service',
+      name: service.title,
+      serviceType: service.title,
+      url: pageUrl,
+      description: pageDescription,
+      provider: { '@type': 'Organization', name: brandName, url: baseUrl + '/' },
+    };
+    if ((service.features || []).length) {
+      serviceLd.hasOfferCatalog = {
+        '@type': 'OfferCatalog',
+        name: service.title + ' — what’s included',
+        itemListElement: service.features.map(function (f) {
+          return { '@type': 'Offer', itemOffered: { '@type': 'Service', name: f } };
+        }),
+      };
+    }
+    jsonLd.push(serviceLd);
+  }
+
+  var featureNotes = (detail && detail.featureNotes) || {};
+  // Service names keep their own casing ("AI & Automation" must not become
+  // "ai & automation"), so they are interpolated verbatim, never lower-cased.
+  var contactPlaceholder = isIndex
+    ? 'A quick sketch of the problem, the timeline, and what success looks like.'
+    : 'What you need from ' + service.title + ' — the problem, the timeline, and what success looks like.';
+%>
+<!doctype html>
+<html lang="en">
+<%- include('partials/page-head', { content: content, pageTitle: pageTitle, pageDescription: pageDescription, pagePath: pagePath, jsonLd: jsonLd }) %>
+<body>
+
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <%- include('partials/nav', { content: content, home: false }) %>
+
+  <!-- HERO -->
+  <header class="svcp-hero">
+    <span class="orb orb-a" aria-hidden="true"></span>
+    <span class="orb orb-b" aria-hidden="true"></span>
+
+    <div class="container">
+      <div class="svcp-hero-inner">
+        <nav class="svcp-crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <% if (isIndex) { %>
+            <span aria-current="page">Services</span>
+          <% } else { %>
+            <a href="/services">Services</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page"><%= service.title %></span>
+          <% } %>
+        </nav>
+
+        <% if (isIndex) { %>
+          <span class="svcp-badge"><%= indexMeta.eyebrow %></span>
+          <h1><%= indexMeta.title %></h1>
+          <p class="svcp-hero-lede"><%= indexMeta.lede %></p>
+        <% } else { %>
+          <span class="svcp-badge">
+            <%- include('partials/service-icon', { icon: service.icon, size: 16 }) %>
+            <%= servicesMeta.eyebrow %>
+          </span>
+          <h1><%= service.title %></h1>
+          <p class="svcp-hero-lede"><%= service.tagline %></p>
+        <% } %>
+
+        <div class="svcp-hero-cta">
+          <a href="#contact" class="btn btn-yellow btn-glow">
+            <span>Start a project</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+          <a href="<%= isIndex ? '/#work' : '/services' %>" class="btn btn-ghost">
+            <%= isIndex ? 'See our work' : 'All services' %>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<% if (isIndex) { %>
+
+  <!-- INDEX: intro + every service -->
+  <section class="section" id="services">
+    <div class="container">
+      <div class="svcp-intro reveal">
+        <% (indexMeta.intro || []).forEach(function (para) { %>
+          <p><%= para %></p>
+        <% }); %>
+      </div>
+
+      <div class="svcp-index-grid">
+        <% services.forEach(function (s) { %>
+          <a class="svcp-index-card reveal" href="/services/<%= s.slug %>">
+            <span class="svcp-index-icon"><%- include('partials/service-icon', { icon: s.icon, size: 22 }) %></span>
+            <h2><%= s.title %></h2>
+            <p class="svcp-index-tagline"><%= s.tagline %></p>
+            <ul class="svcp-chips">
+              <% (s.features || []).slice(0, 4).forEach(function (f) { %>
+                <li><%= f %></li>
+              <% }); %>
+            </ul>
+            <span class="svcp-more">
+              Read more
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+            </span>
+          </a>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+<% } else { %>
+
+  <!-- DETAIL: overview -->
+  <section class="section">
+    <div class="container svcp-body">
+      <div class="svcp-prose">
+        <% if (detail && (detail.intro || []).length) { %>
+          <div class="svcp-block reveal">
+            <h2>What it is</h2>
+            <% detail.intro.forEach(function (para) { %><p><%= para %></p><% }); %>
+          </div>
+        <% } %>
+
+        <% if (detail && detail.problem) { %>
+          <div class="svcp-block reveal">
+            <h2><%= detail.problem.title %></h2>
+            <p><%= detail.problem.body %></p>
+          </div>
+        <% } %>
+
+        <% if (detail && detail.audience) { %>
+          <div class="svcp-block reveal">
+            <h2><%= detail.audience.title %></h2>
+            <p><%= detail.audience.body %></p>
+          </div>
+        <% } %>
+
+        <% if (!detail) { %>
+          <div class="svcp-block reveal">
+            <h2>What it is</h2>
+            <p><%= service.tagline %> We build it around the way your business already works, ship it in working increments, and hand over the source and documentation at the end.</p>
+          </div>
+        <% } %>
+      </div>
+
+      <aside class="svcp-aside">
+        <div class="svcp-card reveal">
+          <h2 class="svcp-card-title">At a glance</h2>
+          <ul class="svcp-card-list">
+            <% (service.features || []).forEach(function (f) { %>
+              <li>
+                <svg class="svcp-check" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>
+                <span><%= f %></span>
+              </li>
+            <% }); %>
+          </ul>
+          <a href="#contact" class="btn btn-dark btn-glow btn-block">
+            <span>Talk about your project</span>
+          </a>
+          <p class="svcp-card-note">We reply within one business day — usually faster.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- DETAIL: what's included -->
+  <% if ((service.features || []).length) { %>
+  <section class="section section-yellow">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">What’s included</span>
+        <h2>The parts we build</h2>
+        <p class="lede">Scope is agreed up front, so you know exactly which of these are in the first release and which can follow later.</p>
+      </div>
+
+      <div class="svcp-feature-grid">
+        <% service.features.forEach(function (f) { %>
+          <article class="svcp-feature reveal">
+            <h3><%= f %></h3>
+            <% if (featureNotes[f]) { %><p><%= featureNotes[f] %></p><% } %>
+          </article>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- DETAIL: outcomes -->
+  <% if (detail && (detail.outcomes || []).length) { %>
+  <section class="section section-navy svcp-outcomes-section">
+    <span class="orb orb-b" aria-hidden="true"></span>
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">What you get</span>
+        <h2>What you end up owning.</h2>
+        <p class="lede">Not a subscription you rent — a system your business keeps, with the source and the documentation to go with it.</p>
+      </div>
+
+      <div class="svcp-outcomes">
+        <% detail.outcomes.forEach(function (o) { %>
+          <article class="svcp-outcome reveal">
+            <h3><%= o.title %></h3>
+            <p><%= o.body %></p>
+          </article>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- DETAIL: how we build it (same four steps as the home page, CMS-driven) -->
+  <section class="section process-section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow"><%= content.process.fields.eyebrow %></span>
+        <h2><%= content.process.fields.title %></h2>
+        <p class="lede"><%= content.process.fields.lede %></p>
+      </div>
+
+      <div class="process">
+        <% (content.process.steps || []).forEach(function (step, idx) { %>
+          <div class="process-step reveal">
+            <div class="process-num"><%= step.num %></div>
+            <h3><%= step.title %></h3>
+            <p><%= step.description %></p>
+          </div>
+          <% if (idx < (content.process.steps.length - 1)) { %>
+            <div class="process-line"><span class="process-line-fill"></span></div>
+          <% } %>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAIL: related services -->
+  <% if ((related || []).length) { %>
+  <section class="section svcp-related-section">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Also built here</span>
+        <h2>Other things we build</h2>
+        <p class="lede">Most projects combine two or three of these. If yours does, we scope them together rather than as separate builds.</p>
+      </div>
+
+      <div class="svcp-related">
+        <% related.forEach(function (s) { %>
+          <a class="svcp-related-card reveal" href="/services/<%= s.slug %>">
+            <span class="svcp-index-icon"><%- include('partials/service-icon', { icon: s.icon, size: 20 }) %></span>
+            <h3><%= s.title %></h3>
+            <p><%= s.tagline %></p>
+          </a>
+        <% }); %>
+      </div>
+
+      <div class="svc-cta reveal">
+        <a href="/services" class="btn btn-dark btn-glow">
+          <span>See all services</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+<% } %>
+
+  <!-- CONTACT -->
+  <section class="section-contact" id="contact">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="container">
+      <div class="contact-card reveal">
+        <span class="eyebrow eyebrow-light"><%= content.contact.fields.eyebrow %></span>
+        <h2 class="text-light">
+          <%= isIndex ? content.contact.fields.title : 'Talk to us about ' + service.title + '.' %>
+        </h2>
+        <p class="lede lede-light"><%= content.contact.fields.lede %></p>
+
+        <form class="contact-form" id="contactForm" method="post" action="/contact" novalidate>
+          <div class="contact-row">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" placeholder="Jane Doe" autocomplete="name" required />
+              <span class="field-err" data-err="name"></span>
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" placeholder="jane@company.com" autocomplete="email" required />
+              <span class="field-err" data-err="email"></span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cf-company">Company</label>
+            <input id="cf-company" name="company" type="text" placeholder="Acme, Inc." autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="cf-msg">What are you building?</label>
+            <textarea id="cf-msg" name="message" placeholder="<%= contactPlaceholder %>" required></textarea>
+            <span class="field-err" data-err="message"></span>
+          </div>
+
+          <!-- Honeypot: hidden from humans, catches bots -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="cf-website">Website</label>
+            <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <button type="submit" class="btn btn-yellow btn-glow btn-block" id="contactSubmit">
+            <span class="btn-label"><%= content.contact.fields.submitLabel %></span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+
+          <p class="contact-status" id="contactStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer', { content: content, home: false }) %>
+
+  <style>
+    /* Scoped to the service pages. Everything here is additive on top of
+       /css/landing.css — same variables, same spacing rhythm, same easing. */
+
+    /* ----- Hero ----- */
+    .svcp-hero {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      padding: clamp(140px, 15vw, 190px) 0 clamp(60px, 7vw, 92px);
+      background: radial-gradient(120% 120% at 100% 0%, var(--navy-3) 0%, var(--navy-2) 42%, var(--navy) 100%);
+      color: var(--soft);
+    }
+    .svcp-hero-inner { position: relative; z-index: 1; max-width: 820px; }
+
+    .svcp-crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: rgba(248, 250, 252, 0.55);
+      margin-bottom: 22px;
+    }
+    .svcp-crumbs a { color: rgba(248, 250, 252, 0.78); transition: color 0.2s; }
+    .svcp-crumbs a:hover { color: var(--yellow); }
+    .svcp-crumbs [aria-current] { color: var(--yellow); }
+
+    .svcp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 14px;
+      border-radius: 99px;
+      background: rgba(247, 226, 126, 0.12);
+      border: 1px solid rgba(247, 226, 126, 0.28);
+      color: var(--yellow);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+    .svcp-badge svg { width: 16px; height: 16px; }
+
+    .svcp-hero h1 {
+      color: var(--soft);
+      font-size: clamp(2.1rem, 4.8vw, 3.6rem);
+      margin: 22px 0 0;
+    }
+    .svcp-hero-lede {
+      margin-top: 18px;
+      max-width: 62ch;
+      font-size: clamp(1.02rem, 1.5vw, 1.24rem);
+      color: rgba(248, 250, 252, 0.8);
+      line-height: 1.65;
+    }
+    .svcp-hero-cta { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; }
+
+    /* ----- Index page ----- */
+    .svcp-intro { max-width: 760px; margin: 0 auto 56px; text-align: center; }
+    .svcp-intro p { color: var(--ink-soft); font-size: 1.04rem; line-height: 1.75; }
+    .svcp-intro p + p { margin-top: 16px; }
+
+    .svcp-index-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    @media (max-width: 1000px) { .svcp-index-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px)  { .svcp-index-grid { grid-template-columns: 1fr; } }
+
+    .svcp-index-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px 22px 22px;
+      box-shadow: var(--shadow-1);
+      transition: transform 0.3s var(--easing), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .svcp-index-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(247, 226, 126, 0.75);
+      box-shadow: var(--shadow-2);
+    }
+    .svcp-index-card h2 { font-size: 1.12rem; margin: 0 0 6px; letter-spacing: -0.015em; }
+    .svcp-index-tagline { color: var(--ink-soft); font-size: 0.9rem; line-height: 1.5; }
+
+    .svcp-index-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: var(--yellow);
+      color: var(--navy);
+      margin-bottom: 16px;
+      transition: transform 0.3s var(--easing);
+    }
+    .svcp-index-card:hover .svcp-index-icon,
+    .svcp-related-card:hover .svcp-index-icon { transform: rotate(-6deg) scale(1.06); }
+
+    .svcp-chips {
+      list-style: none;
+      padding: 0;
+      margin: 16px 0 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .svcp-chips li {
+      font-size: 0.76rem;
+      color: var(--ink-mute);
+      background: rgba(10, 31, 68, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      padding: 4px 10px;
+      line-height: 1.3;
+    }
+    .svcp-more {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .svcp-index-card:hover .svcp-more svg { transform: translateX(3px); }
+    .svcp-more svg { transition: transform 0.25s var(--easing); }
+
+    /* ----- Detail: body + sticky aside ----- */
+    .svcp-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 330px;
+      gap: clamp(32px, 5vw, 64px);
+      align-items: start;
+    }
+    @media (max-width: 940px) { .svcp-body { grid-template-columns: 1fr; } }
+
+    .svcp-block + .svcp-block { margin-top: 44px; }
+    .svcp-block h2 { font-size: clamp(1.45rem, 2.4vw, 2rem); margin-bottom: 14px; }
+    .svcp-block p { color: var(--ink-soft); font-size: 1.03rem; line-height: 1.78; max-width: 68ch; }
+    .svcp-block p + p { margin-top: 15px; }
+
+    .svcp-aside { position: sticky; top: 96px; }
+    @media (max-width: 940px) { .svcp-aside { position: static; } }
+    .svcp-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 26px 24px;
+      box-shadow: var(--shadow-1);
+    }
+    .svcp-card-title { font-size: 1.05rem; margin-bottom: 16px; }
+    .svcp-card-list { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 10px; }
+    .svcp-card-list li { display: flex; align-items: flex-start; gap: 9px; font-size: 0.91rem; color: var(--ink-soft); line-height: 1.45; }
+    .svcp-check { color: var(--navy); flex-shrink: 0; margin-top: 4px; }
+    .svcp-card-note { margin-top: 12px; font-size: 0.8rem; color: var(--ink-mute); text-align: center; }
+
+    /* ----- Detail: what's included ----- */
+    .svcp-feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 760px) { .svcp-feature-grid { grid-template-columns: 1fr; } }
+    .svcp-feature {
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(10, 31, 68, 0.12);
+      border-radius: 16px;
+      padding: 22px 22px 24px;
+      transition: transform 0.3s var(--easing), background 0.3s ease;
+    }
+    .svcp-feature:hover { transform: translateY(-3px); background: #fff; }
+    .svcp-feature h3 { font-size: 1.04rem; margin-bottom: 8px; }
+    .svcp-feature p { color: rgba(10, 31, 68, 0.75); font-size: 0.94rem; line-height: 1.62; }
+
+    /* ----- Detail: outcomes ----- */
+    .svcp-outcomes-section { position: relative; overflow: hidden; }
+    .svcp-outcomes { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 900px) { .svcp-outcomes { grid-template-columns: 1fr; } }
+    .svcp-outcome {
+      background: rgba(248, 250, 252, 0.05);
+      border: 1px solid rgba(248, 250, 252, 0.12);
+      border-radius: 18px;
+      padding: 26px 24px;
+      transition: transform 0.3s var(--easing), border-color 0.3s ease, background 0.3s ease;
+    }
+    .svcp-outcome:hover {
+      transform: translateY(-4px);
+      background: rgba(248, 250, 252, 0.08);
+      border-color: rgba(247, 226, 126, 0.4);
+    }
+    .svcp-outcome h3 { color: var(--soft); font-size: 1.06rem; margin-bottom: 8px; }
+    .svcp-outcome p { color: rgba(248, 250, 252, 0.75); font-size: 0.94rem; line-height: 1.62; }
+
+    /* ----- Detail: related ----- */
+    .svcp-related-section { background: #fff; }
+    .svcp-related { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media (max-width: 900px) { .svcp-related { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .svcp-related { grid-template-columns: 1fr; } }
+    .svcp-related-card {
+      display: block;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 22px 20px;
+      transition: transform 0.3s var(--easing), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .svcp-related-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(247, 226, 126, 0.75);
+      box-shadow: var(--shadow-2);
+    }
+    .svcp-related-card h3 { font-size: 1rem; margin-bottom: 6px; }
+    .svcp-related-card p { color: var(--ink-soft); font-size: 0.88rem; line-height: 1.5; }
+  </style>
+
+  <script src="/js/landing.js" defer></script>
+</body>
+</html>
