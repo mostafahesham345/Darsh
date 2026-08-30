@@ -43,6 +43,24 @@
 
   var pagePath = isIndex ? '/industries' : '/industries/' + industry.slug;
 
+  /* Grammar this template's own copy needs, which a bare trade name cannot
+     carry. All three are OPTIONAL in lib/industries-data.js and fall back to
+     exactly what the page rendered before they existed, so an entry that sets
+     none of them is byte-identical.
+
+       article        'a' / 'an' for "<article> <name> site". Defaults to a
+                      first-letter vowel test, which is wrong for initialisms
+                      read aloud ("an HVAC site"), so HVAC sets it explicitly.
+       plural         The trade as a plural noun, for the two sentences that
+                      talk about the trade rather than about one business
+                      ("what makes coffee shops different"). Defaults to name.
+       businessLabel  What to call one of these businesses. Defaults to
+                      "<name> company", which is right for a contractor and
+                      wrong for a café, a restaurant and a studio. */
+  var indArticle = isIndex ? '' : (industry.article || (/^[aeiou]/i.test(industry.name) ? 'an' : 'a'));
+  var indPlural = isIndex ? '' : (industry.plural || industry.name);
+  var indBusiness = isIndex ? '' : (industry.businessLabel || industry.name + ' company');
+
   // Titles in lib/industries-data.js carry no brand — it is appended here from
   // the same BUSINESS_NAME the rest of the site uses, exactly as
   // views/service.ejs does, so renaming the business stays a one-env change.
@@ -51,7 +69,7 @@
 
   var contactPlaceholder = isIndex
     ? 'A quick sketch of the problem, the timeline, and what success looks like.'
-    : 'Your ' + industry.name + ' company, what you have now, and what is not working.';
+    : 'Your ' + indBusiness + ', what you have now, and what is not working.';
 %>
 <!doctype html>
 <html lang="en">
@@ -161,7 +179,7 @@
     <div class="container indp-body">
       <div class="indp-prose">
         <div class="indp-block reveal">
-          <h2>What an <%= industry.name %> site is actually for</h2>
+          <h2>What <%= indArticle %> <%= industry.name %> site is actually for</h2>
           <% (industry.intro || []).forEach(function (para) { %><p><%= para %></p><% }); %>
         </div>
       </div>
@@ -170,7 +188,7 @@
         <div class="indp-card reveal">
           <h2 class="indp-card-title">On this page</h2>
           <ul class="indp-card-list">
-            <li><a href="#problems">What makes <%= industry.name %> different</a></li>
+            <li><a href="#problems">What makes <%= indPlural %> different</a></li>
             <li><a href="#designs">Five <%= industry.name %> designs, live</a></li>
             <% if (caseStudy) { %><li><a href="#case-study"><%= caseStudy.name %></a></li><% } %>
             <% if ((linked || []).length) { %><li><a href="#software">The software behind it</a></li><% } %>
@@ -191,7 +209,7 @@
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">The <%= industry.name %> part</span>
-        <h2>What a template cannot know about <%= industry.name %>.</h2>
+        <h2>What a template cannot know about <%= indPlural %>.</h2>
         <% if (industry.problemsIntro) { %><p class="lede"><%= industry.problemsIntro %></p><% } %>
       </div>
 
@@ -305,7 +323,7 @@
     <div class="container">
       <div class="section-head reveal">
         <span class="eyebrow">Behind the website</span>
-        <h2>The software an <%= industry.name %> company usually needs next.</h2>
+        <h2>The software <%= indArticle %> <%= indBusiness %> usually needs next.</h2>
         <% if (industry.softwareIntro) { %><p class="lede"><%= industry.softwareIntro %></p><% } %>
       </div>
 
@@ -367,7 +385,7 @@
       <div class="contact-card reveal">
         <span class="eyebrow eyebrow-light"><%= content.contact.fields.eyebrow %></span>
         <h2 class="text-light">
-          <%= isIndex ? content.contact.fields.title : 'Talk to us about your ' + industry.name + ' company.' %>
+          <%= isIndex ? content.contact.fields.title : 'Talk to us about your ' + indBusiness + '.' %>
         </h2>
         <p class="lede lede-light"><%= content.contact.fields.lede %></p>
 
