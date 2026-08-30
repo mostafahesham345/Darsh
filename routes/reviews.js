@@ -41,10 +41,44 @@ router.post('/request', requireAdmin, async (req, res, next) => {
 
     const brand = process.env.BUSINESS_NAME || 'Darsh';
     const link = `${baseUrl(req)}/review`;
+
+    /*
+     * GOOGLE FIRST, site second.
+     *
+     * A Google review is worth considerably more than an on-site one: it feeds the
+     * Business Profile and the local map pack, and it is the only kind that can
+     * produce a star rating in search results. Reviews collected here are
+     * first-party, which Google classes as self-serving and will not render as a
+     * rich result — they are testimonials, not ranking signal.
+     *
+     * Set GOOGLE_REVIEW_URL to the short link from the Business Profile
+     * ("Ask for reviews" -> https://g.page/r/<id>/review), which opens the review
+     * box directly. Do NOT use the Maps listing URL — it drops people on the
+     * profile and makes them hunt for the button.
+     *
+     * Unset is a supported state: the email falls back to exactly its previous
+     * single-button form, so nothing breaks before the profile is verified.
+     *
+     * NOT DONE HERE, deliberately: nothing filters recipients by how happy they
+     * are. Asking only satisfied customers for a Google review is "review gating"
+     * and is against Google's policies — it risks the profile being suspended.
+     * This sends the same email to whoever the admin enters, and the honest-
+     * feedback wording is kept for that reason.
+     */
+    const googleUrl = (process.env.GOOGLE_REVIEW_URL || '').trim();
+
+    const primaryBtn = (href, label) =>
+      `<a href="${escapeHtml(href)}" style="display:inline-block;background:#0a1f44;color:#f7e27e;font-weight:700;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:15px;">${label}</a>`;
+
+    const ctaHtml = googleUrl
+      ? `<p style="margin:0 0 14px;">${primaryBtn(googleUrl, 'Leave a Google review')}</p>
+         <p style="color:#6b7280;margin:0 0 26px;font-size:13px;">Prefer not to use Google? You can <a href="${escapeHtml(link)}" style="color:#0a1f44;">leave one on our site</a> instead.</p>`
+      : `<p style="margin:0 0 26px;">${primaryBtn(link, 'Leave a review')}</p>`;
+
     const bodyHtml = `
       <h1 style="font-family:'Space Grotesk',sans-serif;font-size:22px;margin:0 0 8px;color:#0a1f44;">How did we do?</h1>
       <p style="color:#374151;margin:0 0 16px;line-height:1.6;">Thanks for working with ${escapeHtml(brand)}. If you have a minute, we'd love to hear your honest feedback — it helps us a lot and lets others know what to expect.</p>
-      <p style="margin:0 0 26px;"><a href="${escapeHtml(link)}" style="display:inline-block;background:#0a1f44;color:#f7e27e;font-weight:700;text-decoration:none;padding:14px 28px;border-radius:10px;font-size:15px;">Leave a review</a></p>
+      ${ctaHtml}
       <p style="color:#6b7280;margin:0;font-size:13px;">It takes less than a minute. Thank you!</p>
     `;
     try {

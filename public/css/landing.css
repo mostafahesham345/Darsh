@@ -1286,14 +1286,31 @@ p  { margin: 0; }
 
 /* =============================================================================
    SCROLL REVEAL
+
+   The hidden state is scoped to `.js`, a class an inline script in <head> puts
+   on <html> before first paint. Consequences, in order of importance:
+
+     - Content is visible in the HTML alone. If the script that adds `.js` never
+       runs, or landing.js fails to load, nothing is stuck at opacity 0.
+     - The hero is exempt unconditionally. It holds the LCP element (the <h1>),
+       and gating that on an IntersectionObserver callback pushed LCP behind
+       script parse + execute for no visual gain — it is above the fold on every
+       viewport, so it "reveals" immediately anyway.
    ============================================================================= */
-.reveal {
+.js .reveal {
   opacity: 0;
   transform: translateY(28px);
   transition: opacity 0.9s var(--easing), transform 0.9s var(--easing);
   will-change: opacity, transform;
 }
-.reveal.visible { opacity: 1; transform: translateY(0); }
+.js .reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* Above the fold: painted from the HTML, never waiting on JS. */
+.js .hero-inner .reveal {
+  opacity: 1;
+  transform: none;
+  will-change: auto;
+}
 
 /* Stagger children */
 .hero-inner .reveal:nth-child(1) { transition-delay: 0s; }
@@ -1484,7 +1501,7 @@ p  { margin: 0; }
     transition-duration: 0.001ms !important;
     scroll-behavior: auto !important;
   }
-  .reveal { opacity: 1; transform: none; }
+  .reveal, .js .reveal { opacity: 1; transform: none; }
 }
 
 /* ============================================================

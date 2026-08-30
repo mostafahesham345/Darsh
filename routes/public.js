@@ -12,6 +12,16 @@ import {
   getService,
   getServiceDetail,
 } from '../lib/services-data.js';
+import {
+  industries,
+  industriesIndexMeta,
+  upcomingIndustries,
+  getIndustry,
+  getIndustryDemos,
+  getIndustryServices,
+  resolveCaseStudy,
+} from '../lib/industries-data.js';
+import { buildBreadcrumbList, absoluteUrl } from '../lib/seo.js';
 
 const router = Router();
 
@@ -287,6 +297,198 @@ router.get('/services/:slug', async (req, res, next) => {
   }
 });
 
+/* ------------------------------------------------------------------------ *
+ * Industry pages — /industries (hub) and /industries/<vertical>
+ *
+ * A second SEO layer, at a right angle to /services. /services answers "what do
+ * you build"; these answer "do you understand my trade", which is a different
+ * search made by a different buyer. An HVAC owner searching "HVAC website
+ * design" will not click a page titled "Online Booking & Scheduling", however
+ * relevant it is.
+ *
+ * WHY A HUB AND NOT A MATRIX: twelve services x twenty-three showcase verticals
+ * is 276 pages of near-identical copy — a doorway network, and a site-wide
+ * quality risk rather than a per-page one. One hub per vertical, linking out to
+ * the real service pages, is the entire design. See the header comment in
+ * lib/industries-data.js for the rest of the reasoning, including why exactly
+ * one vertical is published today.
+ *
+ * Both routes render views/industry.ejs — one template, two modes, the same
+ * arrangement views/service.ejs uses.
+ * ------------------------------------------------------------------------ */
+
+/**
+ * Structured data for an industry page. `industry` is null for the hub index.
+ *
+ * Built here rather than in the template because lib/seo.js already exports
+ * buildBreadcrumbList() and this file can `import` it, while an EJS view cannot
+ * (server.js exposes the module as `app.locals.seo` to work around that, but
+ * assembling the payload in one place keeps it reviewable and stops these pages
+ * drifting from the homepage's structured data).
+ *
+ * Nothing here is invented — every URL resolves, every name comes from
+ * lib/industries-data.js or lib/showcase/registry.js, and nodes with no real
+ * data behind them are omitted rather than filled in. Notably absent:
+ * `areaServed`, for the same reason lib/seo.js refuses to emit LocalBusiness —
+ * there is no service area recorded anywhere in this codebase.
+ */
+function buildIndustryJsonLd({ req, industry, demos = [], linked = [] }) {
+  const baseUrl = siteOrigin(req);
+  const brandName = process.env.BUSINESS_NAME || 'Darsh';
+  const isIndex = !industry;
+  const pagePath = isIndex ? '/industries' : `/industries/${industry.slug}`;
+  const pageUrl = absoluteUrl(baseUrl, pagePath);
+
+  const nodes = [];
+
+  const trail = [
+    { name: 'Home', path: '/' },
+    { name: 'Industries', path: '/industries' },
+  ];
+  if (!isIndex) trail.push({ name: industry.name, path: pagePath });
+  const breadcrumb = buildBreadcrumbList({ baseUrl, trail });
+  // buildBreadcrumbList() returns a bare node so it can be dropped into a
+  // @graph; these pages emit one <script> per node, so each needs its own
+  // @context.
+  if (breadcrumb) nodes.push({ '@context': 'https://schema.org', ...breadcrumb });
+
+  if (isIndex) {
+    nodes.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `Industries ${brandName} builds for`,
+      itemListElement: industries.map((item, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: item.name,
+        url: absoluteUrl(baseUrl, `/industries/${item.slug}`),
+      })),
+    });
+    return nodes;
+  }
+
+  const service = {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: `${industry.name} website design and software`,
+    // The phrase the page is actually written to win, verbatim.
+    serviceType: industry.serviceType,
+    url: pageUrl,
+    description: industry.metaDescription,
+    provider: { '@type': 'Organization', name: brandName, url: absoluteUrl(baseUrl, '/') },
+  };
+  if (linked.length) {
+    service.hasOfferCatalog = {
+      '@type': 'OfferCatalog',
+      name: `Software for ${industry.name} companies`,
+      itemListElement: linked.map((s) => ({
+        '@type': 'Offer',
+        itemOffered: {
+          '@type': 'Service',
+          name: s.title,
+          description: s.note || s.tagline,
+          url: absoluteUrl(baseUrl, s.path),
+        },
+      })),
+    };
+  }
+  nodes.push(service);
+
+  if (demos.length) {
+    nodes.push({
+      '@context': 'https://schema.org',
+      '@type': 'ItemList',
+      name: `${industry.name} website designs by ${brandName}`,
+      // itemListOrder is unordered on purpose: these are five alternatives, not
+      // a ranking, and the page does not present them as one.
+      itemListOrder: 'https://schema.org/ItemListUnordered',
+      numberOfItems: demos.length,
+      itemListElement: demos.map((demo, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: demo.name,
+        description: demo.note || demo.blurb,
+        url: absoluteUrl(baseUrl, demo.url),
+      })),
+    });
+  }
+
+  /*
+   * FAQPage. Worth being clear about what this is and is not doing: since
+   * Google's August 2023 change, FAQ rich results are shown only for
+   * well-known government and health sites, so this will not produce an
+   * expandable FAQ in the SERP for an agency site and should not be sold as
+   * one. It is emitted because it is an accurate machine-readable description
+   * of content the page genuinely renders, which is what the crawlers behind
+   * AI answers and non-Google engines read. The markup matches the visible
+   * <details> blocks question-for-question — no hidden extras, no invented
+   * questions.
+   */
+  const faqs = industry.faqs || [];
+  if (faqs.length) {
+    nodes.push({
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: faqs.map((faq) => ({
+        '@type': 'Question',
+        name: faq.q,
+        acceptedAnswer: { '@type': 'Answer', text: faq.a },
+      })),
+    });
+  }
+
+  return nodes;
+}
+
+router.get('/industries', async (req, res, next) => {
+  try {
+    const content = await getAllSections();
+    res.render('industry', {
+      content,
+      indexMeta: industriesIndexMeta,
+      industries,
+      upcoming: upcomingIndustries,
+      industry: null, // index mode
+      demos: [],
+      linked: [],
+      caseStudy: null,
+      jsonLd: buildIndustryJsonLd({ req, industry: null }),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get('/industries/:slug', async (req, res, next) => {
+  try {
+    const industry = getIndustry(req.params.slug);
+    // Unknown vertical → hand off to the app-wide 404 in server.js rather than
+    // rendering an empty shell. Same pattern as /services/:slug above.
+    if (!industry) return next();
+
+    const content = await getAllSections();
+    const demos = getIndustryDemos(industry);
+    const linked = getIndustryServices(industry);
+
+    res.render('industry', {
+      content,
+      indexMeta: industriesIndexMeta,
+      industries,
+      upcoming: upcomingIndustries,
+      industry,
+      demos,
+      linked,
+      // The client's one-line description is read back out of the CMS work
+      // cards when one matches, so this page and the homepage cannot describe
+      // the same client differently.
+      caseStudy: resolveCaseStudy(industry, content.work && content.work.cards),
+      jsonLd: buildIndustryJsonLd({ req, industry, demos, linked }),
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 /* Standalone "leave a review" page — the link emailed to clients. */
 router.get('/review', (req, res) => {
   res.render('review', {
@@ -333,8 +535,15 @@ function siteOrigin(req) {
  *               It's a per-client link emailed after a project, not a landing
  *               page. It stays crawlable in robots.txt on purpose: blocking it
  *               there would stop crawlers from ever reading the noindex tag.
+ *   /showcase/designs/* — the generated demos. Each one serves
+ *               <meta name="robots" content="noindex, follow"> from
+ *               routes/showcase.js, so they are crawlable but not indexable.
+ *               A noindex URL does not belong in a sitemap: a sitemap is a
+ *               request to index, and asking for the opposite of what the page
+ *               says is a contradiction a crawler has to spend budget resolving.
  *   /contact, /reviews — POST-only handlers, no GET representation.
  *   /healthz  — machine endpoint.
+ *   Verticals in `upcomingIndustries` — no page exists, so no URL.
  */
 const SITEMAP_PAGES = [
   { path: '/', lastmod: contentLastModified },
@@ -342,7 +551,8 @@ const SITEMAP_PAGES = [
   // The showcase landing gallery (public/showcase/index.html) — a real,
   // Darsh-branded marketing page with its own title/description, linked from
   // the homepage via views/partials/discover-designs.ejs. Distinct from the
-  // generated demo sites under /showcase/designs/*, which are excluded below.
+  // generated demo sites under /showcase/designs/*, which carry a page-level
+  // noindex instead (see the note above).
   // No <lastmod>: it's a checked-in static file, and its mtime is a deploy
   // artifact (it changes on every clone), not a real content-edit date.
   { path: '/showcase/' },
@@ -359,6 +569,21 @@ const SITEMAP_PAGES = [
   // be a deploy artifact, and a wrong <lastmod> is worse than none.
   { path: '/services' },
   ...services.map((service) => ({ path: `/services/${service.slug}` })),
+
+  // The industries hub, and one page per published vertical.
+  //
+  // Generated from the same `industries` array the pages render from, for the
+  // same reason as the services block above: adding a vertical to
+  // lib/industries-data.js adds its route AND its sitemap entry in one edit.
+  // Verticals in `upcomingIndustries` are deliberately NOT here — they have no
+  // page, and listing a URL that 404s is the fastest way to lose a crawler's
+  // trust in the whole file.
+  //
+  // No <lastmod>, same reasoning as above: the copy lives in a checked-in
+  // source file, not the Firestore CMS, so there is no genuine content-edit
+  // timestamp and a file mtime would just be a deploy artifact.
+  { path: '/industries' },
+  ...industries.map((industry) => ({ path: `/industries/${industry.slug}` })),
 ];
 
 /**
@@ -411,20 +636,35 @@ Disallow: /healthz
 Disallow: /contact
 Disallow: /reviews
 
-# --- Showcase demo sites: PENDING DECISION ---------------------------------
-# The generated demo sites at /showcase/designs/<category>/<design> are thin,
-# templated pages sharing near-identical markup across 100 variants. Whether
-# they should be indexed is being decided separately; excluded for now, since
-# a wrongly-indexed thin demo is harder to undo than a briefly-missing page.
-# TO INDEX THEM: delete the Disallow line below and add the design URLs to
-# SITEMAP_PAGES in routes/public.js. The /showcase/ landing gallery is a real
-# page and stays crawlable either way.
-Disallow: /showcase/designs/
+# --- Showcase demo sites: kept OUT of the index, but crawlable --------------
+# The generated demos at /showcase/designs/<category>/<design> are thin,
+# templated pages sharing near-identical markup across many variants, so they
+# should not be indexed. That is now enforced where it actually works: each
+# demo serves a page-level <meta name="robots" content="noindex, follow">
+# (see seoHead() in routes/showcase.js).
+#
+# There is deliberately NO "Disallow: /showcase/designs/" here, and adding one
+# back would break the noindex rather than reinforce it. Disallow blocks
+# FETCHING, not INDEXING — a crawler that is not allowed to fetch the page can
+# never read the noindex tag, and Google will happily index a blocked URL
+# anchor-text-only (the classic "No information is available for this page"
+# result). The two directives cancel each other out; the page-level one is the
+# one that removes the URL.
+#
+# The Disallow also had a side effect nobody wanted: it matched by prefix, so
+# it was blocking the per-design CSS and JS routes underneath it
+# (/showcase/designs/<cat>/<id>/css/style.css and .../js/main.js) too, and
+# "follow" is only useful if the crawler can render and walk the page.
+#
+# The /showcase/ landing gallery is a real Darsh-branded page, is indexable,
+# and is in the sitemap.
 # ---------------------------------------------------------------------------
 
-# CSS and JS are intentionally left crawlable (/css/, /js/, /showcase/assets/,
-# /__cat_common/, /__layout_*/) — blocking them stops search engines rendering
-# the pages they are allowed to index.
+# CSS and JS are left crawlable throughout (/css/, /js/, /showcase/assets/,
+# /__cat_common/, /__layout_*/, and the per-design theme routes under
+# /showcase/designs/) — blocking them stops search engines rendering the pages
+# they are allowed to index, and stops them seeing that a demo is a genuine
+# page rather than a shell.
 
 Sitemap: ${origin}/sitemap.xml
 `;

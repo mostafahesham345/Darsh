@@ -14,6 +14,7 @@ import leadsRoutes from './routes/leads.js';
 import reviewsRoutes from './routes/reviews.js';
 import portalRoutes from './routes/portal.js';
 import showcaseRoutes from './routes/showcase.js';
+import * as seo from './lib/seo.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
@@ -22,6 +23,11 @@ const port = Number(process.env.PORT) || 3000;
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.set('trust proxy', 1);
+
+// EJS templates can't `import`, so the structured-data builder is handed to
+// every view as a local. Without this the views fall back to a createRequire()
+// workaround, which trips Node's ExperimentalWarning on each render.
+app.locals.seo = seo;
 
 // Gzip/Brotli every text response (HTML, CSS, JS, JSON). Must sit ahead of the
 // static and route handlers so it can wrap their writes.

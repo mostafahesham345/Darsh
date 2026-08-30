@@ -43,6 +43,41 @@ function viewPath(m, page) {
   return path.join(VIEWS, 'layouts', m.layout, 'index.ejs');
 }
 
+/*
+ * Origin for absolute URLs. Mirrors the siteOrigin() helper in routes/public.js
+ * (BASE_URL when set, otherwise the request's own scheme + host). Duplicated
+ * rather than imported: public.js imports plenty of app-level modules and
+ * reaching across for one four-line helper would couple the showcase router to
+ * the marketing router for no gain.
+ */
+function siteOrigin(req) {
+  const raw = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  return raw.trim().replace(/\/+$/, '');
+}
+
+const escAttr = (s) =>
+  String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+/*
+ * SEO head tags for a demo page.
+ *
+ * noindex keeps the 115 generated demos out of search results; follow lets
+ * crawlers keep walking their links so discovery and link equity still flow.
+ * This is deliberately NOT done with `Disallow:` in robots.txt — a Disallow
+ * blocks fetching, so a crawler can never read the noindex, and the URLs get
+ * indexed anyway (snippet-less) off the anchor text on /showcase/.
+ *
+ * The canonical is self-referential and built from the design's own route, so
+ * query-string and alternate-path variants of the same demo collapse to one URL.
+ */
+function seoHead(req, canonicalPath) {
+  const href = `${siteOrigin(req)}${canonicalPath}`;
+  return (
+    `<meta name="robots" content="noindex, follow" />\n` +
+    `  <link rel="canonical" href="${escAttr(href)}" />`
+  );
+}
+
 // Per-brand SVG favicon as a data URI (mirrors build-static.js).
 function faviconLink(brand = {}) {
   const ch = (brand.logoText || '•').slice(0, 1);
@@ -81,7 +116,11 @@ async function renderDesign(req, res, next, page) {
   };
   try {
     let html = await ejs.renderFile(viewPath(m, page), locals);
-    html = html.replace('</head>', `  ${faviconLink(d.content.brand)}\n</head>`);
+    const canonicalPath = page === 'menu' ? `${prefix}/menu` : prefix;
+    html = html.replace(
+      '</head>',
+      `  ${seoHead(req, canonicalPath)}\n  ${faviconLink(d.content.brand)}\n</head>`
+    );
     html = rewrite(html, prefix, page);
     res.type('html').send(html);
   } catch (err) {

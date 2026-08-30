@@ -1,0 +1,802 @@
+<%
+  /* ===========================================================================
+     Industry pages — GET /industries and GET /industries/:slug
+     ---------------------------------------------------------------------------
+     One template, two modes, for the same reason views/service.ejs is one
+     template: both pages share the entire shell (head, nav, hero, contact,
+     footer) and only the middle differs.
+
+       industry == null  →  the hub index at /industries
+       industry != null  →  one vertical at /industries/<slug>
+
+     Everything visual is built from classes already in public/css/landing.css
+     (.section, .container, .section-head, .eyebrow, .lede, .btn*,
+     .section-contact, .contact-form…). The scoped <style> at the bottom adds
+     only the `indp-` classes these two pages need, self-contained in the same
+     way views/service.ejs and views/partials/discover-designs.ejs are — so no
+     stylesheet outside this file has to change.
+
+     WHY THE JSON-LD IS BUILT IN THE ROUTE AND NOT HERE: views/service.ejs
+     hand-rolls its BreadcrumbList in a scriptlet, but lib/seo.js already
+     exports buildBreadcrumbList() for exactly this. An EJS template cannot
+     `import` an ES module — server.js works around that by exposing the module
+     as `app.locals.seo` — but routes/public.js can import it outright, and it
+     is already importing lib/industries-data.js to answer the request. Building
+     the payload there keeps every node of it in one reviewable place, and means
+     these pages cannot drift from the homepage's idea of what a breadcrumb is.
+
+     Locals (see routes/public.js):
+       content     CMS sections
+       indexMeta   industriesIndexMeta
+       industries  every published vertical (for the index + cross-links)
+       upcoming    verticals with demos but no page yet (index only)
+       industry    one entry from `industries`, or null for the index
+       demos       getIndustryDemos(industry)      — [] on the index
+       linked      getIndustryServices(industry)   — [] on the index
+       caseStudy   resolveCaseStudy(industry, …)   — null when there isn't one
+       jsonLd      structured data, already assembled
+     =========================================================================== */
+
+  var isIndex = !industry;
+
+  var brandName = process.env.BUSINESS_NAME || content.footer.fields.brandName || 'Darsh';
+
+  var pagePath = isIndex ? '/industries' : '/industries/' + industry.slug;
+
+  // Titles in lib/industries-data.js carry no brand — it is appended here from
+  // the same BUSINESS_NAME the rest of the site uses, exactly as
+  // views/service.ejs does, so renaming the business stays a one-env change.
+  var pageTitle = (isIndex ? indexMeta.seoTitle : industry.seoTitle) + ' — ' + brandName;
+  var pageDescription = isIndex ? indexMeta.metaDescription : industry.metaDescription;
+
+  var contactPlaceholder = isIndex
+    ? 'A quick sketch of the problem, the timeline, and what success looks like.'
+    : 'Your ' + industry.name + ' company, what you have now, and what is not working.';
+%>
+<!doctype html>
+<html lang="en">
+<%- include('partials/page-head', { content: content, pageTitle: pageTitle, pageDescription: pageDescription, pagePath: pagePath, jsonLd: jsonLd }) %>
+<body>
+
+  <div class="cursor-glow" aria-hidden="true"></div>
+
+  <%- include('partials/nav', { content: content, home: false }) %>
+
+  <!-- HERO -->
+  <header class="indp-hero">
+    <span class="orb orb-a" aria-hidden="true"></span>
+    <span class="orb orb-b" aria-hidden="true"></span>
+
+    <div class="container">
+      <div class="indp-hero-inner">
+        <nav class="indp-crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <% if (isIndex) { %>
+            <span aria-current="page">Industries</span>
+          <% } else { %>
+            <a href="/industries">Industries</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page"><%= industry.name %></span>
+          <% } %>
+        </nav>
+
+        <span class="indp-badge"><%= isIndex ? indexMeta.eyebrow : industry.eyebrow %></span>
+        <h1><%= isIndex ? indexMeta.title : industry.h1 %></h1>
+        <p class="indp-hero-lede"><%= isIndex ? indexMeta.lede : industry.heroLede %></p>
+
+        <div class="indp-hero-cta">
+          <a href="#contact" class="btn btn-yellow btn-glow">
+            <span>Start a project</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </a>
+          <a href="<%= isIndex ? '/services' : '#designs' %>" class="btn btn-ghost">
+            <%= isIndex ? 'All services' : 'See the ' + industry.name + ' designs' %>
+          </a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+<% if (isIndex) { %>
+
+  <!-- INDEX: intro + published verticals + an honest "not yet" list -->
+  <section class="section">
+    <div class="container">
+      <div class="indp-intro reveal">
+        <% (indexMeta.intro || []).forEach(function (para) { %>
+          <p><%= para %></p>
+        <% }); %>
+      </div>
+
+      <div class="indp-index-grid">
+        <% industries.forEach(function (item) { %>
+          <a class="indp-index-card reveal" href="/industries/<%= item.slug %>">
+            <span class="indp-index-tag">Live</span>
+            <h2><%= item.name %></h2>
+            <p class="indp-index-tagline"><%= item.cardTagline %></p>
+            <ul class="indp-chips">
+              <% (item.cardPoints || []).forEach(function (point) { %>
+                <li><%= point %></li>
+              <% }); %>
+            </ul>
+            <span class="indp-more">
+              Read more
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+            </span>
+          </a>
+        <% }); %>
+      </div>
+
+      <% if ((upcoming || []).length) { %>
+      <div class="indp-upcoming reveal">
+        <h2>Not written yet</h2>
+        <p class="indp-upcoming-lede">
+          We have finished design work for more than twenty trades in the
+          <a href="/showcase/">showcase</a>, but a page here is a claim to understand a
+          business, not just to have drawn one. These are next, and they are waiting on
+          something real to point at rather than on our willingness to write copy.
+        </p>
+        <ul class="indp-upcoming-list">
+          <% upcoming.forEach(function (item) { %>
+            <li>
+              <strong><%= item.name %></strong>
+              <span><%= item.note %></span>
+            </li>
+          <% }); %>
+        </ul>
+        <p class="indp-upcoming-note">
+          If your trade is on that list and you would rather not wait, say so —
+          being first is usually the better deal.
+        </p>
+      </div>
+      <% } %>
+    </div>
+  </section>
+
+<% } else { %>
+
+  <!-- DETAIL: opening prose + a jump-links aside -->
+  <section class="section">
+    <div class="container indp-body">
+      <div class="indp-prose">
+        <div class="indp-block reveal">
+          <h2>What an <%= industry.name %> site is actually for</h2>
+          <% (industry.intro || []).forEach(function (para) { %><p><%= para %></p><% }); %>
+        </div>
+      </div>
+
+      <aside class="indp-aside">
+        <div class="indp-card reveal">
+          <h2 class="indp-card-title">On this page</h2>
+          <ul class="indp-card-list">
+            <li><a href="#problems">What makes <%= industry.name %> different</a></li>
+            <li><a href="#designs">Five <%= industry.name %> designs, live</a></li>
+            <% if (caseStudy) { %><li><a href="#case-study"><%= caseStudy.name %></a></li><% } %>
+            <% if ((linked || []).length) { %><li><a href="#software">The software behind it</a></li><% } %>
+            <% if ((industry.faqs || []).length) { %><li><a href="#faq">Questions we get asked</a></li><% } %>
+          </ul>
+          <a href="#contact" class="btn btn-dark btn-glow btn-block">
+            <span>Talk about your project</span>
+          </a>
+          <p class="indp-card-note">We reply within one business day — usually faster.</p>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- DETAIL: vertical-specific problem framing -->
+  <% if ((industry.problems || []).length) { %>
+  <section class="section section-yellow" id="problems">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">The <%= industry.name %> part</span>
+        <h2>What a template cannot know about <%= industry.name %>.</h2>
+        <% if (industry.problemsIntro) { %><p class="lede"><%= industry.problemsIntro %></p><% } %>
+      </div>
+
+      <div class="indp-problem-grid">
+        <% industry.problems.forEach(function (problem, idx) { %>
+          <article class="indp-problem reveal">
+            <span class="indp-problem-num"><%= String(idx + 1).padStart(2, '0') %></span>
+            <h3><%= problem.title %></h3>
+            <p><%= problem.body %></p>
+          </article>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- DETAIL: the live demo designs for this vertical -->
+  <% if ((demos || []).length) { %>
+  <section class="section section-navy indp-demos-section" id="designs">
+    <span class="orb orb-b" aria-hidden="true"></span>
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Live demos</span>
+        <h2><%= demos.length %> <%= industry.name %> directions you can click through.</h2>
+        <% if (industry.demosIntro) { %><p class="lede"><%= industry.demosIntro %></p><% } %>
+      </div>
+
+      <div class="indp-demo-grid">
+        <% demos.forEach(function (demo) { %>
+          <article class="indp-demo reveal">
+            <span class="indp-demo-swatch" aria-hidden="true"
+                  style="background: <%= demo.bg %>; border-color: <%= demo.accent %>;">
+              <i style="background: <%= demo.accent %>;"></i>
+            </span>
+            <h3><%= demo.name %></h3>
+            <p class="indp-demo-blurb"><%= demo.blurb %></p>
+            <% if (demo.note) { %><p class="indp-demo-note"><%= demo.note %></p><% } %>
+            <a class="indp-demo-link" href="<%= demo.url %>" target="_blank" rel="noopener">
+              Open the live demo
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            </a>
+          </article>
+        <% }); %>
+      </div>
+
+      <div class="svc-cta reveal">
+        <a href="/showcase/" class="btn btn-yellow btn-glow" target="_blank" rel="noopener">
+          <span>See every design we have built</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- DETAIL: the one real client in this trade -->
+  <% if (caseStudy) { %>
+  <section class="section indp-case-section" id="case-study">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Client work</span>
+        <h2>A real <%= industry.name %> site, live and in use.</h2>
+        <p class="lede"><%= caseStudy.description %></p>
+      </div>
+
+      <div class="indp-case reveal">
+        <div class="indp-case-head">
+          <div>
+            <h3><%= caseStudy.name %></h3>
+            <a class="indp-case-url" href="<%= caseStudy.url %>" target="_blank" rel="noopener">
+              <%= caseStudy.url.replace(/^https?:\/\//, '') %>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7"/><path d="M8 7h9v9"/></svg>
+            </a>
+          </div>
+          <ul class="indp-case-tags">
+            <% (caseStudy.tags || []).forEach(function (tag) { %><li><%= tag %></li><% }); %>
+          </ul>
+        </div>
+
+        <div class="indp-case-body">
+          <% (caseStudy.body || []).forEach(function (para) { %><p><%= para %></p><% }); %>
+        </div>
+
+        <%
+          /* ---------------------------------------------------------------
+             DELIBERATE GAP — DO NOT FILL THIS WITH AN ESTIMATE.
+
+             Every other claim on this page is checkable: the demos are live
+             URLs, the client site is a live URL, the services are real pages.
+             Performance figures for Infinite Comfort are not, because nobody
+             has measured them and the client has not agreed to publish them.
+
+             Rendering the absence visibly is the honest option and, on a page
+             whose entire argument is "we know this trade", a stated gap reads
+             better than a plausible invention. Replace with a real
+             `results[]` block when there is data — see the honesty note on
+             `caseStudy` in lib/industries-data.js.
+             --------------------------------------------------------------- */
+        %>
+        <% if (caseStudy.resultsGap) { %>
+        <p class="indp-case-gap"><%= caseStudy.resultsGap %></p>
+        <% } %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- DETAIL: the service pages this hub exists to link to -->
+  <% if ((linked || []).length) { %>
+  <section class="section indp-software-section" id="software">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Behind the website</span>
+        <h2>The software an <%= industry.name %> company usually needs next.</h2>
+        <% if (industry.softwareIntro) { %><p class="lede"><%= industry.softwareIntro %></p><% } %>
+      </div>
+
+      <div class="indp-service-grid">
+        <% linked.forEach(function (service) { %>
+          <a class="indp-service reveal" href="<%= service.path %>">
+            <span class="indp-service-icon"><%- include('partials/service-icon', { icon: service.icon, size: 20 }) %></span>
+            <h3><%= service.title %></h3>
+            <p><%= service.note || service.tagline %></p>
+            <span class="indp-more">
+              <%= service.title %>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+            </span>
+          </a>
+        <% }); %>
+      </div>
+
+      <div class="svc-cta reveal">
+        <a href="/services" class="btn btn-dark btn-glow">
+          <span>See all services</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+  <!-- DETAIL: FAQs -->
+  <% if ((industry.faqs || []).length) { %>
+  <section class="section indp-faq-section" id="faq">
+    <div class="container">
+      <div class="section-head reveal">
+        <span class="eyebrow">Questions</span>
+        <h2>What <%= industry.name %> owners ask us.</h2>
+        <p class="lede">Straight answers, including the ones where the answer is “no” or “we have only done this once”.</p>
+      </div>
+
+      <div class="indp-faqs">
+        <% industry.faqs.forEach(function (faq, idx) { %>
+          <details class="indp-faq reveal"<%= idx === 0 ? ' open' : '' %>>
+            <summary>
+              <h3><%= faq.q %></h3>
+              <svg class="indp-faq-chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6"/></svg>
+            </summary>
+            <p><%= faq.a %></p>
+          </details>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+  <% } %>
+
+<% } %>
+
+  <!-- CONTACT -->
+  <section class="section-contact" id="contact">
+    <div class="stars" aria-hidden="true"></div>
+    <div class="container">
+      <div class="contact-card reveal">
+        <span class="eyebrow eyebrow-light"><%= content.contact.fields.eyebrow %></span>
+        <h2 class="text-light">
+          <%= isIndex ? content.contact.fields.title : 'Talk to us about your ' + industry.name + ' company.' %>
+        </h2>
+        <p class="lede lede-light"><%= content.contact.fields.lede %></p>
+
+        <form class="contact-form" id="contactForm" method="post" action="/contact" novalidate>
+          <div class="contact-row">
+            <div class="field">
+              <label for="cf-name">Name</label>
+              <input id="cf-name" name="name" type="text" placeholder="Jane Doe" autocomplete="name" required />
+              <span class="field-err" data-err="name"></span>
+            </div>
+            <div class="field">
+              <label for="cf-email">Email</label>
+              <input id="cf-email" name="email" type="email" placeholder="jane@company.com" autocomplete="email" required />
+              <span class="field-err" data-err="email"></span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="cf-company">Company</label>
+            <input id="cf-company" name="company" type="text" placeholder="Acme, Inc." autocomplete="organization" />
+          </div>
+          <div class="field">
+            <label for="cf-msg">What are you building?</label>
+            <textarea id="cf-msg" name="message" placeholder="<%= contactPlaceholder %>" required></textarea>
+            <span class="field-err" data-err="message"></span>
+          </div>
+
+          <!-- Honeypot: hidden from humans, catches bots -->
+          <div class="hp-field" aria-hidden="true">
+            <label for="cf-website">Website</label>
+            <input id="cf-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <button type="submit" class="btn btn-yellow btn-glow btn-block" id="contactSubmit">
+            <span class="btn-label"><%= content.contact.fields.submitLabel %></span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></svg>
+          </button>
+
+          <p class="contact-status" id="contactStatus" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer', { content: content, home: false }) %>
+
+  <style>
+    /* Scoped to the industry pages. Additive on top of /css/landing.css —
+       same variables, same spacing rhythm, same easing as views/service.ejs. */
+
+    /* ----- Hero ----- */
+    .indp-hero {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      padding: clamp(140px, 15vw, 190px) 0 clamp(60px, 7vw, 92px);
+      background: radial-gradient(120% 120% at 100% 0%, var(--navy-3) 0%, var(--navy-2) 42%, var(--navy) 100%);
+      color: var(--soft);
+    }
+    .indp-hero-inner { position: relative; z-index: 1; max-width: 860px; }
+
+    .indp-crumbs {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: rgba(248, 250, 252, 0.55);
+      margin-bottom: 22px;
+    }
+    .indp-crumbs a { color: rgba(248, 250, 252, 0.78); transition: color 0.2s; }
+    .indp-crumbs a:hover { color: var(--yellow); }
+    .indp-crumbs [aria-current] { color: var(--yellow); }
+
+    .indp-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 7px 14px;
+      border-radius: 99px;
+      background: rgba(247, 226, 126, 0.12);
+      border: 1px solid rgba(247, 226, 126, 0.28);
+      color: var(--yellow);
+      font-size: 0.74rem;
+      font-weight: 600;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    .indp-hero h1 {
+      color: var(--soft);
+      font-size: clamp(2rem, 4.4vw, 3.35rem);
+      margin: 22px 0 0;
+    }
+    .indp-hero-lede {
+      margin-top: 18px;
+      max-width: 64ch;
+      font-size: clamp(1.02rem, 1.5vw, 1.2rem);
+      color: rgba(248, 250, 252, 0.8);
+      line-height: 1.65;
+    }
+    .indp-hero-cta { margin-top: 34px; display: flex; flex-wrap: wrap; gap: 14px; }
+
+    /* ----- Index ----- */
+    .indp-intro { max-width: 760px; margin: 0 auto 52px; text-align: center; }
+    .indp-intro p { color: var(--ink-soft); font-size: 1.04rem; line-height: 1.75; }
+    .indp-intro p + p { margin-top: 16px; }
+
+    .indp-index-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 1000px) { .indp-index-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px)  { .indp-index-grid { grid-template-columns: 1fr; } }
+
+    .indp-index-card {
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px 22px 22px;
+      box-shadow: var(--shadow-1);
+      transition: transform 0.3s var(--easing), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .indp-index-card:hover {
+      transform: translateY(-5px);
+      border-color: rgba(247, 226, 126, 0.75);
+      box-shadow: var(--shadow-2);
+    }
+    .indp-index-tag {
+      align-self: flex-start;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--navy);
+      background: var(--yellow);
+      border-radius: 99px;
+      padding: 4px 10px;
+      margin-bottom: 14px;
+    }
+    .indp-index-card h2 { font-size: 1.35rem; margin: 0 0 6px; letter-spacing: -0.015em; }
+    .indp-index-tagline { color: var(--ink-soft); font-size: 0.93rem; line-height: 1.55; }
+
+    .indp-chips { list-style: none; padding: 0; margin: 16px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .indp-chips li {
+      font-size: 0.76rem;
+      color: var(--ink-mute);
+      background: rgba(10, 31, 68, 0.05);
+      border: 1px solid var(--line);
+      border-radius: 99px;
+      padding: 4px 10px;
+      line-height: 1.3;
+    }
+
+    .indp-more {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--navy);
+    }
+    .indp-more svg { transition: transform 0.25s var(--easing); }
+    .indp-index-card:hover .indp-more svg,
+    .indp-service:hover .indp-more svg { transform: translateX(3px); }
+
+    .indp-upcoming {
+      margin-top: 56px;
+      max-width: 820px;
+      background: rgba(10, 31, 68, 0.035);
+      border: 1px dashed var(--line-strong);
+      border-radius: 20px;
+      padding: 30px 28px;
+    }
+    .indp-upcoming h2 { font-size: 1.35rem; margin-bottom: 12px; }
+    .indp-upcoming-lede { color: var(--ink-soft); font-size: 0.98rem; line-height: 1.7; }
+    .indp-upcoming-lede a { color: var(--navy); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
+    .indp-upcoming-list { list-style: none; padding: 0; margin: 20px 0 0; display: grid; gap: 12px; }
+    .indp-upcoming-list li {
+      display: grid;
+      grid-template-columns: 110px minmax(0, 1fr);
+      gap: 12px;
+      align-items: baseline;
+      padding-top: 12px;
+      border-top: 1px solid var(--line);
+      font-size: 0.94rem;
+      color: var(--ink-soft);
+      line-height: 1.6;
+    }
+    @media (max-width: 560px) { .indp-upcoming-list li { grid-template-columns: 1fr; gap: 4px; } }
+    .indp-upcoming-list strong { color: var(--ink); font-size: 1rem; }
+    .indp-upcoming-note { margin-top: 20px; font-size: 0.9rem; color: var(--ink-mute); }
+
+    /* ----- Detail: body + sticky aside ----- */
+    .indp-body {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      gap: clamp(32px, 5vw, 64px);
+      align-items: start;
+    }
+    @media (max-width: 940px) { .indp-body { grid-template-columns: 1fr; } }
+
+    .indp-block h2 { font-size: clamp(1.45rem, 2.4vw, 2rem); margin-bottom: 14px; }
+    .indp-block p { color: var(--ink-soft); font-size: 1.03rem; line-height: 1.78; max-width: 68ch; }
+    .indp-block p + p { margin-top: 15px; }
+
+    .indp-aside { position: sticky; top: 96px; }
+    @media (max-width: 940px) { .indp-aside { position: static; } }
+    .indp-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 26px 24px;
+      box-shadow: var(--shadow-1);
+    }
+    .indp-card-title { font-size: 1.05rem; margin-bottom: 14px; }
+    .indp-card-list { list-style: none; padding: 0; margin: 0 0 22px; display: flex; flex-direction: column; gap: 2px; }
+    .indp-card-list a {
+      display: block;
+      padding: 9px 0;
+      font-size: 0.92rem;
+      color: var(--ink-soft);
+      border-bottom: 1px solid var(--line);
+      transition: color 0.2s, padding-left 0.2s var(--easing);
+    }
+    .indp-card-list a:hover { color: var(--navy); padding-left: 5px; }
+    .indp-card-note { margin-top: 12px; font-size: 0.8rem; color: var(--ink-mute); text-align: center; }
+
+    /* ----- Detail: problems ----- */
+    .indp-problem-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 800px) { .indp-problem-grid { grid-template-columns: 1fr; } }
+    .indp-problem {
+      position: relative;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(10, 31, 68, 0.12);
+      border-radius: 16px;
+      padding: 24px 24px 26px;
+      transition: transform 0.3s var(--easing), background 0.3s ease;
+    }
+    .indp-problem:hover { transform: translateY(-3px); background: #fff; }
+    .indp-problem-num {
+      display: block;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      color: rgba(10, 31, 68, 0.45);
+      margin-bottom: 10px;
+    }
+    .indp-problem h3 { font-size: 1.06rem; margin-bottom: 9px; }
+    .indp-problem p { color: rgba(10, 31, 68, 0.78); font-size: 0.95rem; line-height: 1.68; }
+
+    /* ----- Detail: demos ----- */
+    .indp-demos-section { position: relative; overflow: hidden; }
+    .indp-demos-section .container { position: relative; z-index: 1; }
+    .indp-demo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 980px) { .indp-demo-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 620px) { .indp-demo-grid { grid-template-columns: 1fr; } }
+
+    .indp-demo {
+      display: flex;
+      flex-direction: column;
+      background: rgba(248, 250, 252, 0.05);
+      border: 1px solid rgba(248, 250, 252, 0.12);
+      border-radius: 18px;
+      padding: 24px 22px 22px;
+      transition: transform 0.3s var(--easing), border-color 0.3s ease, background 0.3s ease;
+    }
+    .indp-demo:hover {
+      transform: translateY(-4px);
+      background: rgba(248, 250, 252, 0.08);
+      border-color: rgba(247, 226, 126, 0.4);
+    }
+    .indp-demo-swatch {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 62px;
+      border-radius: 12px;
+      border: 1px solid;
+      margin-bottom: 16px;
+    }
+    .indp-demo-swatch i { display: block; width: 46px; height: 6px; border-radius: 99px; }
+    .indp-demo h3 { color: var(--soft); font-size: 1.04rem; margin-bottom: 7px; }
+    .indp-demo-blurb {
+      color: rgba(248, 250, 252, 0.62);
+      font-size: 0.82rem;
+      line-height: 1.5;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+    }
+    .indp-demo-note {
+      margin-top: 12px;
+      color: rgba(248, 250, 252, 0.82);
+      font-size: 0.93rem;
+      line-height: 1.65;
+      flex: 1 1 auto;
+    }
+    .indp-demo-link {
+      margin-top: 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--yellow);
+    }
+    .indp-demo-link svg { transition: transform 0.25s var(--easing); }
+    .indp-demo:hover .indp-demo-link svg { transform: translate(2px, -2px); }
+
+    /* ----- Detail: case study ----- */
+    .indp-case-section { background: #fff; }
+    .indp-case {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: clamp(26px, 4vw, 40px);
+      box-shadow: var(--shadow-1);
+    }
+    .indp-case-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--line);
+    }
+    .indp-case-head h3 { font-size: clamp(1.3rem, 2.4vw, 1.75rem); margin-bottom: 6px; }
+    .indp-case-url {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: "JetBrains Mono", ui-monospace, monospace;
+      font-size: 0.84rem;
+      color: var(--ink-mute);
+      transition: color 0.2s;
+    }
+    .indp-case-url:hover { color: var(--navy); }
+    .indp-case-tags { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+    .indp-case-tags li {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--navy);
+      background: rgba(247, 226, 126, 0.4);
+      border-radius: 99px;
+      padding: 4px 11px;
+    }
+    .indp-case-body { margin-top: 24px; }
+    .indp-case-body p { color: var(--ink-soft); font-size: 1.01rem; line-height: 1.78; }
+    .indp-case-body p + p { margin-top: 15px; }
+    .indp-case-gap {
+      margin-top: 26px;
+      padding: 16px 18px;
+      border-left: 3px solid var(--yellow-3);
+      background: rgba(247, 226, 126, 0.14);
+      border-radius: 0 12px 12px 0;
+      font-size: 0.92rem;
+      line-height: 1.65;
+      color: var(--ink-soft);
+    }
+
+    /* ----- Detail: linked services ----- */
+    .indp-service-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media (max-width: 760px) { .indp-service-grid { grid-template-columns: 1fr; } }
+    .indp-service {
+      display: block;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 24px 22px 22px;
+      box-shadow: var(--shadow-1);
+      transition: transform 0.3s var(--easing), box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+    .indp-service:hover {
+      transform: translateY(-4px);
+      border-color: rgba(247, 226, 126, 0.75);
+      box-shadow: var(--shadow-2);
+    }
+    .indp-service-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: var(--yellow);
+      color: var(--navy);
+      margin-bottom: 14px;
+      transition: transform 0.3s var(--easing);
+    }
+    .indp-service:hover .indp-service-icon { transform: rotate(-6deg) scale(1.06); }
+    .indp-service h3 { font-size: 1.06rem; margin-bottom: 8px; }
+    .indp-service p { color: var(--ink-soft); font-size: 0.94rem; line-height: 1.65; }
+
+    /* ----- Detail: FAQs ----- */
+    .indp-faq-section { background: #fff; }
+    .indp-faqs { max-width: 820px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .indp-faq {
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 4px 22px;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    .indp-faq[open] { border-color: rgba(247, 226, 126, 0.75); box-shadow: var(--shadow-1); }
+    .indp-faq summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 0;
+      cursor: pointer;
+      list-style: none;
+    }
+    .indp-faq summary::-webkit-details-marker { display: none; }
+    .indp-faq summary h3 { font-size: 1.02rem; margin: 0; line-height: 1.4; }
+    .indp-faq-chev { flex-shrink: 0; color: var(--ink-mute); transition: transform 0.25s var(--easing); }
+    .indp-faq[open] .indp-faq-chev { transform: rotate(180deg); }
+    .indp-faq > p {
+      padding: 0 0 20px;
+      color: var(--ink-soft);
+      font-size: 0.97rem;
+      line-height: 1.75;
+      max-width: 70ch;
+    }
+  </style>
+
+  <script src="/js/landing.js" defer></script>
+</body>
+</html>

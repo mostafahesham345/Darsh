@@ -36,6 +36,10 @@
 %>
 <head>
   <meta charset="utf-8" />
+  <%# Mirrors index.ejs. public/css/landing.css scopes the scroll-reveal hidden
+      state to `.js`, so content stays visible when scripts don't run; pages that
+      share that stylesheet need this to keep the reveal animation. %>
+  <script>document.documentElement.classList.add('js');</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a1f44" />
   <title><%= pageTitle %></title>

@@ -2,11 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <script>document.documentElement.classList.add('js');</script>
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0a1f44" />
   <title><%= content.meta.fields.title %></title>
   <meta name="description" content="<%= content.meta.fields.description %>" />
-  <link rel="icon" type="image/png" href="<%= content.meta.images.favicon.url %>" />
+  <%
+    var faviconUrl = (content.meta.images.favicon && content.meta.images.favicon.url) || '/images/favicon-32.png';
+    var faviconType = /\.svg$/i.test(faviconUrl) ? 'image/svg+xml'
+      : /\.webp$/i.test(faviconUrl) ? 'image/webp'
+      : /\.ico$/i.test(faviconUrl) ? 'image/x-icon'
+      : 'image/png';
+  %>
+  <link rel="icon" type="<%= faviconType %>" href="<%= faviconUrl %>" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png" />
 
   <%
     // Absolute URLs for sharing / SEO. BASE_URL is per-environment (a LAN IP in
@@ -21,7 +30,11 @@
     }
     var pageUrl = baseUrl + '/';
     var brandName = process.env.BUSINESS_NAME || content.footer.fields.brandName || 'Darsh';
-    var shareImagePath = process.env.BUSINESS_LOGO_URL || content.meta.images.favicon.url || '/images/Logo.png';
+    // Deliberately NOT the favicon: that is now a real 32x32 icon, and a 32px
+    // og:image is below every scraper's minimum, so the card would render with
+    // no image at all. `meta.images.shareImage` is the dedicated 500×500 asset.
+    var shareImageEntry = (content.meta.images && content.meta.images.shareImage) || null;
+    var shareImagePath = process.env.BUSINESS_LOGO_URL || (shareImageEntry && shareImageEntry.url) || '/images/Logo.png';
     var shareImage = absUrl(shareImagePath);
     // Only the bundled logo has known intrinsic dimensions (500×500).
     var shareImageIsLogo = /\/Logo\.png$/i.test(shareImagePath);
@@ -201,7 +214,8 @@
         <% (content.hero.kpis || []).forEach(function(kpi, idx) { %>
           <% if (idx > 0) { %><div class="kpi-sep"></div><% } %>
           <div class="kpi">
-            <div class="kpi-value" data-count="<%= kpi.value %>"<% if (kpi.suffix) { %> data-suffix="<%= kpi.suffix %>"<% } %>>0</div>
+            <%# Rendered at its final value so the number is real with JS off; landing.js overwrites it on the first animation frame and counts up from 0. %>
+            <div class="kpi-value" data-count="<%= kpi.value %>"<% if (kpi.suffix) { %> data-suffix="<%= kpi.suffix %>"<% } %>><%= kpi.value %><%= kpi.suffix || '' %></div>
             <div class="kpi-label"><%= kpi.label %></div>
           </div>
         <% }); %>
@@ -212,10 +226,10 @@
         <span class="hero-brands__label"><%= (content.brands.fields && content.brands.fields.title) || 'Trusted by' %></span>
         <div class="hero-brands__marquee">
           <div class="hero-brands__group">
-            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="<%= b.name ? b.name + ' logo' : '' %>" loading="lazy" decoding="async" /></span><% }); %>
+            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="<%= b.name ? b.name + ' logo' : '' %>" width="<%= b.image.width || 156 %>" height="<%= b.image.height || 92 %>" loading="lazy" decoding="async" /></span><% }); %>
           </div>
           <div class="hero-brands__group" aria-hidden="true">
-            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="" loading="lazy" decoding="async" /></span><% }); %>
+            <% brandLogos.forEach(function(b) { %><span class="hero-brand"><img src="<%= b.image.url %>" alt="" width="<%= b.image.width || 156 %>" height="<%= b.image.height || 92 %>" loading="lazy" decoding="async" /></span><% }); %>
           </div>
         </div>
       </div>
@@ -324,14 +338,63 @@
           function displayUrl(u) {
             try { return new URL(normalizeUrl(u)).host; } catch (_) { return (u || '').replace(/^https?:\/\//, ''); }
           }
+          /*
+           * Last-resort preview for a card an editor added without uploading a
+           * screenshot: Microlink renders the page headlessly and redirects to
+           * the image.
+           *
+           * This used to be the path EVERY card took, because no card carried an
+           * image.url — so one page load fired a headless render per card (seven
+           * on the live CMS) at a rate-limited third party. Measured cold, a
+           * single one of those took 4.9s and returned a 1.8MB PNG.
+           * Every card we ship now resolves to a locally captured WebP
+           * (public/images/work-*.webp, ~46KB each), so this only runs for a card
+           * nobody has captured yet.
+           */
           function shotUrl(u) {
             const full = normalizeUrl(u);
             if (!full) return '/images/placeholder.svg';
             return 'https://api.microlink.io/?url=' + encodeURIComponent(full) + '&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1280&viewport.height=800';
           }
+          /*
+           * Locally captured 1280x800 WebP screenshots, keyed by bare hostname.
+           *
+           * lib/defaults.js carries the same paths on its own cards, but the CMS
+           * replaces the whole `work` section when a Firestore doc exists — so on
+           * the live site the defaults are never read and every card arrives with
+           * image.url === ''. This map is what actually keeps production off
+           * Microlink. An uploaded image on the card still wins; drop an entry
+           * here once its card has a real upload, and re-capture when a client
+           * redesigns.
+           */
+          var LOCAL_SHOTS = {
+            'bigbirdzhotchicken.com': '/images/work-bigbirdz.webp',
+            'najah7.com': '/images/work-najah7.webp',
+            'yafagoldencoffeeusa.com': '/images/work-yafa.webp',
+            'infinitecomfortllc.com': '/images/work-infinite.webp',
+            'yasin-studios.com': '/images/work-yasin.webp',
+            'ingeniumpros.com': '/images/work-ingeniumpros.webp',
+            'bilisanqawmihi.onrender.com': '/images/work-bilisan.webp',
+          };
+          function hostKey(u) {
+            try { return new URL(normalizeUrl(u)).host.replace(/^www\./i, '').toLowerCase(); }
+            catch (_) { return ''; }
+          }
           function previewUrl(card) {
             if (card && card.image && card.image.url) return card.image.url;
+            var local = LOCAL_SHOTS[hostKey(card && card.url)];
+            if (local) return local;
             return shotUrl(card && card.url);
+          }
+          // The frame is a fixed 16/10 box, so 1280x800 is both the capture size
+          // and the aspect ratio the browser should reserve before the bytes
+          // arrive — including for the Microlink fallback, which requests that
+          // same viewport.
+          function previewW(card) {
+            return (card && card.image && card.image.width) || 1280;
+          }
+          function previewH(card) {
+            return (card && card.image && card.image.height) || 800;
           }
         %>
         <% (content.work.cards || []).forEach(function(card, idx) { %>
@@ -342,7 +405,7 @@
                 <span class="work-frame-url"><%= displayUrl(card.url) %></span>
               </div>
               <div class="work-frame-shot">
-                <img src="<%= previewUrl(card) %>" alt="Screenshot of the <%= card.title %> website built by <%= brandName %>" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('shot-error')" />
+                <img src="<%= previewUrl(card) %>" alt="Screenshot of the <%= card.title %> website built by <%= brandName %>" width="<%= previewW(card) %>" height="<%= previewH(card) %>" loading="lazy" decoding="async" onerror="this.parentElement.classList.add('shot-error')" />
                 <div class="work-shot-fallback">preview unavailable</div>
               </div>
               <div class="work-overlay">
