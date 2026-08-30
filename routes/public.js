@@ -310,8 +310,8 @@ router.get('/services/:slug', async (req, res, next) => {
  * is 276 pages of near-identical copy — a doorway network, and a site-wide
  * quality risk rather than a per-page one. One hub per vertical, linking out to
  * the real service pages, is the entire design. See the header comment in
- * lib/industries-data.js for the rest of the reasoning, including why exactly
- * one vertical is published today.
+ * lib/industries-data.js for the rest of the reasoning, including why only a
+ * handful of verticals are published today.
  *
  * Both routes render views/industry.ejs — one template, two modes, the same
  * arrangement views/service.ejs uses.
