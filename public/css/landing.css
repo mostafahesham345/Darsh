@@ -27,6 +27,14 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+
+/* The nav is position:fixed and settles at 72px tall (.nav.scrolled max-height),
+   so an anchor target scrolled flush to the viewport top lands *underneath* it —
+   the heading you jumped to is hidden and the jump reads as "went nowhere".
+   scroll-padding-top offsets every in-page anchor by the nav height plus a little
+   breathing room. Set on <html> so it applies to the scrolling element itself and
+   therefore covers every #anchor on the site, not just the ones listed here. */
+html { scroll-padding-top: 88px; }
 body {
   margin: 0;
   font-family: "Inter", system-ui, -apple-system, sans-serif;
